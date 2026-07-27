@@ -17,10 +17,10 @@
     {
       "id": "EP-002",
       "title": "Trusted workload and measurement protocol",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "stories_total": 4,
-      "stories_done": 0
+      "stories_done": 4
     },
     {
       "id": "EP-003",
@@ -98,58 +98,58 @@
       "id": "US-005",
       "title": "Validate assumption: measurement-v1 controls false promotion",
       "epic": "EP-002",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "size": "L",
       "blocked_by": [
         "US-004"
       ],
-      "started_at": null,
-      "completed_at": null,
-      "reviewed_at": null
+      "started_at": "2026-07-27T22:44:31+02:00",
+      "completed_at": "2026-07-27T23:02:06+02:00",
+      "reviewed_at": "2026-07-27T23:02:06+02:00"
     },
     {
       "id": "US-006",
       "title": "Execute a workload without a shell",
       "epic": "EP-002",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "size": "M",
       "blocked_by": [
         "US-004"
       ],
-      "started_at": null,
-      "completed_at": null,
-      "reviewed_at": null
+      "started_at": "2026-07-27T22:44:31+02:00",
+      "completed_at": "2026-07-27T23:02:06+02:00",
+      "reviewed_at": "2026-07-27T23:02:06+02:00"
     },
     {
       "id": "US-007",
       "title": "Sample workloads and compute measurement-v1",
       "epic": "EP-002",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "size": "L",
       "blocked_by": [
         "US-005",
         "US-006"
       ],
-      "started_at": null,
-      "completed_at": null,
-      "reviewed_at": null
+      "started_at": "2026-07-27T22:44:31+02:00",
+      "completed_at": "2026-07-27T23:02:06+02:00",
+      "reviewed_at": "2026-07-27T23:02:06+02:00"
     },
     {
       "id": "US-008",
       "title": "Terminate interrupted or bounded workload trees",
       "epic": "EP-002",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "size": "M",
       "blocked_by": [
         "US-006"
       ],
-      "started_at": null,
-      "completed_at": null,
-      "reviewed_at": null
+      "started_at": "2026-07-27T22:44:31+02:00",
+      "completed_at": "2026-07-27T23:02:06+02:00",
+      "reviewed_at": "2026-07-27T23:02:06+02:00"
     },
     {
       "id": "US-009",

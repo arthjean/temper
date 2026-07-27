@@ -3,7 +3,7 @@
     "file": "tasks/prd-temper-v0.0.1.md",
     "title": "Temper v0.0.1",
     "created_at": "2026-07-27",
-    "status": "IN_PROGRESS"
+    "status": "DONE"
   },
   "epics": [
     {
@@ -33,10 +33,10 @@
     {
       "id": "EP-004",
       "title": "Confirmation, artifact promotion and evidence",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "stories_total": 4,
-      "stories_done": 0
+      "stories_done": 4
     }
   ],
   "stories": [
@@ -215,50 +215,50 @@
       "id": "US-013",
       "title": "Confirm the selected candidate against a fresh baseline",
       "epic": "EP-004",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "size": "L",
       "blocked_by": [
         "US-012"
       ],
-      "started_at": null,
-      "completed_at": null,
-      "reviewed_at": null
+      "started_at": "2026-07-27T23:36:34+02:00",
+      "completed_at": "2026-07-28T00:02:08+02:00",
+      "reviewed_at": "2026-07-28T00:02:08+02:00"
     },
     {
       "id": "US-014",
       "title": "Promote one artifact atomically",
       "epic": "EP-004",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "size": "M",
       "blocked_by": [
         "US-013"
       ],
-      "started_at": null,
-      "completed_at": null,
-      "reviewed_at": null
+      "started_at": "2026-07-27T23:43:29+02:00",
+      "completed_at": "2026-07-28T00:02:08+02:00",
+      "reviewed_at": "2026-07-28T00:02:08+02:00"
     },
     {
       "id": "US-015",
       "title": "Emit human and machine-readable reports",
       "epic": "EP-004",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "size": "M",
       "blocked_by": [
         "US-004",
         "US-007"
       ],
-      "started_at": null,
-      "completed_at": null,
-      "reviewed_at": null
+      "started_at": "2026-07-27T23:36:34+02:00",
+      "completed_at": "2026-07-28T00:02:08+02:00",
+      "reviewed_at": "2026-07-28T00:02:08+02:00"
     },
     {
       "id": "US-016",
       "title": "Prove the v0.0.1 flow with end-to-end fixtures",
       "epic": "EP-004",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "size": "L",
       "blocked_by": [
@@ -267,9 +267,9 @@
         "US-014",
         "US-015"
       ],
-      "started_at": null,
-      "completed_at": null,
-      "reviewed_at": null
+      "started_at": "2026-07-27T23:45:39+02:00",
+      "completed_at": "2026-07-28T00:02:08+02:00",
+      "reviewed_at": "2026-07-28T00:02:08+02:00"
     }
   ]
 }

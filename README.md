@@ -1,3 +1,3 @@
 # Temper
 
-Temper rend les logiciels Rust plus rapides.
+Temper makes Rust software faster.

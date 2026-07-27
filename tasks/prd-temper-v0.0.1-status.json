@@ -1,0 +1,275 @@
+{
+  "prd": {
+    "file": "tasks/prd-temper-v0.0.1.md",
+    "title": "Temper v0.0.1",
+    "created_at": "2026-07-27",
+    "status": "IN_PROGRESS"
+  },
+  "epics": [
+    {
+      "id": "EP-001",
+      "title": "Experimental CLI and Cargo boundary",
+      "status": "DONE",
+      "priority": "P0",
+      "stories_total": 4,
+      "stories_done": 4
+    },
+    {
+      "id": "EP-002",
+      "title": "Trusted workload and measurement protocol",
+      "status": "TODO",
+      "priority": "P0",
+      "stories_total": 4,
+      "stories_done": 0
+    },
+    {
+      "id": "EP-003",
+      "title": "Bounded strategy search and LLVM PGO",
+      "status": "TODO",
+      "priority": "P0",
+      "stories_total": 4,
+      "stories_done": 0
+    },
+    {
+      "id": "EP-004",
+      "title": "Confirmation, artifact promotion and evidence",
+      "status": "TODO",
+      "priority": "P0",
+      "stories_total": 4,
+      "stories_done": 0
+    }
+  ],
+  "stories": [
+    {
+      "id": "US-001",
+      "title": "Scaffold the v0.0.1 binary and CLI contract",
+      "epic": "EP-001",
+      "status": "DONE",
+      "priority": "P0",
+      "size": "M",
+      "blocked_by": [],
+      "started_at": "2026-07-27T22:18:47+02:00",
+      "completed_at": "2026-07-27T22:31:53+02:00",
+      "reviewed_at": "2026-07-27T22:31:53+02:00"
+    },
+    {
+      "id": "US-002",
+      "title": "Run deterministic preflight diagnostics",
+      "epic": "EP-001",
+      "status": "DONE",
+      "priority": "P0",
+      "size": "M",
+      "blocked_by": [
+        "US-001"
+      ],
+      "started_at": "2026-07-27T22:18:47+02:00",
+      "completed_at": "2026-07-27T22:31:53+02:00",
+      "reviewed_at": "2026-07-27T22:31:53+02:00"
+    },
+    {
+      "id": "US-003",
+      "title": "Resolve one workspace binary through Cargo metadata",
+      "epic": "EP-001",
+      "status": "DONE",
+      "priority": "P0",
+      "size": "M",
+      "blocked_by": [
+        "US-002"
+      ],
+      "started_at": "2026-07-27T22:18:47+02:00",
+      "completed_at": "2026-07-27T22:31:53+02:00",
+      "reviewed_at": "2026-07-27T22:31:53+02:00"
+    },
+    {
+      "id": "US-004",
+      "title": "Build and identify an isolated release baseline",
+      "epic": "EP-001",
+      "status": "DONE",
+      "priority": "P0",
+      "size": "L",
+      "blocked_by": [
+        "US-003"
+      ],
+      "started_at": "2026-07-27T22:18:47+02:00",
+      "completed_at": "2026-07-27T22:31:53+02:00",
+      "reviewed_at": "2026-07-27T22:31:53+02:00"
+    },
+    {
+      "id": "US-005",
+      "title": "Validate assumption: measurement-v1 controls false promotion",
+      "epic": "EP-002",
+      "status": "TODO",
+      "priority": "P0",
+      "size": "L",
+      "blocked_by": [
+        "US-004"
+      ],
+      "started_at": null,
+      "completed_at": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "US-006",
+      "title": "Execute a workload without a shell",
+      "epic": "EP-002",
+      "status": "TODO",
+      "priority": "P0",
+      "size": "M",
+      "blocked_by": [
+        "US-004"
+      ],
+      "started_at": null,
+      "completed_at": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "US-007",
+      "title": "Sample workloads and compute measurement-v1",
+      "epic": "EP-002",
+      "status": "TODO",
+      "priority": "P0",
+      "size": "L",
+      "blocked_by": [
+        "US-005",
+        "US-006"
+      ],
+      "started_at": null,
+      "completed_at": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "US-008",
+      "title": "Terminate interrupted or bounded workload trees",
+      "epic": "EP-002",
+      "status": "TODO",
+      "priority": "P0",
+      "size": "M",
+      "blocked_by": [
+        "US-006"
+      ],
+      "started_at": null,
+      "completed_at": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "US-009",
+      "title": "Build the fixed static strategy set",
+      "epic": "EP-003",
+      "status": "TODO",
+      "priority": "P0",
+      "size": "M",
+      "blocked_by": [
+        "US-004"
+      ],
+      "started_at": null,
+      "completed_at": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "US-010",
+      "title": "Prove PGO prerequisites and build instrumentation",
+      "epic": "EP-003",
+      "status": "TODO",
+      "priority": "P0",
+      "size": "L",
+      "blocked_by": [
+        "US-002",
+        "US-009"
+      ],
+      "started_at": null,
+      "completed_at": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "US-011",
+      "title": "Train, merge and rebuild the PGO candidate",
+      "epic": "EP-003",
+      "status": "TODO",
+      "priority": "P0",
+      "size": "L",
+      "blocked_by": [
+        "US-006",
+        "US-010"
+      ],
+      "started_at": null,
+      "completed_at": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "US-012",
+      "title": "Orchestrate the complete bounded search",
+      "epic": "EP-003",
+      "status": "TODO",
+      "priority": "P0",
+      "size": "L",
+      "blocked_by": [
+        "US-007",
+        "US-009",
+        "US-011"
+      ],
+      "started_at": null,
+      "completed_at": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "US-013",
+      "title": "Confirm the selected candidate against a fresh baseline",
+      "epic": "EP-004",
+      "status": "TODO",
+      "priority": "P0",
+      "size": "L",
+      "blocked_by": [
+        "US-012"
+      ],
+      "started_at": null,
+      "completed_at": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "US-014",
+      "title": "Promote one artifact atomically",
+      "epic": "EP-004",
+      "status": "TODO",
+      "priority": "P0",
+      "size": "M",
+      "blocked_by": [
+        "US-013"
+      ],
+      "started_at": null,
+      "completed_at": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "US-015",
+      "title": "Emit human and machine-readable reports",
+      "epic": "EP-004",
+      "status": "TODO",
+      "priority": "P0",
+      "size": "M",
+      "blocked_by": [
+        "US-004",
+        "US-007"
+      ],
+      "started_at": null,
+      "completed_at": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "US-016",
+      "title": "Prove the v0.0.1 flow with end-to-end fixtures",
+      "epic": "EP-004",
+      "status": "TODO",
+      "priority": "P0",
+      "size": "L",
+      "blocked_by": [
+        "US-008",
+        "US-013",
+        "US-014",
+        "US-015"
+      ],
+      "started_at": null,
+      "completed_at": null,
+      "reviewed_at": null
+    }
+  ]
+}

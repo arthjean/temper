@@ -25,10 +25,10 @@
     {
       "id": "EP-003",
       "title": "Bounded strategy search and LLVM PGO",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "stories_total": 4,
-      "stories_done": 0
+      "stories_done": 4
     },
     {
       "id": "EP-004",
@@ -155,51 +155,51 @@
       "id": "US-009",
       "title": "Build the fixed static strategy set",
       "epic": "EP-003",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "size": "M",
       "blocked_by": [
         "US-004"
       ],
-      "started_at": null,
-      "completed_at": null,
-      "reviewed_at": null
+      "started_at": "2026-07-27T23:09:10+02:00",
+      "completed_at": "2026-07-27T23:29:48+02:00",
+      "reviewed_at": "2026-07-27T23:29:48+02:00"
     },
     {
       "id": "US-010",
       "title": "Prove PGO prerequisites and build instrumentation",
       "epic": "EP-003",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "size": "L",
       "blocked_by": [
         "US-002",
         "US-009"
       ],
-      "started_at": null,
-      "completed_at": null,
-      "reviewed_at": null
+      "started_at": "2026-07-27T23:09:10+02:00",
+      "completed_at": "2026-07-27T23:29:48+02:00",
+      "reviewed_at": "2026-07-27T23:29:48+02:00"
     },
     {
       "id": "US-011",
       "title": "Train, merge and rebuild the PGO candidate",
       "epic": "EP-003",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "size": "L",
       "blocked_by": [
         "US-006",
         "US-010"
       ],
-      "started_at": null,
-      "completed_at": null,
-      "reviewed_at": null
+      "started_at": "2026-07-27T23:09:10+02:00",
+      "completed_at": "2026-07-27T23:29:48+02:00",
+      "reviewed_at": "2026-07-27T23:29:48+02:00"
     },
     {
       "id": "US-012",
       "title": "Orchestrate the complete bounded search",
       "epic": "EP-003",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "size": "L",
       "blocked_by": [
@@ -207,9 +207,9 @@
         "US-009",
         "US-011"
       ],
-      "started_at": null,
-      "completed_at": null,
-      "reviewed_at": null
+      "started_at": "2026-07-27T23:09:10+02:00",
+      "completed_at": "2026-07-27T23:29:48+02:00",
+      "reviewed_at": "2026-07-27T23:29:48+02:00"
     },
     {
       "id": "US-013",

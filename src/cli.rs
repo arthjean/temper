@@ -69,6 +69,10 @@ pub(crate) struct OptimizeArgs {
     #[arg(long)]
     pub(crate) allow_dirty: bool,
 
+    /// Emit exactly one schema-v1 JSON report on stdout.
+    #[arg(long)]
+    pub(crate) json: bool,
+
     /// Workload executable followed by literal arguments. It is never run through a shell.
     #[arg(last = true, num_args = 0.., value_name = "WORKLOAD")]
     pub(crate) workload: Vec<OsString>,

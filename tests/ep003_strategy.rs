@@ -16,9 +16,12 @@ fn builds_screens_and_records_the_fixed_strategy_order() {
     assert!(output.status.success(), "{}", stderr(&output));
 
     let manifest = fixture.manifest();
-    assert_eq!(manifest["status"], "confirmation");
+    assert_ne!(manifest["final_decision"], "pending");
+    let completed_phases = manifest["completed_phases"]
+        .as_array()
+        .expect("completed phases");
     assert_eq!(
-        manifest["completed_phases"],
+        &completed_phases[..7],
         serde_json::json!([
             "preflight",
             "baseline_build",
@@ -28,7 +31,10 @@ fn builds_screens_and_records_the_fixed_strategy_order() {
             "pgo_build",
             "candidate_selection"
         ])
+        .as_array()
+        .expect("expected phases")
     );
+    assert!(completed_phases.iter().any(|phase| phase == "confirmation"));
     assert_eq!(manifest["baseline"]["strategy"], "baseline");
     assert_eq!(manifest["baseline"]["outcome"], "built");
     assert_eq!(
@@ -165,7 +171,7 @@ fn a_static_build_failure_does_not_stop_remaining_strategies() {
         manifest["pgo_training"]["instrumentation_failure"]["outcome"],
         "failed"
     );
-    assert_eq!(manifest["status"], "confirmation");
+    assert_ne!(manifest["final_decision"], "pending");
 }
 
 #[test]

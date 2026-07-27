@@ -23,6 +23,7 @@ fn help_documents_the_experimental_cli_contract() {
         "--minimum-improvement",
         "--timeout",
         "--allow-dirty",
+        "--json",
         "-- <WORKLOAD>...",
         "experimental",
     ] {

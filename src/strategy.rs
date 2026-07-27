@@ -57,6 +57,7 @@ pub(crate) enum BuildStage {
     StaticCandidate,
     PgoInstrumentation,
     PgoOptimized,
+    Confirmation,
 }
 
 #[derive(Debug)]
@@ -83,6 +84,21 @@ impl BuildPlan {
             stage,
             target_directory: target_root.join(strategy.canonical_identity()),
             cargo_config_overrides: strategy.profile_overrides(),
+        }
+    }
+
+    pub(crate) fn confirmation(
+        strategy: Strategy,
+        target_root: &Path,
+        cargo_config_overrides: Vec<String>,
+    ) -> Self {
+        Self {
+            strategy,
+            stage: BuildStage::Confirmation,
+            target_directory: target_root
+                .join("confirmation")
+                .join(strategy.canonical_identity()),
+            cargo_config_overrides,
         }
     }
 
@@ -868,6 +884,21 @@ mod tests {
                 "profile.release.lto=\"fat\"",
                 "profile.release.codegen-units=1"
             ]
+        );
+
+        let confirmation = BuildPlan::confirmation(
+            Strategy::FatLtoCgu1,
+            root,
+            fat.cargo_config_overrides.clone(),
+        );
+        assert_eq!(
+            confirmation.target_directory,
+            root.join("confirmation/fat-lto-cgu1")
+        );
+        assert!(matches!(confirmation.stage, BuildStage::Confirmation));
+        assert_eq!(
+            confirmation.cargo_config_overrides,
+            fat.cargo_config_overrides
         );
     }
 

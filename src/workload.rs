@@ -45,6 +45,19 @@ pub(crate) struct WorkloadFailure {
     pub(crate) diagnostics_truncated: bool,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum ConfirmationStep {
+    Baseline,
+    Candidate,
+    Measurement,
+}
+
+#[derive(Debug)]
+pub(crate) struct ConfirmationFailure {
+    pub(crate) step: ConfirmationStep,
+    pub(crate) failure: WorkloadFailure,
+}
+
 impl WorkloadFailure {
     fn new(kind: WorkloadFailureKind, message: impl Into<String>) -> Self {
         Self {
@@ -274,22 +287,49 @@ impl WorkloadSpec {
         measurement::screening(&samples).map_err(WorkloadFailure::measurement)
     }
 
-    #[allow(dead_code)]
     pub(crate) fn confirm(
         &self,
         baseline: &Path,
         candidate: &Path,
         minimum_improvement_percent: f64,
-    ) -> Result<ConfirmationResult, WorkloadFailure> {
+    ) -> Result<ConfirmationResult, ConfirmationFailure> {
         let mut baseline_samples = Vec::with_capacity(CONFIRMATION_PAIR_COUNT);
         let mut candidate_samples = Vec::with_capacity(CONFIRMATION_PAIR_COUNT);
         for pair_index in 0..CONFIRMATION_PAIR_COUNT {
             if pair_index % 2 == 0 {
-                baseline_samples.push(self.invoke(baseline)?.duration_ns);
-                candidate_samples.push(self.invoke(candidate)?.duration_ns);
+                baseline_samples.push(
+                    self.invoke(baseline)
+                        .map_err(|failure| ConfirmationFailure {
+                            step: ConfirmationStep::Baseline,
+                            failure,
+                        })?
+                        .duration_ns,
+                );
+                candidate_samples.push(
+                    self.invoke(candidate)
+                        .map_err(|failure| ConfirmationFailure {
+                            step: ConfirmationStep::Candidate,
+                            failure,
+                        })?
+                        .duration_ns,
+                );
             } else {
-                candidate_samples.push(self.invoke(candidate)?.duration_ns);
-                baseline_samples.push(self.invoke(baseline)?.duration_ns);
+                candidate_samples.push(
+                    self.invoke(candidate)
+                        .map_err(|failure| ConfirmationFailure {
+                            step: ConfirmationStep::Candidate,
+                            failure,
+                        })?
+                        .duration_ns,
+                );
+                baseline_samples.push(
+                    self.invoke(baseline)
+                        .map_err(|failure| ConfirmationFailure {
+                            step: ConfirmationStep::Baseline,
+                            failure,
+                        })?
+                        .duration_ns,
+                );
             }
         }
         measurement::confirmation(
@@ -299,6 +339,10 @@ impl WorkloadSpec {
             BOOTSTRAP_SEED,
         )
         .map_err(WorkloadFailure::measurement)
+        .map_err(|failure| ConfirmationFailure {
+            step: ConfirmationStep::Measurement,
+            failure,
+        })
     }
 }
 
@@ -319,6 +363,10 @@ pub(crate) fn install_interrupt_handler() -> TemperResult<()> {
     } else {
         Ok(())
     }
+}
+
+pub(crate) fn interrupted() -> bool {
+    INTERRUPTED.load(Ordering::SeqCst)
 }
 
 extern "C" fn record_interrupt(_signal: libc::c_int) {

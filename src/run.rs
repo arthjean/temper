@@ -1,5 +1,6 @@
 use std::fs::{self, File, OpenOptions};
 use std::io::{BufWriter, Write};
+use std::os::unix::fs::OpenOptionsExt;
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -8,7 +9,9 @@ use serde::Serialize;
 use crate::cargo::{BaselineRecord, BuildFailure, TargetSelection};
 use crate::cli::OptimizeArgs;
 use crate::error::{Result, TemperError};
+use crate::measurement::ScreeningResult;
 use crate::preflight::{Preflight, SourceReproducibility};
+use crate::workload::{WorkloadFailure, WorkloadFailureKind};
 
 const SCHEMA_VERSION: u8 = 1;
 
@@ -17,6 +20,9 @@ const SCHEMA_VERSION: u8 = 1;
 enum RunStatus {
     BuildingBaseline,
     BaselineReady,
+    MeasuringBaseline,
+    BaselineMeasured,
+    Interrupted,
     Failed,
 }
 
@@ -30,6 +36,7 @@ struct RequestRecord {
 #[derive(Debug, Serialize)]
 struct FailureRecord {
     phase: &'static str,
+    outcome: Option<WorkloadFailureKind>,
     message: String,
     bounded_diagnostics: String,
     diagnostics_truncated: bool,
@@ -48,6 +55,7 @@ struct RunManifest {
     preflight: crate::preflight::PreflightRecord,
     target: TargetSelection,
     baseline: Option<BaselineRecord>,
+    baseline_measurement: Option<ScreeningResult>,
     failure: Option<FailureRecord>,
 }
 
@@ -100,6 +108,7 @@ impl Run {
                 preflight: preflight.record,
                 target: selection,
                 baseline: None,
+                baseline_measurement: None,
                 failure: None,
             },
         };
@@ -125,6 +134,37 @@ impl Run {
         self.manifest.status = RunStatus::Failed;
         self.manifest.failure = Some(FailureRecord {
             phase: "baseline_build",
+            outcome: None,
+            message: failure.message.clone(),
+            bounded_diagnostics: failure.bounded_diagnostics.clone(),
+            diagnostics_truncated: failure.diagnostics_truncated,
+        });
+        self.persist()
+    }
+
+    pub(crate) fn begin_baseline_measurement(&mut self) -> Result<()> {
+        self.manifest.status = RunStatus::MeasuringBaseline;
+        self.persist()
+    }
+
+    pub(crate) fn complete_baseline_measurement(
+        &mut self,
+        measurement: ScreeningResult,
+    ) -> Result<()> {
+        self.manifest.baseline_measurement = Some(measurement);
+        self.manifest.status = RunStatus::BaselineMeasured;
+        self.persist()
+    }
+
+    pub(crate) fn fail_workload(&mut self, failure: &WorkloadFailure) -> Result<()> {
+        self.manifest.status = if failure.kind == WorkloadFailureKind::Interrupted {
+            RunStatus::Interrupted
+        } else {
+            RunStatus::Failed
+        };
+        self.manifest.failure = Some(FailureRecord {
+            phase: "baseline_measurement",
+            outcome: Some(failure.kind),
             message: failure.message.clone(),
             bounded_diagnostics: failure.bounded_diagnostics.clone(),
             diagnostics_truncated: failure.diagnostics_truncated,
@@ -161,6 +201,7 @@ fn write_json_atomic(path: &Path, value: &impl Serialize) -> Result<()> {
     let file = OpenOptions::new()
         .write(true)
         .create_new(true)
+        .mode(0o600)
         .open(&temporary_path)
         .map_err(|error| {
             TemperError::new(format!(

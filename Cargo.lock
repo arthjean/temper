@@ -390,6 +390,7 @@ version = "0.0.1"
 dependencies = [
  "cargo_metadata",
  "clap",
+ "libc",
  "serde",
  "serde_json",
  "sha2",

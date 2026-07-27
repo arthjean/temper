@@ -19,7 +19,7 @@ fn builds_and_records_a_single_clean_baseline_without_source_mutation() {
     let manifest = fixture.manifest();
     assert_eq!(manifest["schema_version"], 1);
     assert_eq!(manifest["experimental"], true);
-    assert_eq!(manifest["status"], "baseline_ready");
+    assert_eq!(manifest["status"], "baseline_measured");
     assert_eq!(manifest["source_reproducibility"], "clean");
     assert_eq!(manifest["target"]["package_name"], "single-fixture");
     assert_eq!(manifest["target"]["binary_name"], "single-fixture");
@@ -57,6 +57,12 @@ fn builds_and_records_a_single_clean_baseline_without_source_mutation() {
     );
     assert!(executable.starts_with(fixture.root.join(".temper/runs")));
     assert!(manifest["baseline"]["bounded_diagnostics"].is_string());
+    assert_eq!(
+        manifest["baseline_measurement"]["sample_durations_ns"]
+            .as_array()
+            .map(Vec::len),
+        Some(7)
+    );
 
     let status = Command::new("git")
         .current_dir(&fixture.root)

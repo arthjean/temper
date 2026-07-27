@@ -1,4 +1,4 @@
-use std::ffi::OsString;
+use std::ffi::{OsStr, OsString};
 use std::fmt;
 use std::io::{self, Read};
 use std::os::unix::process::CommandExt;
@@ -75,6 +75,15 @@ impl WorkloadFailure {
             format!("measurement-v1 rejected the sample set: {error}"),
         )
     }
+
+    pub(crate) fn unstable_baseline(relative_mad: f64) -> Self {
+        Self::new(
+            WorkloadFailureKind::MeasurementFailed,
+            format!(
+                "Baseline screening was unstable (relative MAD {relative_mad:.6}); no candidate can be compared safely."
+            ),
+        )
+    }
 }
 
 impl fmt::Display for WorkloadFailure {
@@ -139,12 +148,21 @@ impl WorkloadSpec {
     }
 
     pub(crate) fn invoke(&self, candidate: &Path) -> Result<InvocationResult, WorkloadFailure> {
+        self.invoke_with_environment(candidate, &[])
+    }
+
+    pub(crate) fn invoke_with_environment(
+        &self,
+        candidate: &Path,
+        environment: &[(&str, &OsStr)],
+    ) -> Result<InvocationResult, WorkloadFailure> {
         let candidate = canonical_candidate(candidate)?;
         let started = Instant::now();
         let mut child = Command::new(&self.executable)
             .args(&self.arguments)
             .current_dir(&self.workspace_root)
             .env("TEMPER_BINARY", &candidate)
+            .envs(environment.iter().copied())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
             .process_group(0)

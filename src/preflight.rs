@@ -89,7 +89,7 @@ pub(crate) fn cargo_program() -> OsString {
     std::env::var_os("CARGO").unwrap_or_else(|| OsString::from("cargo"))
 }
 
-fn rustc_program() -> OsString {
+pub(crate) fn rustc_program() -> OsString {
     std::env::var_os("RUSTC").unwrap_or_else(|| OsString::from("rustc"))
 }
 

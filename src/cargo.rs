@@ -1,6 +1,7 @@
 use std::collections::HashSet;
+use std::ffi::OsString;
 use std::io::{BufReader, Read};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::thread;
 use std::time::Instant;
@@ -12,6 +13,7 @@ use crate::cli::OptimizeArgs;
 use crate::error::{Result, TemperError};
 use crate::hash::sha256_file;
 use crate::preflight::{Preflight, SUPPORTED_HOST, cargo_program};
+use crate::strategy::{BuildPlan, BuildStage, Strategy};
 
 const DIAGNOSTIC_LIMIT: usize = 64 * 1024;
 
@@ -23,8 +25,27 @@ pub(crate) struct TargetSelection {
     pub(crate) workspace_root: PathBuf,
 }
 
+#[derive(Clone, Copy, Debug, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub(crate) enum BuildOutcome {
+    Built,
+    Failed,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub(crate) struct BuildInvocation {
+    pub(crate) strategy: Strategy,
+    pub(crate) stage: BuildStage,
+    pub(crate) target_directory: PathBuf,
+    pub(crate) cargo_arguments: Vec<String>,
+    pub(crate) cargo_config_overrides: Vec<String>,
+}
+
 #[derive(Debug, Serialize)]
-pub(crate) struct BaselineRecord {
+pub(crate) struct BuildRecord {
+    #[serde(flatten)]
+    pub(crate) invocation: BuildInvocation,
+    pub(crate) outcome: BuildOutcome,
     pub(crate) executable_path: PathBuf,
     pub(crate) sha256: String,
     pub(crate) size_bytes: u64,
@@ -33,7 +54,12 @@ pub(crate) struct BaselineRecord {
     pub(crate) diagnostics_truncated: bool,
 }
 
+#[derive(Debug, Serialize)]
 pub(crate) struct BuildFailure {
+    #[serde(flatten)]
+    pub(crate) invocation: Box<BuildInvocation>,
+    pub(crate) outcome: BuildOutcome,
+    pub(crate) build_duration_ms: u128,
     pub(crate) message: String,
     pub(crate) bounded_diagnostics: String,
     pub(crate) diagnostics_truncated: bool,
@@ -160,33 +186,35 @@ fn selection_error(message: &str, metadata: &Metadata) -> TemperError {
     ))
 }
 
-pub(crate) fn build_baseline(
+pub(crate) fn build(
     selection: &TargetSelection,
-    target_directory: &Path,
-) -> std::result::Result<BaselineRecord, BuildFailure> {
+    plan: &BuildPlan,
+) -> std::result::Result<BuildRecord, BuildFailure> {
+    let (arguments, invocation) = build_invocation(selection, plan);
     let started = Instant::now();
     let mut child = Command::new(cargo_program())
-        .args(["build", "--release", "--locked", "--target", SUPPORTED_HOST])
-        .args(["--message-format=json", "--package"])
-        .arg(&selection.package_name)
-        .args(["--bin"])
-        .arg(&selection.binary_name)
-        .arg("--target-dir")
-        .arg(target_directory)
+        .args(&arguments)
         .current_dir(&selection.workspace_root)
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
-        .map_err(|_| BuildFailure::new("Cargo baseline build could not start."))?;
+        .map_err(|_| {
+            BuildFailure::new(
+                &invocation,
+                started,
+                format!(
+                    "Cargo {} build could not start.",
+                    plan.strategy.canonical_identity()
+                ),
+            )
+        })?;
 
-    let stdout = child
-        .stdout
-        .take()
-        .ok_or_else(|| BuildFailure::new("Cargo baseline stdout was unavailable."))?;
-    let stderr = child
-        .stderr
-        .take()
-        .ok_or_else(|| BuildFailure::new("Cargo baseline stderr was unavailable."))?;
+    let stdout = child.stdout.take().ok_or_else(|| {
+        BuildFailure::new(&invocation, started, "Cargo build stdout was unavailable.")
+    })?;
+    let stderr = child.stderr.take().ok_or_else(|| {
+        BuildFailure::new(&invocation, started, "Cargo build stderr was unavailable.")
+    })?;
     let stderr_reader = thread::spawn(move || drain_bounded(stderr));
 
     let mut diagnostics = BoundedDiagnostics::default();
@@ -221,24 +249,39 @@ pub(crate) fn build_baseline(
         }
     }
 
-    let status = child
-        .wait()
-        .map_err(|error| BuildFailure::new(format!("Cargo baseline wait failed: {error}")))?;
-    let stderr = stderr_reader
-        .join()
-        .map_err(|_| BuildFailure::new("Cargo stderr reader terminated unexpectedly."))?;
+    let status = child.wait().map_err(|error| {
+        BuildFailure::new(
+            &invocation,
+            started,
+            format!("Cargo build wait failed: {error}"),
+        )
+    })?;
+    let stderr = stderr_reader.join().map_err(|_| {
+        BuildFailure::new(
+            &invocation,
+            started,
+            "Cargo stderr reader terminated unexpectedly.",
+        )
+    })?;
     diagnostics.push(&stderr.text);
     diagnostics.truncated |= stderr.truncated;
 
     if let Some(error) = stream_error {
         return Err(BuildFailure::with_diagnostics(
+            &invocation,
+            started,
             format!("Cargo JSON message stream failed: {error}"),
             diagnostics,
         ));
     }
     if !status.success() {
         return Err(BuildFailure::with_diagnostics(
-            "Cargo build failed for baseline; see bounded diagnostics.",
+            &invocation,
+            started,
+            format!(
+                "Cargo build failed for {}; see bounded diagnostics.",
+                plan.strategy.canonical_identity()
+            ),
             diagnostics,
         ));
     }
@@ -246,6 +289,8 @@ pub(crate) fn build_baseline(
         [executable] => executable,
         _ => {
             return Err(BuildFailure::with_diagnostics(
+                &invocation,
+                started,
                 format!(
                     "Cargo did not emit exactly one executable for {}/{}.",
                     selection.package_name, selection.binary_name
@@ -256,32 +301,43 @@ pub(crate) fn build_baseline(
     };
     let executable = std::fs::canonicalize(executable).map_err(|error| {
         BuildFailure::with_diagnostics(
+            &invocation,
+            started,
             format!("Cargo executable could not be canonicalized: {error}"),
             diagnostics.clone(),
         )
     })?;
-    let canonical_target = std::fs::canonicalize(target_directory).map_err(|error| {
+    let canonical_target = std::fs::canonicalize(&plan.target_directory).map_err(|error| {
         BuildFailure::with_diagnostics(
+            &invocation,
+            started,
             format!("Isolated target directory could not be canonicalized: {error}"),
             diagnostics.clone(),
         )
     })?;
     if !executable.starts_with(&canonical_target) {
         return Err(BuildFailure::with_diagnostics(
+            &invocation,
+            started,
             "Cargo emitted an executable outside the isolated target directory.",
             diagnostics,
         ));
     }
     let file_metadata = std::fs::metadata(&executable).map_err(|error| {
         BuildFailure::with_diagnostics(
+            &invocation,
+            started,
             format!("Cargo executable metadata could not be read: {error}"),
             diagnostics.clone(),
         )
     })?;
-    let sha256 = sha256_file(&executable)
-        .map_err(|error| BuildFailure::with_diagnostics(error.to_string(), diagnostics.clone()))?;
+    let sha256 = sha256_file(&executable).map_err(|error| {
+        BuildFailure::with_diagnostics(&invocation, started, error.to_string(), diagnostics.clone())
+    })?;
 
-    Ok(BaselineRecord {
+    Ok(BuildRecord {
+        invocation,
+        outcome: BuildOutcome::Built,
         executable_path: executable,
         sha256,
         size_bytes: file_metadata.len(),
@@ -291,17 +347,69 @@ pub(crate) fn build_baseline(
     })
 }
 
+fn build_invocation(
+    selection: &TargetSelection,
+    plan: &BuildPlan,
+) -> (Vec<OsString>, BuildInvocation) {
+    let mut arguments: Vec<OsString> = [
+        "build",
+        "--release",
+        "--locked",
+        "--target",
+        SUPPORTED_HOST,
+        "--message-format=json",
+        "--package",
+    ]
+    .into_iter()
+    .map(OsString::from)
+    .collect();
+    arguments.push(selection.package_name.clone().into());
+    arguments.push("--bin".into());
+    arguments.push(selection.binary_name.clone().into());
+    arguments.push("--target-dir".into());
+    arguments.push(plan.target_directory.as_os_str().to_owned());
+    for configuration in &plan.cargo_config_overrides {
+        arguments.push("--config".into());
+        arguments.push(configuration.into());
+    }
+    let cargo_arguments = arguments
+        .iter()
+        .map(|argument| argument.to_string_lossy().into_owned())
+        .collect();
+    (
+        arguments,
+        BuildInvocation {
+            strategy: plan.strategy,
+            stage: plan.stage,
+            target_directory: plan.target_directory.clone(),
+            cargo_arguments,
+            cargo_config_overrides: plan.cargo_config_overrides.clone(),
+        },
+    )
+}
+
 impl BuildFailure {
-    fn new(message: impl Into<String>) -> Self {
+    fn new(invocation: &BuildInvocation, started: Instant, message: impl Into<String>) -> Self {
         Self {
+            invocation: Box::new(invocation.clone()),
+            outcome: BuildOutcome::Failed,
+            build_duration_ms: started.elapsed().as_millis(),
             message: message.into(),
             bounded_diagnostics: String::new(),
             diagnostics_truncated: false,
         }
     }
 
-    fn with_diagnostics(message: impl Into<String>, diagnostics: BoundedDiagnostics) -> Self {
+    fn with_diagnostics(
+        invocation: &BuildInvocation,
+        started: Instant,
+        message: impl Into<String>,
+        diagnostics: BoundedDiagnostics,
+    ) -> Self {
         Self {
+            invocation: Box::new(invocation.clone()),
+            outcome: BuildOutcome::Failed,
+            build_duration_ms: started.elapsed().as_millis(),
             message: message.into(),
             bounded_diagnostics: diagnostics.text,
             diagnostics_truncated: diagnostics.truncated,

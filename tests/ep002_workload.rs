@@ -25,7 +25,7 @@ fn output_limited_workload_is_rejected_and_persisted() {
     assert!(stderr(&output).contains("stdout exceeded the 1 MiB limit"));
     let manifest = fixture.manifest();
     assert_eq!(manifest["status"], "failed");
-    assert_eq!(manifest["failure"]["phase"], "baseline_measurement");
+    assert_eq!(manifest["failure"]["phase"], "screening");
     assert_eq!(manifest["failure"]["outcome"], "output_limit");
     assert!(manifest["baseline_measurement"].is_null());
 }

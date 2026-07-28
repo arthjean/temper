@@ -295,3 +295,102 @@ retained no failure record and wrote an explicit null aggregate score.
 The evidence identifies an uncommitted implementation through both its baseline
 commit and production-input hash. A clean committed-state rerun remains required
 before any release-readiness claim.
+
+## 2026-07-28 strict v0.0.1 contract review
+
+This append-only section audits the v0.0.1 requirements inherited by the
+current v0.0.2/schema-2 implementation. It does not rewrite the historical
+v0.0.1 commit or claim that the reviewed uncommitted worktree was releasable.
+
+| Field | Value |
+|---|---|
+| Baseline commit | `350357ba8ebdb9f657af5819ea00bc1feb1d4b54` |
+| Tested worktree | Dirty remediation worktree |
+| Current package/report identity | Temper `0.0.2`, schema 2 |
+| Historical contract artifact | [`schema-v1.json`](schema-v1.json), CLI `0.0.1` fixture |
+| Production inputs | SHA-256 `00cb6b89e56ee47e9ceb54dda429c27745821b3f2fbf1499ee449edd0c13bfba` |
+| Host | Linux 7.1.5, `x86_64-unknown-linux-gnu` |
+| Rust | rustc 1.97.1, LLVM 22.1.6 |
+| Cargo | cargo 1.97.1 |
+| Classification | Correctness, durability and reference-host NFR evidence |
+
+The four exact repository gates passed:
+
+```sh
+cargo fmt --check
+cargo check --all-targets --locked
+cargo clippy --all-targets --all-features --locked --no-deps -- -D warnings
+cargo test --all-targets --locked
+```
+
+The broad suite executed 90 passing tests, 0 failures and 4 intentionally
+ignored tests. Two ignored tests are one-shot evidence collectors. The other
+two are reference-host NFR measurements and were run explicitly:
+
+```sh
+cargo test --locked --test nfr_v001 -- --ignored --nocapture
+```
+
+Both passed. The 100-package planning path consumed less than one observable
+Linux scheduler tick of parent CPU (`0.000 s` at the available resolution).
+The complete four-artifact run recorded 68 samples and reached 7,244 KiB
+maximum direct-parent RSS, below the 150 MiB limit.
+
+The remediation added or strengthened the following discriminating evidence:
+
+- deterministic measurement cohorts now assert 0 accepted A/A datasets across
+  100 controls, 0 accepted regressions across 20 controls and at least 18
+  accepted improvements across 20 controls;
+- one unit test performs 100 timeout lifecycles and checks every forked
+  descendant in `/proc`; separate integration tests exercise real SIGINT
+  cleanup;
+- successful and failed end-to-end runs compare target `Cargo.toml`,
+  `Cargo.lock` and source bytes before and after execution;
+- the checked-in schema-v1 contract validates structurally complete confirmed,
+  no-improvement, failed and interrupted terminal variants, including exact
+  sample counts and nested build, confirmation, promotion and failure fields;
+- SIGINT during a baseline Cargo build persists an interrupted terminal
+  manifest;
+- SIGINT during artifact copy is made deterministic by stopping the Temper
+  process while the temporary artifact exists, queuing SIGINT, then resuming
+  it;
+- promotion copy, checksum, rename and both post-rename directory-sync failures
+  leave no stable artifact;
+- `latest.json` publication preserves a durable hard-link recovery point and
+  restores the previous pointer when its post-rename directory sync fails;
+- promotion reserves enough allocated filesystem space for the current
+  manifest plus a bounded failure record, and releases it only after
+  `latest.json` completes; before every active `run.json` persistence, a full
+  emergency terminal manifest containing all previously durable experimental
+  evidence is written and synchronized. A reserve-creation failure E2E
+  activates that fallback, and an emergency-refresh failure activates the
+  preceding durable fallback. `/dev/full` separately proves write-side ENOSPC
+  classification;
+
+The review also corrected the package identity to `0.0.2`, while retaining the
+historical schema-1 fixture and preserving existing schema-1 files byte for
+byte. The v0.0.1 platform and workload boundaries remain unchanged.
+
+Evidence limits remain:
+
+- the reviewed state was an uncommitted v0.0.2 successor worktree; this section
+  does not identify a post-commit clean-state rerun and does not retroactively
+  change commit `024b3899fd64a25084eaeff33301acf76b5f4d94`;
+- the temporary 2026-07-28 schema-v1 dogfood manifests are unavailable, so
+  their historical aggregate cannot be revalidated against the new checked-in
+  schema;
+- ENOSPC is covered by allocated-reserve behavior, reserve-creation failure
+  E2E, emergency fallback activation, rollback, injected sync failures and
+  `/dev/full`, not by a full end-to-end run on a deliberately saturated
+  isolated filesystem;
+- the CPU and RSS results apply only to the stated reference host and
+  toolchain;
+- the PRD month-1 and month-6 adoption, completion-rate and external-user
+  targets are time-based product outcomes, not local implementation gates;
+- no new production-representative benchmark or clean committed-state
+  verification was produced.
+
+On the available evidence, no known code-level v0.0.1 contract blocker remains
+in the current successor implementation. This is a strict implementation
+conformance conclusion, not a claim that historical v0.0.1 evidence is
+reproducible or that either version is release-ready.

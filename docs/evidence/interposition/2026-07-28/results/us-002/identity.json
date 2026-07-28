@@ -1,0 +1,11 @@
+{
+  "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+  "cpu_model": "AMD Ryzen 7 7800X3D 8-Core Processor",
+  "host_triple": "x86_64-unknown-linux-gnu",
+  "kernel": "7.1.5-200.fc44.x86_64",
+  "logical_cores": 16,
+  "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+  "rustc_verbose": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+  "temper_commit": "f1619f9201c2abe75043952fb278c0d0c2295034",
+  "temper_tracked_diff": "M docs/verification-v0.0.1.md"
+}

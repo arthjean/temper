@@ -1,0 +1,325 @@
+{
+  "checks": [
+    {
+      "check": "direct: direct cargo build carries the sentinel on every target compile",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 1
+      },
+      "passed": true
+    },
+    {
+      "check": "direct: direct cargo build never applies the sentinel to host units",
+      "detail": {
+        "host_compiles_with_sentinel": 0
+      },
+      "passed": true
+    },
+    {
+      "check": "direct: baseline preserves the sentinel",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 1
+      },
+      "passed": true
+    },
+    {
+      "check": "direct: thin-lto preserves the sentinel",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 1
+      },
+      "passed": true
+    },
+    {
+      "check": "direct: fat-lto-cgu1 preserves the sentinel",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 1
+      },
+      "passed": true
+    },
+    {
+      "check": "direct: pgo-instrumented sentinel presence is preserved",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 1
+      },
+      "passed": true
+    },
+    {
+      "check": "direct: pgo sentinel presence is preserved",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 1
+      },
+      "passed": true
+    },
+    {
+      "check": "direct: schema-2 phase parity reports no unexpected difference",
+      "detail": {
+        "matched": true,
+        "schema_version": 2,
+        "unexpected_differences": []
+      },
+      "passed": true
+    },
+    {
+      "check": "required-include: direct cargo build carries the sentinel on every target compile",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 1
+      },
+      "passed": true
+    },
+    {
+      "check": "required-include: direct cargo build never applies the sentinel to host units",
+      "detail": {
+        "host_compiles_with_sentinel": 0
+      },
+      "passed": true
+    },
+    {
+      "check": "required-include: baseline preserves the sentinel",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 1
+      },
+      "passed": true
+    },
+    {
+      "check": "required-include: thin-lto preserves the sentinel",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 1
+      },
+      "passed": true
+    },
+    {
+      "check": "required-include: fat-lto-cgu1 preserves the sentinel",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 1
+      },
+      "passed": true
+    },
+    {
+      "check": "required-include: pgo-instrumented sentinel presence is lost",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 0
+      },
+      "passed": true
+    },
+    {
+      "check": "required-include: pgo sentinel presence is lost",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 0
+      },
+      "passed": true
+    },
+    {
+      "check": "required-include: schema-2 phase parity reports no unexpected difference",
+      "detail": {
+        "matched": true,
+        "schema_version": 2,
+        "unexpected_differences": []
+      },
+      "passed": true
+    },
+    {
+      "check": "nested-include: direct cargo build carries the sentinel on every target compile",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 1
+      },
+      "passed": true
+    },
+    {
+      "check": "nested-include: direct cargo build never applies the sentinel to host units",
+      "detail": {
+        "host_compiles_with_sentinel": 0
+      },
+      "passed": true
+    },
+    {
+      "check": "nested-include: baseline preserves the sentinel",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 1
+      },
+      "passed": true
+    },
+    {
+      "check": "nested-include: thin-lto preserves the sentinel",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 1
+      },
+      "passed": true
+    },
+    {
+      "check": "nested-include: fat-lto-cgu1 preserves the sentinel",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 1
+      },
+      "passed": true
+    },
+    {
+      "check": "nested-include: pgo-instrumented sentinel presence is lost",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 0
+      },
+      "passed": true
+    },
+    {
+      "check": "nested-include: pgo sentinel presence is lost",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 0
+      },
+      "passed": true
+    },
+    {
+      "check": "nested-include: schema-2 phase parity reports no unexpected difference",
+      "detail": {
+        "matched": true,
+        "schema_version": 2,
+        "unexpected_differences": []
+      },
+      "passed": true
+    },
+    {
+      "check": "optional-missing: direct cargo build carries the sentinel on every target compile",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 1
+      },
+      "passed": true
+    },
+    {
+      "check": "optional-missing: direct cargo build never applies the sentinel to host units",
+      "detail": {
+        "host_compiles_with_sentinel": 0
+      },
+      "passed": true
+    },
+    {
+      "check": "optional-missing: baseline preserves the sentinel",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 1
+      },
+      "passed": true
+    },
+    {
+      "check": "optional-missing: thin-lto preserves the sentinel",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 1
+      },
+      "passed": true
+    },
+    {
+      "check": "optional-missing: fat-lto-cgu1 preserves the sentinel",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 1
+      },
+      "passed": true
+    },
+    {
+      "check": "optional-missing: pgo-instrumented sentinel presence is lost",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 0
+      },
+      "passed": true
+    },
+    {
+      "check": "optional-missing: pgo sentinel presence is lost",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 0
+      },
+      "passed": true
+    },
+    {
+      "check": "optional-missing: schema-2 phase parity reports no unexpected difference",
+      "detail": {
+        "matched": true,
+        "schema_version": 2,
+        "unexpected_differences": []
+      },
+      "passed": true
+    },
+    {
+      "check": "cargo 1.93 silently ignores stable include instead of applying it",
+      "detail": {
+        "target_compiles": 1,
+        "with_sentinel": 0
+      },
+      "passed": true
+    },
+    {
+      "check": "cargo 1.93 does not fail the build, so the version boundary is not observable from its exit status",
+      "detail": {
+        "log_excerpt": [
+          "cargo_version: cargo 1.93.1 (083ac5135 2025-12-15)",
+          "exit_status: 0",
+          "--- stderr ---"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "check": "missing-required: Cargo rejects the include graph",
+      "detail": {
+        "log_excerpt": [
+          "error: could not load Cargo configuration",
+          "  No such file or directory (os error 2)"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "check": "cycle-include: Cargo rejects the include graph",
+      "detail": {
+        "log_excerpt": [
+          "error: could not load Cargo configuration"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "check": "strict control: the baseline build succeeds with the included flag",
+      "detail": {
+        "baseline_outcome": "built"
+      },
+      "passed": true
+    },
+    {
+      "check": "strict control: the PGO instrumentation build fails without the included flag",
+      "detail": {
+        "build_failure_reason": "cargo_build_failed",
+        "failure_stage": "instrumentation",
+        "rejection_reason": "pgo_instrumentation_failed"
+      },
+      "passed": true
+    },
+    {
+      "check": "strict control: the failure names the lost included compiler input",
+      "detail": {
+        "diagnostics_excerpt": "error: the included target rustflag did not reach this compilation\n --> src/main.rs:7:1\n  |\n7 | compile_error!(\"the included target rustflag did not reach this compilation\");\n  | ^^^^^^^^^^^^^^^^^^^^^"
+      },
+      "passed": true
+    }
+  ],
+  "checks_failed": [],
+  "checks_total": 39,
+  "passed": true,
+  "story": "US-001"
+}

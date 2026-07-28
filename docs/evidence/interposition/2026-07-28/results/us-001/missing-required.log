@@ -1,0 +1,12 @@
+exit_status: 101
+--- stderr ---
+error: could not load Cargo configuration
+
+Caused by:
+  failed to load config include `absent.toml` from `/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us001-missing-required/.cargo/config.toml`
+
+Caused by:
+  failed to read configuration file `/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us001-missing-required/.cargo/absent.toml`
+
+Caused by:
+  No such file or directory (os error 2)

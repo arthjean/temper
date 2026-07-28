@@ -1,0 +1,5 @@
+[build]
+rustc-wrapper = "WRAPPER_PATH"
+
+[target.x86_64-unknown-linux-gnu]
+rustflags = ["--cfg", "temper_included_sentinel", "--check-cfg", "cfg(temper_included_sentinel)"]

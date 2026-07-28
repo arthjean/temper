@@ -1,0 +1,698 @@
+[
+  {
+    "_temper_stage": "unattributed",
+    "argv_display": [
+      "--crate-name",
+      "build_script_build",
+      "--edition=2024",
+      "app/build.rs",
+      "--error-format=json",
+      "--json=diagnostic-rendered-ansi,artifacts,future-incompat",
+      "--crate-type",
+      "bin",
+      "--emit=dep-info,link",
+      "-C",
+      "embed-bitcode=no",
+      "-C",
+      "debug-assertions=off",
+      "--check-cfg",
+      "cfg(docsrs,test)",
+      "--check-cfg",
+      "cfg(feature, values())",
+      "-C",
+      "metadata=504e5667a89652b9",
+      "-C",
+      "extra-filename=-676e03b8f5612e02",
+      "--out-dir",
+      "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-target-wrapper-nested/release/build/temper-units-app-676e03b8f5612e02",
+      "-C",
+      "strip=debuginfo",
+      "-L",
+      "dependency=/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-target-wrapper-nested/release/deps"
+    ],
+    "capture_file": "51ec1b899ec79a38e023955bdd2eab26-00.json",
+    "class": "host_compile",
+    "crate_name": "build_script_build",
+    "crate_types": [
+      "bin"
+    ],
+    "cwd": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-units",
+    "emit": true,
+    "environment": {
+      "CARGO_BUILD_RUSTFLAGS": {
+        "present": false
+      },
+      "CARGO_ENCODED_RUSTFLAGS": {
+        "present": false
+      },
+      "CARGO_PRIMARY_PACKAGE": {
+        "digest": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+        "empty": false,
+        "present": true
+      },
+      "RUSTC_WORKSPACE_WRAPPER": {
+        "digest": "5c508bcce7bdc16489fe8451b1fea1b97341967434f78f8de6c228a242b466f3",
+        "empty": false,
+        "present": true
+      },
+      "RUSTC_WRAPPER": {
+        "digest": "1fc8e1d82d06b7d476680499b79d9b7963514fd532b7e9f6053c33b4637edb9d",
+        "empty": false,
+        "present": true
+      },
+      "RUSTFLAGS": {
+        "present": false
+      }
+    },
+    "exact_target": false,
+    "extra_filename": "-676e03b8f5612e02",
+    "injected": [],
+    "metadata": "504e5667a89652b9",
+    "out_dir": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-target-wrapper-nested/release/build/temper-units-app-676e03b8f5612e02",
+    "pid": 556017,
+    "post_digest": "ce40d60d130973851514ff4f84ccd001ecbf0e3647557f8b6eb7c798ab06861b",
+    "pre_digest": "ce40d60d130973851514ff4f84ccd001ecbf0e3647557f8b6eb7c798ab06861b",
+    "print": false,
+    "protocol": "temper-exp-shim-1",
+    "real_rustc": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+    "stage": "wrapper-nested",
+    "target": "x86_64-unknown-linux-gnu",
+    "temper_stage": "unattributed"
+  },
+  {
+    "_temper_stage": "unattributed",
+    "argv_display": [
+      "--crate-name",
+      "temper_units_macro",
+      "--edition=2024",
+      "unitmacro/src/lib.rs",
+      "--error-format=json",
+      "--json=diagnostic-rendered-ansi,artifacts,future-incompat",
+      "--crate-type",
+      "proc-macro",
+      "--emit=dep-info,link",
+      "-C",
+      "prefer-dynamic",
+      "-C",
+      "embed-bitcode=no",
+      "-C",
+      "debug-assertions=off",
+      "--check-cfg",
+      "cfg(docsrs,test)",
+      "--check-cfg",
+      "cfg(feature, values())",
+      "-C",
+      "metadata=a59c55f2f2b58ea6",
+      "-C",
+      "extra-filename=-4bd4cbaa00246b2a",
+      "--out-dir",
+      "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-target-wrapper-nested/release/deps",
+      "-C",
+      "strip=debuginfo",
+      "-L",
+      "dependency=/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-target-wrapper-nested/release/deps",
+      "--extern",
+      "proc_macro"
+    ],
+    "capture_file": "06d9d3772141f228c2e8e3289788669a-00.json",
+    "class": "host_compile",
+    "crate_name": "temper_units_macro",
+    "crate_types": [
+      "proc-macro"
+    ],
+    "cwd": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-units",
+    "emit": true,
+    "environment": {
+      "CARGO_BUILD_RUSTFLAGS": {
+        "present": false
+      },
+      "CARGO_ENCODED_RUSTFLAGS": {
+        "present": false
+      },
+      "CARGO_PRIMARY_PACKAGE": {
+        "present": false
+      },
+      "RUSTC_WORKSPACE_WRAPPER": {
+        "digest": "5c508bcce7bdc16489fe8451b1fea1b97341967434f78f8de6c228a242b466f3",
+        "empty": false,
+        "present": true
+      },
+      "RUSTC_WRAPPER": {
+        "digest": "1fc8e1d82d06b7d476680499b79d9b7963514fd532b7e9f6053c33b4637edb9d",
+        "empty": false,
+        "present": true
+      },
+      "RUSTFLAGS": {
+        "present": false
+      }
+    },
+    "exact_target": false,
+    "extra_filename": "-4bd4cbaa00246b2a",
+    "injected": [],
+    "metadata": "a59c55f2f2b58ea6",
+    "out_dir": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-target-wrapper-nested/release/deps",
+    "pid": 556019,
+    "post_digest": "ac5e0e36326e4a8d1e5e744a72eca123dcc730edeefa58e16711427529cd6bb5",
+    "pre_digest": "ac5e0e36326e4a8d1e5e744a72eca123dcc730edeefa58e16711427529cd6bb5",
+    "print": false,
+    "protocol": "temper-exp-shim-1",
+    "real_rustc": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+    "stage": "wrapper-nested",
+    "target": "x86_64-unknown-linux-gnu",
+    "temper_stage": "unattributed"
+  },
+  {
+    "_temper_stage": "unattributed",
+    "argv_display": [
+      "-vV"
+    ],
+    "capture_file": "308c0f40e7b28fb1766092285f6edca1-00.json",
+    "class": "other",
+    "crate_name": null,
+    "crate_types": [],
+    "cwd": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-units",
+    "emit": false,
+    "environment": {
+      "CARGO_BUILD_RUSTFLAGS": {
+        "present": false
+      },
+      "CARGO_ENCODED_RUSTFLAGS": {
+        "present": false
+      },
+      "CARGO_PRIMARY_PACKAGE": {
+        "present": false
+      },
+      "RUSTC_WORKSPACE_WRAPPER": {
+        "digest": "5c508bcce7bdc16489fe8451b1fea1b97341967434f78f8de6c228a242b466f3",
+        "empty": false,
+        "present": true
+      },
+      "RUSTC_WRAPPER": {
+        "digest": "1fc8e1d82d06b7d476680499b79d9b7963514fd532b7e9f6053c33b4637edb9d",
+        "empty": false,
+        "present": true
+      },
+      "RUSTFLAGS": {
+        "present": false
+      }
+    },
+    "exact_target": false,
+    "extra_filename": null,
+    "injected": [],
+    "metadata": null,
+    "out_dir": null,
+    "pid": 556005,
+    "post_digest": "ce9e98153ce7c87b6ecc49eda6ed82435d95610812cb336143d48ebe6ff52d68",
+    "pre_digest": "ce9e98153ce7c87b6ecc49eda6ed82435d95610812cb336143d48ebe6ff52d68",
+    "print": false,
+    "protocol": "temper-exp-shim-1",
+    "real_rustc": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+    "stage": "wrapper-nested",
+    "target": "x86_64-unknown-linux-gnu",
+    "temper_stage": "unattributed"
+  },
+  {
+    "_temper_stage": "unattributed",
+    "argv_display": [
+      "-vV"
+    ],
+    "capture_file": "c8740ff7bc812da3cf5b0ba672d5d011-00.json",
+    "class": "other",
+    "crate_name": null,
+    "crate_types": [],
+    "cwd": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-units",
+    "emit": false,
+    "environment": {
+      "CARGO_BUILD_RUSTFLAGS": {
+        "present": false
+      },
+      "CARGO_ENCODED_RUSTFLAGS": {
+        "present": false
+      },
+      "CARGO_PRIMARY_PACKAGE": {
+        "present": false
+      },
+      "RUSTC_WORKSPACE_WRAPPER": {
+        "digest": "5c508bcce7bdc16489fe8451b1fea1b97341967434f78f8de6c228a242b466f3",
+        "empty": false,
+        "present": true
+      },
+      "RUSTC_WRAPPER": {
+        "digest": "1fc8e1d82d06b7d476680499b79d9b7963514fd532b7e9f6053c33b4637edb9d",
+        "empty": false,
+        "present": true
+      },
+      "RUSTFLAGS": {
+        "present": false
+      }
+    },
+    "exact_target": false,
+    "extra_filename": null,
+    "injected": [],
+    "metadata": null,
+    "out_dir": null,
+    "pid": 556010,
+    "post_digest": "ce9e98153ce7c87b6ecc49eda6ed82435d95610812cb336143d48ebe6ff52d68",
+    "pre_digest": "ce9e98153ce7c87b6ecc49eda6ed82435d95610812cb336143d48ebe6ff52d68",
+    "print": false,
+    "protocol": "temper-exp-shim-1",
+    "real_rustc": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+    "stage": "wrapper-nested",
+    "target": "x86_64-unknown-linux-gnu",
+    "temper_stage": "unattributed"
+  },
+  {
+    "_temper_stage": "unattributed",
+    "argv_display": [
+      "-vV"
+    ],
+    "capture_file": "f3371b10ca280accca3d9531536b8951-00.json",
+    "class": "other",
+    "crate_name": null,
+    "crate_types": [],
+    "cwd": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-units",
+    "emit": false,
+    "environment": {
+      "CARGO_BUILD_RUSTFLAGS": {
+        "present": false
+      },
+      "CARGO_ENCODED_RUSTFLAGS": {
+        "present": false
+      },
+      "CARGO_PRIMARY_PACKAGE": {
+        "present": false
+      },
+      "RUSTC_WORKSPACE_WRAPPER": {
+        "digest": "5c508bcce7bdc16489fe8451b1fea1b97341967434f78f8de6c228a242b466f3",
+        "empty": false,
+        "present": true
+      },
+      "RUSTC_WRAPPER": {
+        "digest": "1fc8e1d82d06b7d476680499b79d9b7963514fd532b7e9f6053c33b4637edb9d",
+        "empty": false,
+        "present": true
+      },
+      "RUSTFLAGS": {
+        "present": false
+      }
+    },
+    "exact_target": false,
+    "extra_filename": null,
+    "injected": [],
+    "metadata": null,
+    "out_dir": null,
+    "pid": 556007,
+    "post_digest": "ce9e98153ce7c87b6ecc49eda6ed82435d95610812cb336143d48ebe6ff52d68",
+    "pre_digest": "ce9e98153ce7c87b6ecc49eda6ed82435d95610812cb336143d48ebe6ff52d68",
+    "print": false,
+    "protocol": "temper-exp-shim-1",
+    "real_rustc": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+    "stage": "wrapper-nested",
+    "target": "x86_64-unknown-linux-gnu",
+    "temper_stage": "unattributed"
+  },
+  {
+    "_temper_stage": "unattributed",
+    "argv_display": [
+      "-vV"
+    ],
+    "capture_file": "fdb7819824463a845f7c844ecb482b99-00.json",
+    "class": "other",
+    "crate_name": null,
+    "crate_types": [],
+    "cwd": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-units",
+    "emit": false,
+    "environment": {
+      "CARGO_BUILD_RUSTFLAGS": {
+        "present": false
+      },
+      "CARGO_ENCODED_RUSTFLAGS": {
+        "present": false
+      },
+      "CARGO_PRIMARY_PACKAGE": {
+        "present": false
+      },
+      "RUSTC_WORKSPACE_WRAPPER": {
+        "digest": "5c508bcce7bdc16489fe8451b1fea1b97341967434f78f8de6c228a242b466f3",
+        "empty": false,
+        "present": true
+      },
+      "RUSTC_WRAPPER": {
+        "digest": "1fc8e1d82d06b7d476680499b79d9b7963514fd532b7e9f6053c33b4637edb9d",
+        "empty": false,
+        "present": true
+      },
+      "RUSTFLAGS": {
+        "present": false
+      }
+    },
+    "exact_target": false,
+    "extra_filename": null,
+    "injected": [],
+    "metadata": null,
+    "out_dir": null,
+    "pid": 555995,
+    "post_digest": "ce9e98153ce7c87b6ecc49eda6ed82435d95610812cb336143d48ebe6ff52d68",
+    "pre_digest": "ce9e98153ce7c87b6ecc49eda6ed82435d95610812cb336143d48ebe6ff52d68",
+    "print": false,
+    "protocol": "temper-exp-shim-1",
+    "real_rustc": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+    "stage": "wrapper-nested",
+    "target": "x86_64-unknown-linux-gnu",
+    "temper_stage": "unattributed"
+  },
+  {
+    "_temper_stage": "unattributed",
+    "argv_display": [
+      "-",
+      "--crate-name",
+      "___",
+      "--print=file-names",
+      "--crate-type",
+      "bin",
+      "--crate-type",
+      "rlib",
+      "--crate-type",
+      "dylib",
+      "--crate-type",
+      "cdylib",
+      "--crate-type",
+      "staticlib",
+      "--crate-type",
+      "proc-macro",
+      "--print=sysroot",
+      "--print=split-debuginfo",
+      "--print=crate-name",
+      "--print=cfg",
+      "-Wwarnings"
+    ],
+    "capture_file": "b567bece278900d2a60dabfb0b0a5d16-00.json",
+    "class": "probe",
+    "crate_name": "___",
+    "crate_types": [
+      "bin",
+      "rlib",
+      "dylib",
+      "cdylib",
+      "staticlib",
+      "proc-macro"
+    ],
+    "cwd": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-units",
+    "emit": false,
+    "environment": {
+      "CARGO_BUILD_RUSTFLAGS": {
+        "present": false
+      },
+      "CARGO_ENCODED_RUSTFLAGS": {
+        "present": false
+      },
+      "CARGO_PRIMARY_PACKAGE": {
+        "present": false
+      },
+      "RUSTC_WORKSPACE_WRAPPER": {
+        "digest": "5c508bcce7bdc16489fe8451b1fea1b97341967434f78f8de6c228a242b466f3",
+        "empty": false,
+        "present": true
+      },
+      "RUSTC_WRAPPER": {
+        "digest": "1fc8e1d82d06b7d476680499b79d9b7963514fd532b7e9f6053c33b4637edb9d",
+        "empty": false,
+        "present": true
+      },
+      "RUSTFLAGS": {
+        "present": false
+      }
+    },
+    "exact_target": false,
+    "extra_filename": null,
+    "injected": [],
+    "metadata": null,
+    "out_dir": null,
+    "pid": 555997,
+    "post_digest": "1eda4d64344053f2934c29adbd0320f0739742f2477f595cc8f93255f43ee317",
+    "pre_digest": "1eda4d64344053f2934c29adbd0320f0739742f2477f595cc8f93255f43ee317",
+    "print": true,
+    "protocol": "temper-exp-shim-1",
+    "real_rustc": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+    "stage": "wrapper-nested",
+    "target": "x86_64-unknown-linux-gnu",
+    "temper_stage": "unattributed"
+  },
+  {
+    "_temper_stage": "unattributed",
+    "argv_display": [
+      "-",
+      "--crate-name",
+      "___",
+      "--print=file-names",
+      "--target",
+      "x86_64-unknown-linux-gnu",
+      "--crate-type",
+      "bin",
+      "--crate-type",
+      "rlib",
+      "--crate-type",
+      "dylib",
+      "--crate-type",
+      "cdylib",
+      "--crate-type",
+      "staticlib",
+      "--crate-type",
+      "proc-macro",
+      "--print=sysroot",
+      "--print=split-debuginfo",
+      "--print=crate-name",
+      "--print=cfg",
+      "-Wwarnings"
+    ],
+    "capture_file": "dcb8cb41cfe9152c9e8b6f21f0a572a6-00.json",
+    "class": "probe",
+    "crate_name": "___",
+    "crate_types": [
+      "bin",
+      "rlib",
+      "dylib",
+      "cdylib",
+      "staticlib",
+      "proc-macro"
+    ],
+    "cwd": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-units",
+    "emit": false,
+    "environment": {
+      "CARGO_BUILD_RUSTFLAGS": {
+        "present": false
+      },
+      "CARGO_ENCODED_RUSTFLAGS": {
+        "present": false
+      },
+      "CARGO_PRIMARY_PACKAGE": {
+        "present": false
+      },
+      "RUSTC_WORKSPACE_WRAPPER": {
+        "digest": "5c508bcce7bdc16489fe8451b1fea1b97341967434f78f8de6c228a242b466f3",
+        "empty": false,
+        "present": true
+      },
+      "RUSTC_WRAPPER": {
+        "digest": "1fc8e1d82d06b7d476680499b79d9b7963514fd532b7e9f6053c33b4637edb9d",
+        "empty": false,
+        "present": true
+      },
+      "RUSTFLAGS": {
+        "present": false
+      }
+    },
+    "exact_target": true,
+    "extra_filename": null,
+    "injected": [],
+    "metadata": null,
+    "out_dir": null,
+    "pid": 556001,
+    "post_digest": "5c812fe862b9b70e2ab17b9ffe129ffeb7e93eeaf67cf3acdb4808316722384d",
+    "pre_digest": "5c812fe862b9b70e2ab17b9ffe129ffeb7e93eeaf67cf3acdb4808316722384d",
+    "print": true,
+    "protocol": "temper-exp-shim-1",
+    "real_rustc": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+    "stage": "wrapper-nested",
+    "target": "x86_64-unknown-linux-gnu",
+    "temper_stage": "unattributed"
+  },
+  {
+    "_temper_stage": "unattributed",
+    "argv_display": [
+      "--crate-name",
+      "temper_units_app",
+      "--edition=2024",
+      "app/src/main.rs",
+      "--error-format=json",
+      "--json=diagnostic-rendered-ansi,artifacts,future-incompat",
+      "--crate-type",
+      "bin",
+      "--emit=dep-info,link",
+      "-C",
+      "opt-level=3",
+      "-C",
+      "embed-bitcode=no",
+      "--check-cfg",
+      "cfg(docsrs,test)",
+      "--check-cfg",
+      "cfg(feature, values())",
+      "-C",
+      "metadata=2fc3273faea3f52d",
+      "-C",
+      "extra-filename=-32a83473321c92e0",
+      "--out-dir",
+      "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-target-wrapper-nested/x86_64-unknown-linux-gnu/release/deps",
+      "--target",
+      "x86_64-unknown-linux-gnu",
+      "-C",
+      "strip=debuginfo",
+      "-L",
+      "dependency=/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-target-wrapper-nested/x86_64-unknown-linux-gnu/release/deps",
+      "-L",
+      "dependency=/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-target-wrapper-nested/release/deps",
+      "--extern",
+      "temper_units_lib=/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-target-wrapper-nested/x86_64-unknown-linux-gnu/release/deps/libtemper_units_lib-798abd29b0ab0397.rlib",
+      "--extern",
+      "temper_units_macro=/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-target-wrapper-nested/release/deps/libtemper_units_macro-4bd4cbaa00246b2a.so",
+      "--cfg",
+      "temper_units_build_script",
+      "--check-cfg",
+      "cfg(temper_units_build_script)"
+    ],
+    "capture_file": "d8fbd9ed9b88b5f87922888d81a7f680-00.json",
+    "class": "target_compile",
+    "crate_name": "temper_units_app",
+    "crate_types": [
+      "bin"
+    ],
+    "cwd": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-units",
+    "emit": true,
+    "environment": {
+      "CARGO_BUILD_RUSTFLAGS": {
+        "present": false
+      },
+      "CARGO_ENCODED_RUSTFLAGS": {
+        "present": false
+      },
+      "CARGO_PRIMARY_PACKAGE": {
+        "digest": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+        "empty": false,
+        "present": true
+      },
+      "RUSTC_WORKSPACE_WRAPPER": {
+        "digest": "5c508bcce7bdc16489fe8451b1fea1b97341967434f78f8de6c228a242b466f3",
+        "empty": false,
+        "present": true
+      },
+      "RUSTC_WRAPPER": {
+        "digest": "1fc8e1d82d06b7d476680499b79d9b7963514fd532b7e9f6053c33b4637edb9d",
+        "empty": false,
+        "present": true
+      },
+      "RUSTFLAGS": {
+        "present": false
+      }
+    },
+    "exact_target": true,
+    "extra_filename": "-32a83473321c92e0",
+    "injected": [
+      "-Cprofile-generate=/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-profraw"
+    ],
+    "metadata": "2fc3273faea3f52d",
+    "out_dir": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-target-wrapper-nested/x86_64-unknown-linux-gnu/release/deps",
+    "pid": 556083,
+    "post_digest": "0b6d568f1b5d67933d23c587003711a302f170b88bd4cab9f3ea72fe105318a4",
+    "pre_digest": "9b04c097693687d52f756b3b22f23ba4baaa572834f6fe5d7f638bae5289a035",
+    "print": false,
+    "protocol": "temper-exp-shim-1",
+    "real_rustc": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+    "stage": "wrapper-nested",
+    "target": "x86_64-unknown-linux-gnu",
+    "temper_stage": "unattributed"
+  },
+  {
+    "_temper_stage": "unattributed",
+    "argv_display": [
+      "--crate-name",
+      "temper_units_lib",
+      "--edition=2024",
+      "unitlib/src/lib.rs",
+      "--error-format=json",
+      "--json=diagnostic-rendered-ansi,artifacts,future-incompat",
+      "--crate-type",
+      "lib",
+      "--emit=dep-info,metadata,link",
+      "-C",
+      "opt-level=3",
+      "-C",
+      "embed-bitcode=no",
+      "--check-cfg",
+      "cfg(docsrs,test)",
+      "--check-cfg",
+      "cfg(feature, values())",
+      "-C",
+      "metadata=cc46c11061ddffa8",
+      "-C",
+      "extra-filename=-798abd29b0ab0397",
+      "--out-dir",
+      "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-target-wrapper-nested/x86_64-unknown-linux-gnu/release/deps",
+      "--target",
+      "x86_64-unknown-linux-gnu",
+      "-C",
+      "strip=debuginfo",
+      "-L",
+      "dependency=/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-target-wrapper-nested/x86_64-unknown-linux-gnu/release/deps",
+      "-L",
+      "dependency=/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-target-wrapper-nested/release/deps"
+    ],
+    "capture_file": "618ba21a7bbe287ac21dae3a4fb170e4-00.json",
+    "class": "target_compile",
+    "crate_name": "temper_units_lib",
+    "crate_types": [
+      "lib"
+    ],
+    "cwd": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-units",
+    "emit": true,
+    "environment": {
+      "CARGO_BUILD_RUSTFLAGS": {
+        "present": false
+      },
+      "CARGO_ENCODED_RUSTFLAGS": {
+        "present": false
+      },
+      "CARGO_PRIMARY_PACKAGE": {
+        "present": false
+      },
+      "RUSTC_WORKSPACE_WRAPPER": {
+        "digest": "5c508bcce7bdc16489fe8451b1fea1b97341967434f78f8de6c228a242b466f3",
+        "empty": false,
+        "present": true
+      },
+      "RUSTC_WRAPPER": {
+        "digest": "1fc8e1d82d06b7d476680499b79d9b7963514fd532b7e9f6053c33b4637edb9d",
+        "empty": false,
+        "present": true
+      },
+      "RUSTFLAGS": {
+        "present": false
+      }
+    },
+    "exact_target": true,
+    "extra_filename": "-798abd29b0ab0397",
+    "injected": [
+      "-Cprofile-generate=/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-profraw"
+    ],
+    "metadata": "cc46c11061ddffa8",
+    "out_dir": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-target-wrapper-nested/x86_64-unknown-linux-gnu/release/deps",
+    "pid": 556018,
+    "post_digest": "fd9ddea99e0e44ce9e7156024b7bf62cb40b2d0d51823a894d1c4df8f35b1ecf",
+    "pre_digest": "a1635d6019b13c66ed588cb076d095d5e48eb3c5611ef6ab134103d440080e8c",
+    "print": false,
+    "protocol": "temper-exp-shim-1",
+    "real_rustc": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+    "stage": "wrapper-nested",
+    "target": "x86_64-unknown-linux-gnu",
+    "temper_stage": "unattributed"
+  }
+]

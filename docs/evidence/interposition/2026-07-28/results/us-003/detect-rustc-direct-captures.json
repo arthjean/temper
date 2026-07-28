@@ -1,0 +1,499 @@
+{
+  "counts": {
+    "other": 23,
+    "probe": 11,
+    "target_compile": 5
+  },
+  "detail": {
+    "other": [
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      }
+    ],
+    "probe": [
+      {
+        "argv_length": 23,
+        "crate": "___",
+        "crate_types": [
+          "bin",
+          "rlib",
+          "dylib",
+          "cdylib",
+          "staticlib",
+          "proc-macro"
+        ],
+        "emit": false,
+        "exact_target": true,
+        "injected": [],
+        "print": true,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 23,
+        "crate": "___",
+        "crate_types": [
+          "bin",
+          "rlib",
+          "dylib",
+          "cdylib",
+          "staticlib",
+          "proc-macro"
+        ],
+        "emit": false,
+        "exact_target": true,
+        "injected": [],
+        "print": true,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 21,
+        "crate": "___",
+        "crate_types": [
+          "bin",
+          "rlib",
+          "dylib",
+          "cdylib",
+          "staticlib",
+          "proc-macro"
+        ],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": true,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 21,
+        "crate": "___",
+        "crate_types": [
+          "bin",
+          "rlib",
+          "dylib",
+          "cdylib",
+          "staticlib",
+          "proc-macro"
+        ],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": true,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 21,
+        "crate": "___",
+        "crate_types": [
+          "bin",
+          "rlib",
+          "dylib",
+          "cdylib",
+          "staticlib",
+          "proc-macro"
+        ],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": true,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 23,
+        "crate": "___",
+        "crate_types": [
+          "bin",
+          "rlib",
+          "dylib",
+          "cdylib",
+          "staticlib",
+          "proc-macro"
+        ],
+        "emit": false,
+        "exact_target": true,
+        "injected": [],
+        "print": true,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 23,
+        "crate": "___",
+        "crate_types": [
+          "bin",
+          "rlib",
+          "dylib",
+          "cdylib",
+          "staticlib",
+          "proc-macro"
+        ],
+        "emit": false,
+        "exact_target": true,
+        "injected": [],
+        "print": true,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 21,
+        "crate": "___",
+        "crate_types": [
+          "bin",
+          "rlib",
+          "dylib",
+          "cdylib",
+          "staticlib",
+          "proc-macro"
+        ],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": true,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 21,
+        "crate": "___",
+        "crate_types": [
+          "bin",
+          "rlib",
+          "dylib",
+          "cdylib",
+          "staticlib",
+          "proc-macro"
+        ],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": true,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 23,
+        "crate": "___",
+        "crate_types": [
+          "bin",
+          "rlib",
+          "dylib",
+          "cdylib",
+          "staticlib",
+          "proc-macro"
+        ],
+        "emit": false,
+        "exact_target": true,
+        "injected": [],
+        "print": true,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 21,
+        "crate": "___",
+        "crate_types": [
+          "bin",
+          "rlib",
+          "dylib",
+          "cdylib",
+          "staticlib",
+          "proc-macro"
+        ],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": true,
+        "stage": "unattributed"
+      }
+    ],
+    "target_compile": [
+      {
+        "argv_length": 33,
+        "crate": "temper_include_loss",
+        "crate_types": [
+          "bin"
+        ],
+        "emit": true,
+        "exact_target": true,
+        "injected": [],
+        "print": false,
+        "stage": "fat-lto-cgu1"
+      },
+      {
+        "argv_length": 31,
+        "crate": "temper_include_loss",
+        "crate_types": [
+          "bin"
+        ],
+        "emit": true,
+        "exact_target": true,
+        "injected": [],
+        "print": false,
+        "stage": "baseline"
+      },
+      {
+        "argv_length": 31,
+        "crate": "temper_include_loss",
+        "crate_types": [
+          "bin"
+        ],
+        "emit": true,
+        "exact_target": true,
+        "injected": [],
+        "print": false,
+        "stage": "thin-lto"
+      },
+      {
+        "argv_length": 31,
+        "crate": "temper_include_loss",
+        "crate_types": [
+          "bin"
+        ],
+        "emit": true,
+        "exact_target": true,
+        "injected": [],
+        "print": false,
+        "stage": "confirmation"
+      },
+      {
+        "argv_length": 33,
+        "crate": "temper_include_loss",
+        "crate_types": [
+          "bin"
+        ],
+        "emit": true,
+        "exact_target": true,
+        "injected": [],
+        "print": false,
+        "stage": "confirmation"
+      }
+    ]
+  },
+  "injected_by_class": {
+    "other": 0,
+    "probe": 0,
+    "target_compile": 0
+  },
+  "injected_records": 0,
+  "records": 39
+}

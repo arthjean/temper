@@ -1,0 +1,110 @@
+{
+  "records": 58,
+  "sentinel": "temper_included_sentinel",
+  "stages": {
+    "baseline": {
+      "host_compiles": 0,
+      "host_compiles_with_sentinel": 0,
+      "host_crates": [],
+      "other": 0,
+      "probes": 0,
+      "target_compiles": 1,
+      "target_compiles_with_sentinel": 1,
+      "target_crates": [
+        {
+          "crate": "temper_include_loss",
+          "sentinel": true
+        }
+      ]
+    },
+    "confirmation": {
+      "host_compiles": 0,
+      "host_compiles_with_sentinel": 0,
+      "host_crates": [],
+      "other": 0,
+      "probes": 0,
+      "target_compiles": 2,
+      "target_compiles_with_sentinel": 2,
+      "target_crates": [
+        {
+          "crate": "temper_include_loss",
+          "sentinel": true
+        },
+        {
+          "crate": "temper_include_loss",
+          "sentinel": true
+        }
+      ]
+    },
+    "fat-lto-cgu1": {
+      "host_compiles": 0,
+      "host_compiles_with_sentinel": 0,
+      "host_crates": [],
+      "other": 0,
+      "probes": 0,
+      "target_compiles": 1,
+      "target_compiles_with_sentinel": 1,
+      "target_crates": [
+        {
+          "crate": "temper_include_loss",
+          "sentinel": true
+        }
+      ]
+    },
+    "pgo": {
+      "host_compiles": 0,
+      "host_compiles_with_sentinel": 0,
+      "host_crates": [],
+      "other": 0,
+      "probes": 0,
+      "target_compiles": 1,
+      "target_compiles_with_sentinel": 0,
+      "target_crates": [
+        {
+          "crate": "temper_include_loss",
+          "sentinel": false
+        }
+      ]
+    },
+    "pgo-instrumented": {
+      "host_compiles": 0,
+      "host_compiles_with_sentinel": 0,
+      "host_crates": [],
+      "other": 0,
+      "probes": 0,
+      "target_compiles": 1,
+      "target_compiles_with_sentinel": 0,
+      "target_crates": [
+        {
+          "crate": "temper_include_loss",
+          "sentinel": false
+        }
+      ]
+    },
+    "thin-lto": {
+      "host_compiles": 0,
+      "host_compiles_with_sentinel": 0,
+      "host_crates": [],
+      "other": 0,
+      "probes": 0,
+      "target_compiles": 1,
+      "target_compiles_with_sentinel": 1,
+      "target_crates": [
+        {
+          "crate": "temper_include_loss",
+          "sentinel": true
+        }
+      ]
+    },
+    "unattributed": {
+      "host_compiles": 0,
+      "host_compiles_with_sentinel": 0,
+      "host_crates": [],
+      "other": 34,
+      "probes": 17,
+      "target_compiles": 0,
+      "target_compiles_with_sentinel": 0,
+      "target_crates": []
+    }
+  }
+}

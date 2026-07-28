@@ -1,0 +1,140 @@
+{
+  "allowed_differences": {
+    "generate": [
+      "profile_generate"
+    ],
+    "reference": [],
+    "use": [
+      "missing_function_warning",
+      "profile_use"
+    ]
+  },
+  "counts": {
+    "generate": 2,
+    "reference": 2,
+    "use": 2
+  },
+  "differences": [],
+  "matched": true,
+  "mutations": {
+    "argument_added": {
+      "difference_classes": [
+        "argument_added",
+        "argument_count"
+      ],
+      "expected_matched": false,
+      "matched": false
+    },
+    "argument_changed": {
+      "difference_classes": [
+        "argument_added",
+        "argument_removed"
+      ],
+      "expected_matched": false,
+      "matched": false
+    },
+    "argument_order": {
+      "difference_classes": [
+        "argument_order"
+      ],
+      "expected_matched": false,
+      "matched": false
+    },
+    "argument_removed": {
+      "difference_classes": [
+        "argument_count",
+        "argument_removed"
+      ],
+      "expected_matched": false,
+      "matched": false
+    },
+    "artifact_extra_filename_changed": {
+      "difference_classes": [
+        "artifact_extra_filename_changed"
+      ],
+      "expected_matched": false,
+      "matched": false
+    },
+    "artifact_metadata_changed": {
+      "difference_classes": [
+        "artifact_metadata_changed"
+      ],
+      "expected_matched": false,
+      "matched": false
+    },
+    "crate_added": {
+      "difference_classes": [
+        "crate_added",
+        "crate_count"
+      ],
+      "expected_matched": false,
+      "matched": false
+    },
+    "crate_kind_changed": {
+      "difference_classes": [
+        "crate_kind_changed"
+      ],
+      "expected_matched": false,
+      "matched": false
+    },
+    "crate_name_changed": {
+      "difference_classes": [
+        "crate_added",
+        "crate_missing"
+      ],
+      "expected_matched": false,
+      "matched": false
+    },
+    "crate_removed": {
+      "difference_classes": [
+        "crate_count",
+        "crate_missing"
+      ],
+      "expected_matched": false,
+      "matched": false
+    },
+    "escaped_stage_root_path": {
+      "difference_classes": [
+        "argument_added",
+        "argument_removed"
+      ],
+      "expected_matched": false,
+      "matched": false
+    },
+    "record_order": {
+      "difference_classes": [],
+      "expected_matched": true,
+      "matched": true
+    },
+    "tool_changed": {
+      "difference_classes": [
+        "tool_changed"
+      ],
+      "expected_matched": false,
+      "matched": false
+    }
+  },
+  "mutations_behaved_as_expected": true,
+  "mutations_rejected": 12,
+  "mutations_total": 13,
+  "stage_root_dependent_arguments": {
+    "generate": [
+      "--extern temper_units_lib=<STAGE_ROOT>\u2026",
+      "--extern temper_units_macro=<STAGE_ROOT>\u2026",
+      "--out-dir <STAGE_ROOT>\u2026",
+      "-L dependency=<STAGE_ROOT>\u2026"
+    ],
+    "reference": [
+      "--extern temper_units_lib=<STAGE_ROOT>\u2026",
+      "--extern temper_units_macro=<STAGE_ROOT>\u2026",
+      "--out-dir <STAGE_ROOT>\u2026",
+      "-L dependency=<STAGE_ROOT>\u2026"
+    ],
+    "use": [
+      "--extern temper_units_lib=<STAGE_ROOT>\u2026",
+      "--extern temper_units_macro=<STAGE_ROOT>\u2026",
+      "--out-dir <STAGE_ROOT>\u2026",
+      "-L dependency=<STAGE_ROOT>\u2026"
+    ]
+  }
+}

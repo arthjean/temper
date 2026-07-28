@@ -1,0 +1,107 @@
+{
+  "max_ratio": 1.050450105214326,
+  "median_direct_ms": 152.088077,
+  "median_overhead_percent": 2.2441644156647733,
+  "median_pass_through_ms": 154.630646,
+  "median_ratio": 1.0224416441566477,
+  "min_ratio": 0.9962920306440985,
+  "pairs": 12,
+  "samples": [
+    {
+      "direct_first": true,
+      "direct_ns": 152918282,
+      "pair": 0,
+      "pass_through_ns": 154753501,
+      "ratio": 1.0120013053769463,
+      "shim_invocations": 10
+    },
+    {
+      "direct_first": false,
+      "direct_ns": 152209172,
+      "pair": 1,
+      "pass_through_ns": 155298460,
+      "ratio": 1.0202963327334833,
+      "shim_invocations": 10
+    },
+    {
+      "direct_first": true,
+      "direct_ns": 152440212,
+      "pair": 2,
+      "pass_through_ns": 152349652,
+      "ratio": 0.9994059310282251,
+      "shim_invocations": 10
+    },
+    {
+      "direct_first": false,
+      "direct_ns": 150186723,
+      "pair": 3,
+      "pass_through_ns": 153379381,
+      "ratio": 1.0212579243772433,
+      "shim_invocations": 10
+    },
+    {
+      "direct_first": true,
+      "direct_ns": 156516099,
+      "pair": 4,
+      "pass_through_ns": 161439637,
+      "ratio": 1.0314570707515525,
+      "shim_invocations": 10
+    },
+    {
+      "direct_first": false,
+      "direct_ns": 151966982,
+      "pair": 5,
+      "pass_through_ns": 156532550,
+      "ratio": 1.0300431576643405,
+      "shim_invocations": 10
+    },
+    {
+      "direct_first": true,
+      "direct_ns": 150863453,
+      "pair": 6,
+      "pass_through_ns": 158024899,
+      "ratio": 1.0474697208475003,
+      "shim_invocations": 10
+    },
+    {
+      "direct_first": false,
+      "direct_ns": 150771213,
+      "pair": 7,
+      "pass_through_ns": 154507791,
+      "ratio": 1.0247830996756655,
+      "shim_invocations": 10
+    },
+    {
+      "direct_first": true,
+      "direct_ns": 150767203,
+      "pair": 8,
+      "pass_through_ns": 151362852,
+      "ratio": 1.0039507862993253,
+      "shim_invocations": 10
+    },
+    {
+      "direct_first": false,
+      "direct_ns": 153549432,
+      "pair": 9,
+      "pass_through_ns": 161296017,
+      "ratio": 1.050450105214326,
+      "shim_invocations": 10
+    },
+    {
+      "direct_first": true,
+      "direct_ns": 150199464,
+      "pair": 10,
+      "pass_through_ns": 153747981,
+      "ratio": 1.0236253639360524,
+      "shim_invocations": 10
+    },
+    {
+      "direct_first": false,
+      "direct_ns": 153533901,
+      "pair": 11,
+      "pass_through_ns": 152964602,
+      "ratio": 0.9962920306440985,
+      "shim_invocations": 10
+    }
+  ]
+}

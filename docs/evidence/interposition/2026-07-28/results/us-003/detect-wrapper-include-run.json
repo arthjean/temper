@@ -1,0 +1,661 @@
+{
+  "schema_version": 2,
+  "experimental": true,
+  "compatibility": "No backward-compatibility promise during 0.x.",
+  "cli_version": "0.0.2",
+  "run_id": "1785256844-46099682-560400",
+  "status": "no_improvement",
+  "completed_phases": [
+    "preflight",
+    "baseline_build",
+    "static_builds",
+    "screening",
+    "pgo_training",
+    "pgo_build",
+    "candidate_selection",
+    "confirmation"
+  ],
+  "final_decision": "no_improvement",
+  "source_reproducibility": "clean",
+  "request": {
+    "minimum_improvement_percent": 2.0,
+    "timeout_seconds": 300,
+    "workload": {
+      "executable": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-workload.sh",
+      "arguments": []
+    }
+  },
+  "preflight": {
+    "host_triple": "x86_64-unknown-linux-gnu",
+    "kernel": "Linux 7.1.5-200.fc44.x86_64",
+    "cpu_model": "AMD Ryzen 7 7800X3D 8-Core Processor",
+    "logical_core_count": 16,
+    "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+    "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+    "manifest_path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/Cargo.toml",
+    "lockfile_path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/Cargo.lock",
+    "lockfile_sha256": "a153e9153787e8cdb7a21344bd1c28677686cd72bf9cfd19fb1f787255943a1e"
+  },
+  "target": {
+    "package_id": "path+file:///tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include#temper-include-loss@0.1.0",
+    "package_name": "temper-include-loss",
+    "binary_name": "temper-include-loss",
+    "workspace_root": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include"
+  },
+  "baseline": {
+    "strategy": "baseline",
+    "stage": "baseline",
+    "target_directory": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/baseline",
+    "cargo_arguments": [
+      "build",
+      "--release",
+      "--locked",
+      "--target",
+      "x86_64-unknown-linux-gnu",
+      "--message-format=json",
+      "--package",
+      "temper-include-loss",
+      "--bin",
+      "temper-include-loss",
+      "--target-dir",
+      "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/baseline"
+    ],
+    "cargo_config_overrides": [],
+    "environment_overrides": [],
+    "outcome": "built",
+    "executable_path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/baseline/x86_64-unknown-linux-gnu/release/temper-include-loss",
+    "sha256": "e8c664b58c908f35b99a76236b24c4b00b65ad2c0bb58e125718836a86874ad2",
+    "size_bytes": 446200,
+    "build_duration_ms": 102,
+    "bounded_diagnostics": "build-finished: success=true\n   Compiling temper-include-loss v0.1.0 (/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include)\n\n    Finished `release` profile [optimized] target(s) in 0.09s\n",
+    "compiler_diagnostics": [],
+    "diagnostics_truncated": false
+  },
+  "baseline_measurement": {
+    "sample_durations_ns": [
+      111463631,
+      111582771,
+      111465841,
+      111388692,
+      111529571,
+      111686321,
+      111380221
+    ],
+    "median_duration_ns": 111465841,
+    "relative_mad": 0.0006921313229942795,
+    "outcome": "stable"
+  },
+  "strategies": [
+    {
+      "identity": "thin-lto",
+      "build": {
+        "strategy": "thin-lto",
+        "stage": "static_candidate",
+        "target_directory": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/thin-lto",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "temper-include-loss",
+          "--bin",
+          "temper-include-loss",
+          "--target-dir",
+          "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/thin-lto",
+          "--config",
+          "profile.release.lto=\"thin\""
+        ],
+        "cargo_config_overrides": [
+          "profile.release.lto=\"thin\""
+        ],
+        "environment_overrides": [],
+        "outcome": "built",
+        "executable_path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/thin-lto/x86_64-unknown-linux-gnu/release/temper-include-loss",
+        "sha256": "f84b37b5718df44b5deef44ed9538a4735ed6c8f6c231a47d1e88f3794cccdf8",
+        "size_bytes": 434200,
+        "build_duration_ms": 1544,
+        "bounded_diagnostics": "build-finished: success=true\n   Compiling temper-include-loss v0.1.0 (/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include)\n\n    Finished `release` profile [optimized] target(s) in 1.53s\n",
+        "compiler_diagnostics": [],
+        "diagnostics_truncated": false
+      },
+      "build_failure": null,
+      "screening": {
+        "sample_durations_ns": [
+          111484491,
+          107266054,
+          111457281,
+          111437382,
+          111415531,
+          111502271,
+          111423231
+        ],
+        "median_duration_ns": 111437382,
+        "relative_mad": 0.00019608321379983604,
+        "outcome": "stable"
+      },
+      "workload_failure": null,
+      "rejection_reason": null
+    },
+    {
+      "identity": "fat-lto-cgu1",
+      "build": {
+        "strategy": "fat-lto-cgu1",
+        "stage": "static_candidate",
+        "target_directory": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/fat-lto-cgu1",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "temper-include-loss",
+          "--bin",
+          "temper-include-loss",
+          "--target-dir",
+          "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/fat-lto-cgu1",
+          "--config",
+          "profile.release.lto=\"fat\"",
+          "--config",
+          "profile.release.codegen-units=1"
+        ],
+        "cargo_config_overrides": [
+          "profile.release.lto=\"fat\"",
+          "profile.release.codegen-units=1"
+        ],
+        "environment_overrides": [],
+        "outcome": "built",
+        "executable_path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/fat-lto-cgu1/x86_64-unknown-linux-gnu/release/temper-include-loss",
+        "sha256": "af0f966cd983e156f477bfb3756aa35e7db21d14bb711ccd2396e4119e5f735e",
+        "size_bytes": 379152,
+        "build_duration_ms": 1664,
+        "bounded_diagnostics": "build-finished: success=true\n   Compiling temper-include-loss v0.1.0 (/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include)\n\n    Finished `release` profile [optimized] target(s) in 1.65s\n",
+        "compiler_diagnostics": [],
+        "diagnostics_truncated": false
+      },
+      "build_failure": null,
+      "screening": {
+        "sample_durations_ns": [
+          111424101,
+          111405721,
+          111689581,
+          111493491,
+          111413120,
+          111511212,
+          106518644
+        ],
+        "median_duration_ns": 111424101,
+        "relative_mad": 0.0006227557537125652,
+        "outcome": "stable"
+      },
+      "workload_failure": null,
+      "rejection_reason": "confirmation_rejected"
+    },
+    {
+      "identity": "pgo",
+      "build": {
+        "strategy": "pgo",
+        "stage": "pgo_optimized",
+        "target_directory": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/pgo",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "temper-include-loss",
+          "--bin",
+          "temper-include-loss",
+          "--target-dir",
+          "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/pgo",
+          "--config",
+          "profile.release.lto=\"fat\"",
+          "--config",
+          "profile.release.codegen-units=1"
+        ],
+        "cargo_config_overrides": [
+          "profile.release.lto=\"fat\"",
+          "profile.release.codegen-units=1"
+        ],
+        "environment_overrides": [
+          {
+            "name": "CARGO_ENCODED_RUSTFLAGS",
+            "arguments": [
+              "-Cprofile-use=/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/pgo/merged.profdata",
+              "-Cllvm-args=-pgo-warn-missing-function"
+            ]
+          }
+        ],
+        "outcome": "built",
+        "executable_path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/pgo/x86_64-unknown-linux-gnu/release/temper-include-loss",
+        "sha256": "afe2494b18645d0802fb527495b53475938e7ef7fa95655151bdd16acf928eb3",
+        "size_bytes": 374688,
+        "build_duration_ms": 1781,
+        "bounded_diagnostics": "warning: unexpected `cfg` condition name: `temper_included_sentinel`\n  --> src/main.rs:17:7\n   |\n17 | #[cfg(temper_included_sentinel)]\n   |       ^^^^^^^^^^^^^^^^^^^^^^^^\n   |\n   = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n   = help: consider using a Cargo feature instead\n   = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n            [lints.rust]\n            unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_included_sentinel)'] }\n   = help: or consider adding `println!(\"cargo::rustc-check-cfg=cfg(temper_included_sentinel)\");` to the top of the `build.rs`\n   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n   = note: `#[warn(unexpected_cfgs)]` on by default\n\n\nwarning: unexpected `cfg` condition name: `temper_included_sentinel`\n  --> src/main.rs:20:11\n   |\n20 | #[cfg(not(temper_included_sentinel))]\n   |           ^^^^^^^^^^^^^^^^^^^^^^^^\n   |\n   = help: consider using a Cargo feature instead\n   = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n            [lints.rust]\n            unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_included_sentinel)'] }\n   = help: or consider adding `println!(\"cargo::rustc-check-cfg=cfg(temper_included_sentinel)\");` to the top of the `build.rs`\n   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n\n\nbuild-finished: success=true\n   Compiling temper-include-loss v0.1.0 (/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include)\n\n    Finished `release` profile [optimized] target(s) in 1.77s\n",
+        "compiler_diagnostics": [
+          {
+            "package_id": "path+file:///tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include#temper-include-loss@0.1.0",
+            "target_name": "temper-include-loss",
+            "target_kind": [
+              "bin"
+            ],
+            "target_src_path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/src/main.rs",
+            "level": "warning",
+            "code": "unexpected_cfgs",
+            "message": "unexpected `cfg` condition name: `temper_included_sentinel`",
+            "rendered": "warning: unexpected `cfg` condition name: `temper_included_sentinel`\n  --> src/main.rs:17:7\n   |\n17 | #[cfg(temper_included_sentinel)]\n   |       ^^^^^^^^^^^^^^^^^^^^^^^^\n   |\n   = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n   = help: consider using a Cargo feature instead\n   = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n            [lints.rust]\n            unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_included_sentinel)'] }\n   = help: or consider adding `println!(\"cargo::rustc-check-cfg=cfg(temper_included_sentinel)\");` to the top of the `build.rs`\n   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n   = note: `#[warn(unexpected_cfgs)]` on by default\n\n"
+          },
+          {
+            "package_id": "path+file:///tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include#temper-include-loss@0.1.0",
+            "target_name": "temper-include-loss",
+            "target_kind": [
+              "bin"
+            ],
+            "target_src_path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/src/main.rs",
+            "level": "warning",
+            "code": "unexpected_cfgs",
+            "message": "unexpected `cfg` condition name: `temper_included_sentinel`",
+            "rendered": "warning: unexpected `cfg` condition name: `temper_included_sentinel`\n  --> src/main.rs:20:11\n   |\n20 | #[cfg(not(temper_included_sentinel))]\n   |           ^^^^^^^^^^^^^^^^^^^^^^^^\n   |\n   = help: consider using a Cargo feature instead\n   = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n            [lints.rust]\n            unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_included_sentinel)'] }\n   = help: or consider adding `println!(\"cargo::rustc-check-cfg=cfg(temper_included_sentinel)\");` to the top of the `build.rs`\n   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n\n"
+          }
+        ],
+        "diagnostics_truncated": false
+      },
+      "build_failure": null,
+      "screening": {
+        "sample_durations_ns": [
+          106518215,
+          111478741,
+          106366154,
+          111461741,
+          111425672,
+          111493801,
+          111391511
+        ],
+        "median_duration_ns": 111425672,
+        "relative_mad": 0.0004762726492688328,
+        "outcome": "stable"
+      },
+      "workload_failure": null,
+      "rejection_reason": null
+    }
+  ],
+  "pgo_base_strategy": "fat-lto-cgu1",
+  "pgo_training": {
+    "outcome": "trained",
+    "base_strategy": "fat-lto-cgu1",
+    "prerequisites": {
+      "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+      "target_libdir": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+      "preserved_target_rustflags": [],
+      "inspected_config_sources": [
+        {
+          "path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.cargo/config.toml",
+          "sha256": "9831b9b7690e5db4d5538b7098c4aadc7a995e53fe07064d3e6e62bbe0e28f87"
+        }
+      ],
+      "tool_identity": {
+        "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+        "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+        "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+        "llvm_profdata_sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+        "llvm_profdata_version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+      }
+    },
+    "instrumentation_build": {
+      "strategy": "pgo",
+      "stage": "pgo_instrumentation",
+      "target_directory": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/pgo-instrumented",
+      "cargo_arguments": [
+        "build",
+        "--release",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--message-format=json",
+        "--package",
+        "temper-include-loss",
+        "--bin",
+        "temper-include-loss",
+        "--target-dir",
+        "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/pgo-instrumented",
+        "--config",
+        "profile.release.lto=\"fat\"",
+        "--config",
+        "profile.release.codegen-units=1"
+      ],
+      "cargo_config_overrides": [
+        "profile.release.lto=\"fat\"",
+        "profile.release.codegen-units=1"
+      ],
+      "environment_overrides": [
+        {
+          "name": "CARGO_ENCODED_RUSTFLAGS",
+          "arguments": [
+            "-Cprofile-generate=/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/pgo/raw"
+          ]
+        }
+      ],
+      "outcome": "built",
+      "executable_path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/pgo-instrumented/x86_64-unknown-linux-gnu/release/temper-include-loss",
+      "sha256": "e71369f03d22e75200344074fc0c6c231145e204106592e18371b18a6edc180a",
+      "size_bytes": 455136,
+      "build_duration_ms": 1660,
+      "bounded_diagnostics": "warning: unexpected `cfg` condition name: `temper_included_sentinel`\n  --> src/main.rs:17:7\n   |\n17 | #[cfg(temper_included_sentinel)]\n   |       ^^^^^^^^^^^^^^^^^^^^^^^^\n   |\n   = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n   = help: consider using a Cargo feature instead\n   = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n            [lints.rust]\n            unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_included_sentinel)'] }\n   = help: or consider adding `println!(\"cargo::rustc-check-cfg=cfg(temper_included_sentinel)\");` to the top of the `build.rs`\n   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n   = note: `#[warn(unexpected_cfgs)]` on by default\n\n\nwarning: unexpected `cfg` condition name: `temper_included_sentinel`\n  --> src/main.rs:20:11\n   |\n20 | #[cfg(not(temper_included_sentinel))]\n   |           ^^^^^^^^^^^^^^^^^^^^^^^^\n   |\n   = help: consider using a Cargo feature instead\n   = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n            [lints.rust]\n            unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_included_sentinel)'] }\n   = help: or consider adding `println!(\"cargo::rustc-check-cfg=cfg(temper_included_sentinel)\");` to the top of the `build.rs`\n   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n\n\nbuild-finished: success=true\n   Compiling temper-include-loss v0.1.0 (/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include)\n\n    Finished `release` profile [optimized] target(s) in 1.65s\n",
+      "compiler_diagnostics": [
+        {
+          "package_id": "path+file:///tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include#temper-include-loss@0.1.0",
+          "target_name": "temper-include-loss",
+          "target_kind": [
+            "bin"
+          ],
+          "target_src_path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/src/main.rs",
+          "level": "warning",
+          "code": "unexpected_cfgs",
+          "message": "unexpected `cfg` condition name: `temper_included_sentinel`",
+          "rendered": "warning: unexpected `cfg` condition name: `temper_included_sentinel`\n  --> src/main.rs:17:7\n   |\n17 | #[cfg(temper_included_sentinel)]\n   |       ^^^^^^^^^^^^^^^^^^^^^^^^\n   |\n   = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n   = help: consider using a Cargo feature instead\n   = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n            [lints.rust]\n            unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_included_sentinel)'] }\n   = help: or consider adding `println!(\"cargo::rustc-check-cfg=cfg(temper_included_sentinel)\");` to the top of the `build.rs`\n   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n   = note: `#[warn(unexpected_cfgs)]` on by default\n\n"
+        },
+        {
+          "package_id": "path+file:///tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include#temper-include-loss@0.1.0",
+          "target_name": "temper-include-loss",
+          "target_kind": [
+            "bin"
+          ],
+          "target_src_path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/src/main.rs",
+          "level": "warning",
+          "code": "unexpected_cfgs",
+          "message": "unexpected `cfg` condition name: `temper_included_sentinel`",
+          "rendered": "warning: unexpected `cfg` condition name: `temper_included_sentinel`\n  --> src/main.rs:20:11\n   |\n20 | #[cfg(not(temper_included_sentinel))]\n   |           ^^^^^^^^^^^^^^^^^^^^^^^^\n   |\n   = help: consider using a Cargo feature instead\n   = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n            [lints.rust]\n            unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_included_sentinel)'] }\n   = help: or consider adding `println!(\"cargo::rustc-check-cfg=cfg(temper_included_sentinel)\");` to the top of the `build.rs`\n   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n\n"
+        }
+      ],
+      "diagnostics_truncated": false
+    },
+    "instrumentation_failure": null,
+    "training_duration_ns": 111414672,
+    "raw_profile_files": [
+      {
+        "path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/pgo/raw/temper-16335219665362061034_0-562414.profraw",
+        "size_bytes": 1048,
+        "sha256": "172f1de74f3a14826cb534f8d3c2cb2951bbd33af6608c6aa81ccd3f31bc516a"
+      }
+    ],
+    "merge": {
+      "outcome": "merged",
+      "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+      "arguments": [
+        "merge",
+        "--failure-mode=any",
+        "-o",
+        "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/pgo/merged.profdata",
+        "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/pgo/raw/temper-16335219665362061034_0-562414.profraw"
+      ],
+      "profraw_files": [
+        {
+          "path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/pgo/raw/temper-16335219665362061034_0-562414.profraw",
+          "size_bytes": 1048,
+          "sha256": "172f1de74f3a14826cb534f8d3c2cb2951bbd33af6608c6aa81ccd3f31bc516a"
+        }
+      ],
+      "profdata_path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/pgo/merged.profdata",
+      "profdata_size_bytes": 2072,
+      "profdata_sha256": "85de56a6a4e02bc6463a1244a5f0aa1e54d051332e251e4269108b06ce4073bd",
+      "bounded_diagnostics": "",
+      "diagnostics_truncated": false,
+      "message": null
+    },
+    "phase_parity": {
+      "permitted_differences": [
+        "target_directory",
+        "profile_generate_vs_use",
+        "pgo_warn_missing_function_in_use"
+      ],
+      "instrumentation": {
+        "package_id": "path+file:///tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include#temper-include-loss@0.1.0",
+        "binary_target": "temper-include-loss",
+        "target_triple": "x86_64-unknown-linux-gnu",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "temper-include-loss",
+          "--bin",
+          "temper-include-loss",
+          "--target-dir",
+          "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/pgo-instrumented",
+          "--config",
+          "profile.release.lto=\"fat\"",
+          "--config",
+          "profile.release.codegen-units=1"
+        ],
+        "base_profile_overrides": [
+          "profile.release.lto=\"fat\"",
+          "profile.release.codegen-units=1"
+        ],
+        "project_rustflags": [],
+        "config_sources": [
+          {
+            "path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.cargo/config.toml",
+            "sha256": "9831b9b7690e5db4d5538b7098c4aadc7a995e53fe07064d3e6e62bbe0e28f87"
+          }
+        ],
+        "cargo_identity": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+        "rustc_identity": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+        "llvm_profdata_identity": {
+          "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+          "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+          "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "llvm_profdata_sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+          "llvm_profdata_version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+        },
+        "target_directory": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/pgo-instrumented",
+        "environment_overrides": [
+          {
+            "name": "CARGO_ENCODED_RUSTFLAGS",
+            "arguments": [
+              "-Cprofile-generate=/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/pgo/raw"
+            ]
+          }
+        ]
+      },
+      "optimization": {
+        "package_id": "path+file:///tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include#temper-include-loss@0.1.0",
+        "binary_target": "temper-include-loss",
+        "target_triple": "x86_64-unknown-linux-gnu",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "temper-include-loss",
+          "--bin",
+          "temper-include-loss",
+          "--target-dir",
+          "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/pgo",
+          "--config",
+          "profile.release.lto=\"fat\"",
+          "--config",
+          "profile.release.codegen-units=1"
+        ],
+        "base_profile_overrides": [
+          "profile.release.lto=\"fat\"",
+          "profile.release.codegen-units=1"
+        ],
+        "project_rustflags": [],
+        "config_sources": [
+          {
+            "path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.cargo/config.toml",
+            "sha256": "9831b9b7690e5db4d5538b7098c4aadc7a995e53fe07064d3e6e62bbe0e28f87"
+          }
+        ],
+        "cargo_identity": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+        "rustc_identity": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+        "llvm_profdata_identity": {
+          "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+          "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+          "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "llvm_profdata_sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+          "llvm_profdata_version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+        },
+        "target_directory": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/pgo",
+        "environment_overrides": [
+          {
+            "name": "CARGO_ENCODED_RUSTFLAGS",
+            "arguments": [
+              "-Cprofile-use=/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/pgo/merged.profdata",
+              "-Cllvm-args=-pgo-warn-missing-function"
+            ]
+          }
+        ]
+      },
+      "matched": true,
+      "unexpected_differences": []
+    },
+    "failure_stage": null,
+    "rejection_reason": null,
+    "message": null,
+    "remediation": null
+  },
+  "selected_candidate": "fat-lto-cgu1",
+  "confirmation": {
+    "strategy": "fat-lto-cgu1",
+    "outcome": "rejected",
+    "baseline_build": {
+      "strategy": "baseline",
+      "stage": "confirmation",
+      "target_directory": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/confirmation/baseline",
+      "cargo_arguments": [
+        "build",
+        "--release",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--message-format=json",
+        "--package",
+        "temper-include-loss",
+        "--bin",
+        "temper-include-loss",
+        "--target-dir",
+        "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/confirmation/baseline"
+      ],
+      "cargo_config_overrides": [],
+      "environment_overrides": [],
+      "outcome": "built",
+      "executable_path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/confirmation/baseline/x86_64-unknown-linux-gnu/release/temper-include-loss",
+      "sha256": "e8c664b58c908f35b99a76236b24c4b00b65ad2c0bb58e125718836a86874ad2",
+      "size_bytes": 446200,
+      "build_duration_ms": 105,
+      "bounded_diagnostics": "build-finished: success=true\n   Compiling temper-include-loss v0.1.0 (/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include)\n\n    Finished `release` profile [optimized] target(s) in 0.09s\n",
+      "compiler_diagnostics": [],
+      "diagnostics_truncated": false
+    },
+    "baseline_build_failure": null,
+    "candidate_build": {
+      "strategy": "fat-lto-cgu1",
+      "stage": "confirmation",
+      "target_directory": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/confirmation/fat-lto-cgu1",
+      "cargo_arguments": [
+        "build",
+        "--release",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--message-format=json",
+        "--package",
+        "temper-include-loss",
+        "--bin",
+        "temper-include-loss",
+        "--target-dir",
+        "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/confirmation/fat-lto-cgu1",
+        "--config",
+        "profile.release.lto=\"fat\"",
+        "--config",
+        "profile.release.codegen-units=1"
+      ],
+      "cargo_config_overrides": [
+        "profile.release.lto=\"fat\"",
+        "profile.release.codegen-units=1"
+      ],
+      "environment_overrides": [],
+      "outcome": "built",
+      "executable_path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include/.temper/runs/1785256844-46099682-560400/target/confirmation/fat-lto-cgu1/x86_64-unknown-linux-gnu/release/temper-include-loss",
+      "sha256": "af0f966cd983e156f477bfb3756aa35e7db21d14bb711ccd2396e4119e5f735e",
+      "size_bytes": 379152,
+      "build_duration_ms": 1660,
+      "bounded_diagnostics": "build-finished: success=true\n   Compiling temper-include-loss v0.1.0 (/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-wrapper-include)\n\n    Finished `release` profile [optimized] target(s) in 1.65s\n",
+      "compiler_diagnostics": [],
+      "diagnostics_truncated": false
+    },
+    "candidate_build_failure": null,
+    "measurement": {
+      "baseline_durations_ns": [
+        111472031,
+        111442621,
+        111499311,
+        111476111,
+        112844141,
+        111409711,
+        111549931,
+        111471361,
+        106430564,
+        108719963,
+        111388622,
+        106441764,
+        106342534,
+        111387981,
+        106430945,
+        113135081,
+        111494045,
+        111432396,
+        106397829,
+        111360276
+      ],
+      "candidate_durations_ns": [
+        111513001,
+        111434122,
+        111428351,
+        111442521,
+        111554811,
+        111461871,
+        111380502,
+        111505451,
+        111475631,
+        111431341,
+        111406631,
+        106408734,
+        111403772,
+        106371464,
+        106351835,
+        106457024,
+        106403459,
+        106383468,
+        106356898,
+        106399059
+      ],
+      "median_ratio": 0.99965249588642,
+      "baseline_relative_mad": 0.0006787316935516665,
+      "candidate_relative_mad": 0.0009337535327457468,
+      "confidence_interval_95": {
+        "lower": 0.9935276891028216,
+        "upper": 1.0002337478278815
+      },
+      "threshold_ratio": 0.98,
+      "outcome": "insufficient_improvement"
+    },
+    "workload_failure": null,
+    "rejection_reason": "insufficient_improvement"
+  },
+  "promotion": null,
+  "failure": null
+}

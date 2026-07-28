@@ -1,0 +1,21 @@
+{
+  "records": 7,
+  "sentinel": "temper_included_sentinel",
+  "stages": {
+    "unattributed": {
+      "host_compiles": 0,
+      "host_compiles_with_sentinel": 0,
+      "host_crates": [],
+      "other": 4,
+      "probes": 2,
+      "target_compiles": 1,
+      "target_compiles_with_sentinel": 0,
+      "target_crates": [
+        {
+          "crate": "temper_include_loss",
+          "sentinel": false
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,152 @@
+{
+  "counts": {
+    "host_compile": 2,
+    "other": 4,
+    "probe": 2,
+    "target_compile": 2
+  },
+  "detail": {
+    "host_compile": [
+      {
+        "argv_length": 31,
+        "crate": "temper_units_macro",
+        "crate_types": [
+          "proc-macro"
+        ],
+        "emit": true,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 27,
+        "crate": "build_script_build",
+        "crate_types": [
+          "bin"
+        ],
+        "emit": true,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      }
+    ],
+    "other": [
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 1,
+        "crate": null,
+        "crate_types": [],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": false,
+        "stage": "unattributed"
+      }
+    ],
+    "probe": [
+      {
+        "argv_length": 23,
+        "crate": "___",
+        "crate_types": [
+          "bin",
+          "rlib",
+          "dylib",
+          "cdylib",
+          "staticlib",
+          "proc-macro"
+        ],
+        "emit": false,
+        "exact_target": true,
+        "injected": [],
+        "print": true,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 21,
+        "crate": "___",
+        "crate_types": [
+          "bin",
+          "rlib",
+          "dylib",
+          "cdylib",
+          "staticlib",
+          "proc-macro"
+        ],
+        "emit": false,
+        "exact_target": false,
+        "injected": [],
+        "print": true,
+        "stage": "unattributed"
+      }
+    ],
+    "target_compile": [
+      {
+        "argv_length": 39,
+        "crate": "temper_units_app",
+        "crate_types": [
+          "bin"
+        ],
+        "emit": true,
+        "exact_target": true,
+        "injected": [
+          "-Cprofile-generate=/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us002-profraw"
+        ],
+        "print": false,
+        "stage": "unattributed"
+      },
+      {
+        "argv_length": 31,
+        "crate": "temper_units_lib",
+        "crate_types": [
+          "lib"
+        ],
+        "emit": true,
+        "exact_target": true,
+        "injected": [
+          "-Cprofile-generate=/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us002-profraw"
+        ],
+        "print": false,
+        "stage": "unattributed"
+      }
+    ]
+  },
+  "injected_by_class": {
+    "host_compile": 0,
+    "other": 0,
+    "probe": 0,
+    "target_compile": 2
+  },
+  "injected_records": 2,
+  "records": 10
+}

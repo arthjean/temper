@@ -1,0 +1,68 @@
+{
+  "claims": {
+    "note": "This directory retains correctness and cost evidence only. It makes no runtime optimization claim.",
+    "optimization_gain": null
+  },
+  "date": "2026-07-28",
+  "epic": "EP-001",
+  "harness_sha256": {
+    "analyze.py": "31f2dd2b485a08ac8d728298ff1e911a5e5de30b47b265ddae7e0a7dce81d3db",
+    "bench_overhead.py": "a7fe37271c9da048c26891453ef364fc85cbb641a8f82afad1724a0b58258408",
+    "fake-rustc.rs": "63c8201d98281152beed72b15e78d4b93a9d81df259de373f44cc83618d771ae",
+    "lib.sh": "d6786be612ac6724b05ffcf482831f43587aaf0b56791566059dfab35f2a9c1e",
+    "probe_process.py": "303725473a0ede33a8abe5d06fca1cc5ef7f7cd3e425f0a09323b623fe607af1",
+    "run-all.sh": "dc744847057b0bcbb697f8cf98cda2badd69bc72b8049d749de077c2835a51bc",
+    "sha256.rs": "3c2e945318920ec4600f518bbbafee503de09a92b08ddc1813fa01e1da9197bf",
+    "shim.rs": "3165e998cf858f0388cf5ced4415546dcb0c2542b4431e4b37efc36ab2e6ddde",
+    "summarize.py": "0dc5ee32410dea8f8d99dd5d7f874a7c13139b7a55efd473887031648bd699e7",
+    "us001.sh": "1fb84e13f20bc4f5e612d1be020775e623914f0bc562499419381eb97ea372b1",
+    "us002.sh": "f763ffd9469cbbb254167b464bb7a36a70c0d3d5e24fa44dea3b02564956568f",
+    "us003.sh": "f3cda2466359cf27c4d17cd76570e2399b3b90c211e94d724a765ece3fbbcceb",
+    "verify_us001.py": "30e33cfa70115b61279e0d3a52be2ac9fb553ed3e17474878d300aa2ca61dbee",
+    "verify_us002.py": "d9b5d53705b5ab407d0cb6333d611662a1c865d6c62aa20cb52fc78067911b0b",
+    "verify_us003.py": "717bdf37609eb32d20cec6c898a13c4bad01ca7e8900af28b446a39bb601087c",
+    "wrapper.rs": "51ec891be4caca070cd01ea09e73e40e13335495594d6ffd9716efea8fa2142a"
+  },
+  "headline": {
+    "median_overhead_percent": 2.244,
+    "overhead_pairs": 12,
+    "parity_matched": true,
+    "parity_mutations_rejected": 12,
+    "parity_mutations_total": 13,
+    "pass_through_executable_identical": true
+  },
+  "identity": {
+    "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+    "cpu_model": "AMD Ryzen 7 7800X3D 8-Core Processor",
+    "host_triple": "x86_64-unknown-linux-gnu",
+    "kernel": "7.1.5-200.fc44.x86_64",
+    "logical_cores": 16,
+    "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+    "rustc_verbose": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+    "temper_commit": "f1619f9201c2abe75043952fb278c0d0c2295034",
+    "temper_tracked_diff": "M docs/verification-v0.0.1.md"
+  },
+  "passed": true,
+  "prd": "tasks/prd-temper-v0.0.3.md",
+  "stories": {
+    "us-001": {
+      "checks_failed": 0,
+      "checks_total": 39,
+      "passed": true,
+      "title": "Reproduce the stable Cargo include loss"
+    },
+    "us-002": {
+      "checks_failed": 0,
+      "checks_total": 57,
+      "passed": true,
+      "title": "Validate shim classification, transparency and parity inputs"
+    },
+    "us-003": {
+      "checks_failed": 0,
+      "checks_total": 29,
+      "passed": true,
+      "title": "Validate the wrapper-cache boundary, fingerprints and overhead"
+    }
+  },
+  "workload_class": "synthetic"
+}

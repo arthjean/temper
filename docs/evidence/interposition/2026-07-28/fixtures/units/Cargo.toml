@@ -1,0 +1,6 @@
+[workspace]
+members = ["app", "unitlib", "unitmacro"]
+resolver = "3"
+
+[profile.release]
+debug = 0

@@ -1,0 +1,295 @@
+{
+  "checks": [
+    {
+      "check": "a wrapper-free build invokes no wrapper at all",
+      "detail": {
+        "records": 0
+      },
+      "passed": true
+    },
+    {
+      "check": "a general wrapper alone wraps the shim directly",
+      "detail": {
+        "next": [
+          "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/bin/shim"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "check": "a workspace wrapper alone wraps the shim directly",
+      "detail": {
+        "next": [
+          "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/bin/shim"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "check": "nested wrappers execute as $RUSTC_WRAPPER $RUSTC_WORKSPACE_WRAPPER $RUSTC",
+      "detail": {
+        "general_next": [
+          "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/bin/workspace-wrapper"
+        ],
+        "workspace_next": [
+          "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/bin/shim"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "check": "no wrapper in any fixture ever sees a shim-appended PGO control",
+      "detail": {
+        "general": 10,
+        "nested": 20,
+        "none": 0,
+        "workspace": 10
+      },
+      "passed": true
+    },
+    {
+      "check": "both nested wrappers see the same unit set, including Cargo's probes",
+      "detail": [
+        "___",
+        "build_script_build",
+        "temper_units_app",
+        "temper_units_lib",
+        "temper_units_macro"
+      ],
+      "passed": true
+    },
+    {
+      "check": "reference, generate and use produce one shared outer cache key per target crate",
+      "detail": {
+        "temper_units_app": {
+          "distinct_keys": 1,
+          "outcomes": [
+            "cache_hit",
+            "cache_miss"
+          ]
+        },
+        "temper_units_lib": {
+          "distinct_keys": 1,
+          "outcomes": [
+            "cache_hit",
+            "cache_miss"
+          ]
+        }
+      },
+      "passed": true
+    },
+    {
+      "check": "the instrumented and optimized phases are served from the reference cache entry",
+      "detail": {
+        "cache_hits": 8
+      },
+      "passed": true
+    },
+    {
+      "check": "a cached PGO phase silently returns the reference executable",
+      "detail": {
+        "generate": "979a06351430de5acb2b0f2fcaff8c4e3bf90564d7ddd34ea3453cf7c1332cf5",
+        "reference": "979a06351430de5acb2b0f2fcaff8c4e3bf90564d7ddd34ea3453cf7c1332cf5",
+        "use": "979a06351430de5acb2b0f2fcaff8c4e3bf90564d7ddd34ea3453cf7c1332cf5"
+      },
+      "passed": true
+    },
+    {
+      "check": "the cached instrumented executable emits no profile data while an uncached one does",
+      "detail": {
+        "cached_profraw": 0,
+        "uncached_profraw": 1
+      },
+      "passed": true
+    },
+    {
+      "check": "reusing a stage target directory hides the next PGO phase from Cargo entirely",
+      "detail": {
+        "alias_invocations": 0,
+        "alias_sha256": "979a06351430de5acb2b0f2fcaff8c4e3bf90564d7ddd34ea3453cf7c1332cf5",
+        "artifact_unchanged": true,
+        "first_invocations": 10,
+        "first_sha256": "979a06351430de5acb2b0f2fcaff8c4e3bf90564d7ddd34ea3453cf7c1332cf5",
+        "precreated_invocations": 8,
+        "second_invocations": 0,
+        "second_sha256": "979a06351430de5acb2b0f2fcaff8c4e3bf90564d7ddd34ea3453cf7c1332cf5"
+      },
+      "passed": true
+    },
+    {
+      "check": "a symlinked alias of a stage target directory is equally invisible",
+      "detail": {
+        "alias_invocations": 0,
+        "alias_sha256": "979a06351430de5acb2b0f2fcaff8c4e3bf90564d7ddd34ea3453cf7c1332cf5"
+      },
+      "passed": true
+    },
+    {
+      "check": "Cargo accepts a precreated stage directory without any warning, so Temper must reject it itself",
+      "detail": {
+        "precreated_invocations": 8
+      },
+      "passed": true
+    },
+    {
+      "check": "a fresh wrapper-free per-stage target directory recompiles every target unit",
+      "detail": {
+        "us003-instr": {
+          "host_compiles": 2,
+          "shim_invocations": 10,
+          "target_compiles": 2
+        },
+        "us003-reuse-first": {
+          "host_compiles": 2,
+          "shim_invocations": 10,
+          "target_compiles": 2
+        },
+        "us003-wrapper-order": {
+          "host_compiles": 2,
+          "shim_invocations": 10,
+          "target_compiles": 2
+        }
+      },
+      "passed": true
+    },
+    {
+      "check": "an outer cache removes every instrumented and optimized compilation from the shim",
+      "detail": {
+        "us003-cache-generate": {
+          "host_compiles": 0,
+          "shim_invocations": 6,
+          "target_compiles": 0
+        },
+        "us003-cache-reference": {
+          "host_compiles": 2,
+          "shim_invocations": 10,
+          "target_compiles": 2
+        },
+        "us003-cache-use": {
+          "host_compiles": 0,
+          "shim_invocations": 6,
+          "target_compiles": 0
+        }
+      },
+      "passed": true
+    },
+    {
+      "check": "v0.0.2 detects the wrapper-direct compiler override",
+      "detail": {
+        "outcome": "rejected",
+        "rejection_reason": "unproven_compiler_override"
+      },
+      "passed": true
+    },
+    {
+      "check": "v0.0.2 does not detect the wrapper-include compiler override",
+      "detail": {
+        "outcome": "trained",
+        "rejection_reason": null
+      },
+      "passed": true
+    },
+    {
+      "check": "wrapper-include: the undetected override really compiled the run",
+      "detail": {
+        "configured_compiler_invocations": 0,
+        "target_compiles": 0,
+        "wrapper_records": 53
+      },
+      "passed": true
+    },
+    {
+      "check": "v0.0.2 detects the workspace-wrapper-direct compiler override",
+      "detail": {
+        "outcome": "rejected",
+        "rejection_reason": "unproven_compiler_override"
+      },
+      "passed": true
+    },
+    {
+      "check": "v0.0.2 does not detect the workspace-wrapper-include compiler override",
+      "detail": {
+        "outcome": "trained",
+        "rejection_reason": null
+      },
+      "passed": true
+    },
+    {
+      "check": "workspace-wrapper-include: the undetected override really compiled the run",
+      "detail": {
+        "configured_compiler_invocations": 0,
+        "target_compiles": 0,
+        "wrapper_records": 53
+      },
+      "passed": true
+    },
+    {
+      "check": "v0.0.2 detects the rustc-direct compiler override",
+      "detail": {
+        "outcome": "rejected",
+        "rejection_reason": "unproven_compiler_override"
+      },
+      "passed": true
+    },
+    {
+      "check": "v0.0.2 does not detect the rustc-include compiler override",
+      "detail": {
+        "outcome": "trained",
+        "rejection_reason": null
+      },
+      "passed": true
+    },
+    {
+      "check": "rustc-include: the undetected override really compiled the run",
+      "detail": {
+        "configured_compiler_invocations": 53,
+        "target_compiles": 7,
+        "wrapper_records": 0
+      },
+      "passed": true
+    },
+    {
+      "check": "an ambient general wrapper rejects only PGO and keeps static candidates eligible",
+      "detail": {
+        "rejection_reason": "ambient_compiler_override",
+        "static_candidates_built": true
+      },
+      "passed": true
+    },
+    {
+      "check": "an ambient workspace wrapper rejects only PGO and keeps static candidates eligible",
+      "detail": {
+        "rejection_reason": "ambient_compiler_override",
+        "static_candidates_built": true
+      },
+      "passed": true
+    },
+    {
+      "check": "at least ten paired cold builds were measured",
+      "detail": {
+        "pairs": 12
+      },
+      "passed": true
+    },
+    {
+      "check": "median pass-through shim overhead is at or below 5%",
+      "detail": {
+        "median_direct_ms": 152.1,
+        "median_overhead_percent": 2.244,
+        "median_pass_through_ms": 154.6
+      },
+      "passed": true
+    },
+    {
+      "check": "every measured pass-through build actually went through the shim",
+      "detail": {
+        "min_invocations": 10
+      },
+      "passed": true
+    }
+  ],
+  "checks_failed": [],
+  "checks_total": 29,
+  "passed": true,
+  "story": "US-003"
+}

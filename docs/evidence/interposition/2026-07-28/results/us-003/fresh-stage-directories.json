@@ -1,0 +1,36 @@
+{
+  "cached": {
+    "us003-cache-generate": {
+      "host_compiles": 0,
+      "shim_invocations": 6,
+      "target_compiles": 0
+    },
+    "us003-cache-reference": {
+      "host_compiles": 2,
+      "shim_invocations": 10,
+      "target_compiles": 2
+    },
+    "us003-cache-use": {
+      "host_compiles": 0,
+      "shim_invocations": 6,
+      "target_compiles": 0
+    }
+  },
+  "wrapper_free": {
+    "us003-instr": {
+      "host_compiles": 2,
+      "shim_invocations": 10,
+      "target_compiles": 2
+    },
+    "us003-reuse-first": {
+      "host_compiles": 2,
+      "shim_invocations": 10,
+      "target_compiles": 2
+    },
+    "us003-wrapper-order": {
+      "host_compiles": 2,
+      "shim_invocations": 10,
+      "target_compiles": 2
+    }
+  }
+}

@@ -1,0 +1,363 @@
+{
+  "schema_version": 2,
+  "experimental": true,
+  "compatibility": "No backward-compatibility promise during 0.x.",
+  "cli_version": "0.0.2",
+  "run_id": "1785256861-279706949-564831",
+  "status": "no_improvement",
+  "completed_phases": [
+    "preflight",
+    "baseline_build",
+    "static_builds",
+    "screening",
+    "pgo_training",
+    "pgo_build",
+    "candidate_selection",
+    "confirmation"
+  ],
+  "final_decision": "no_improvement",
+  "source_reproducibility": "clean",
+  "request": {
+    "minimum_improvement_percent": 2.0,
+    "timeout_seconds": 300,
+    "workload": {
+      "executable": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-workload.sh",
+      "arguments": []
+    }
+  },
+  "preflight": {
+    "host_triple": "x86_64-unknown-linux-gnu",
+    "kernel": "Linux 7.1.5-200.fc44.x86_64",
+    "cpu_model": "AMD Ryzen 7 7800X3D 8-Core Processor",
+    "logical_core_count": 16,
+    "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+    "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+    "manifest_path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct/Cargo.toml",
+    "lockfile_path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct/Cargo.lock",
+    "lockfile_sha256": "a153e9153787e8cdb7a21344bd1c28677686cd72bf9cfd19fb1f787255943a1e"
+  },
+  "target": {
+    "package_id": "path+file:///tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct#temper-include-loss@0.1.0",
+    "package_name": "temper-include-loss",
+    "binary_name": "temper-include-loss",
+    "workspace_root": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct"
+  },
+  "baseline": {
+    "strategy": "baseline",
+    "stage": "baseline",
+    "target_directory": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct/.temper/runs/1785256861-279706949-564831/target/baseline",
+    "cargo_arguments": [
+      "build",
+      "--release",
+      "--locked",
+      "--target",
+      "x86_64-unknown-linux-gnu",
+      "--message-format=json",
+      "--package",
+      "temper-include-loss",
+      "--bin",
+      "temper-include-loss",
+      "--target-dir",
+      "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct/.temper/runs/1785256861-279706949-564831/target/baseline"
+    ],
+    "cargo_config_overrides": [],
+    "environment_overrides": [],
+    "outcome": "built",
+    "executable_path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct/.temper/runs/1785256861-279706949-564831/target/baseline/x86_64-unknown-linux-gnu/release/temper-include-loss",
+    "sha256": "5dea12aed97af7148f88576de280b8c2ebea331b36871387158128bd4cfa68b8",
+    "size_bytes": 446200,
+    "build_duration_ms": 101,
+    "bounded_diagnostics": "build-finished: success=true\n   Compiling temper-include-loss v0.1.0 (/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct)\n\n    Finished `release` profile [optimized] target(s) in 0.09s\n",
+    "compiler_diagnostics": [],
+    "diagnostics_truncated": false
+  },
+  "baseline_measurement": {
+    "sample_durations_ns": [
+      106334008,
+      111445506,
+      106384579,
+      106477908,
+      106406889,
+      111462706,
+      106519798
+    ],
+    "median_duration_ns": 106477908,
+    "relative_mad": 0.0008765104588643872,
+    "outcome": "stable"
+  },
+  "strategies": [
+    {
+      "identity": "thin-lto",
+      "build": {
+        "strategy": "thin-lto",
+        "stage": "static_candidate",
+        "target_directory": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct/.temper/runs/1785256861-279706949-564831/target/thin-lto",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "temper-include-loss",
+          "--bin",
+          "temper-include-loss",
+          "--target-dir",
+          "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct/.temper/runs/1785256861-279706949-564831/target/thin-lto",
+          "--config",
+          "profile.release.lto=\"thin\""
+        ],
+        "cargo_config_overrides": [
+          "profile.release.lto=\"thin\""
+        ],
+        "environment_overrides": [],
+        "outcome": "built",
+        "executable_path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct/.temper/runs/1785256861-279706949-564831/target/thin-lto/x86_64-unknown-linux-gnu/release/temper-include-loss",
+        "sha256": "83ecb64cdca0e9fae37a197d03351979a079d210f92847cafc514985bd48f00c",
+        "size_bytes": 434184,
+        "build_duration_ms": 1528,
+        "bounded_diagnostics": "build-finished: success=true\n   Compiling temper-include-loss v0.1.0 (/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct)\n\n    Finished `release` profile [optimized] target(s) in 1.52s\n",
+        "compiler_diagnostics": [],
+        "diagnostics_truncated": false
+      },
+      "build_failure": null,
+      "screening": {
+        "sample_durations_ns": [
+          111394316,
+          111478806,
+          111539645,
+          111432796,
+          106965158,
+          111368446,
+          111480496
+        ],
+        "median_duration_ns": 111432796,
+        "relative_mad": 0.0004280606940886595,
+        "outcome": "stable"
+      },
+      "workload_failure": null,
+      "rejection_reason": "confirmation_rejected"
+    },
+    {
+      "identity": "fat-lto-cgu1",
+      "build": {
+        "strategy": "fat-lto-cgu1",
+        "stage": "static_candidate",
+        "target_directory": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct/.temper/runs/1785256861-279706949-564831/target/fat-lto-cgu1",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "temper-include-loss",
+          "--bin",
+          "temper-include-loss",
+          "--target-dir",
+          "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct/.temper/runs/1785256861-279706949-564831/target/fat-lto-cgu1",
+          "--config",
+          "profile.release.lto=\"fat\"",
+          "--config",
+          "profile.release.codegen-units=1"
+        ],
+        "cargo_config_overrides": [
+          "profile.release.lto=\"fat\"",
+          "profile.release.codegen-units=1"
+        ],
+        "environment_overrides": [],
+        "outcome": "built",
+        "executable_path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct/.temper/runs/1785256861-279706949-564831/target/fat-lto-cgu1/x86_64-unknown-linux-gnu/release/temper-include-loss",
+        "sha256": "774795b39e294773455419da561b74b7aa5c04e4c9e6db744ce8467c9499d081",
+        "size_bytes": 379152,
+        "build_duration_ms": 1627,
+        "bounded_diagnostics": "build-finished: success=true\n   Compiling temper-include-loss v0.1.0 (/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct)\n\n    Finished `release` profile [optimized] target(s) in 1.61s\n",
+        "compiler_diagnostics": [],
+        "diagnostics_truncated": false
+      },
+      "build_failure": null,
+      "screening": {
+        "sample_durations_ns": [
+          111436406,
+          106397638,
+          111500606,
+          111525756,
+          111413265,
+          106464459,
+          111440876
+        ],
+        "median_duration_ns": 111436406,
+        "relative_mad": 0.0005761133394772261,
+        "outcome": "stable"
+      },
+      "workload_failure": null,
+      "rejection_reason": null
+    },
+    {
+      "identity": "pgo",
+      "build": null,
+      "build_failure": null,
+      "screening": null,
+      "workload_failure": null,
+      "rejection_reason": "pgo_training_rejected"
+    }
+  ],
+  "pgo_base_strategy": "baseline",
+  "pgo_training": {
+    "outcome": "rejected",
+    "base_strategy": "baseline",
+    "prerequisites": null,
+    "instrumentation_build": null,
+    "instrumentation_failure": null,
+    "training_duration_ns": null,
+    "raw_profile_files": [],
+    "merge": null,
+    "phase_parity": {
+      "permitted_differences": [
+        "target_directory",
+        "profile_generate_vs_use",
+        "pgo_warn_missing_function_in_use"
+      ],
+      "instrumentation": null,
+      "optimization": null,
+      "matched": false,
+      "unexpected_differences": [
+        "instrumentation_inputs_unavailable"
+      ]
+    },
+    "failure_stage": "prerequisites",
+    "rejection_reason": "unproven_compiler_override",
+    "message": "PGO was rejected because effective build.rustc-workspace-wrapper may come from /tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct/.cargo/config.toml.",
+    "remediation": null
+  },
+  "selected_candidate": "thin-lto",
+  "confirmation": {
+    "strategy": "thin-lto",
+    "outcome": "rejected",
+    "baseline_build": {
+      "strategy": "baseline",
+      "stage": "confirmation",
+      "target_directory": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct/.temper/runs/1785256861-279706949-564831/target/confirmation/baseline",
+      "cargo_arguments": [
+        "build",
+        "--release",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--message-format=json",
+        "--package",
+        "temper-include-loss",
+        "--bin",
+        "temper-include-loss",
+        "--target-dir",
+        "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct/.temper/runs/1785256861-279706949-564831/target/confirmation/baseline"
+      ],
+      "cargo_config_overrides": [],
+      "environment_overrides": [],
+      "outcome": "built",
+      "executable_path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct/.temper/runs/1785256861-279706949-564831/target/confirmation/baseline/x86_64-unknown-linux-gnu/release/temper-include-loss",
+      "sha256": "5dea12aed97af7148f88576de280b8c2ebea331b36871387158128bd4cfa68b8",
+      "size_bytes": 446200,
+      "build_duration_ms": 111,
+      "bounded_diagnostics": "build-finished: success=true\n   Compiling temper-include-loss v0.1.0 (/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct)\n\n    Finished `release` profile [optimized] target(s) in 0.10s\n",
+      "compiler_diagnostics": [],
+      "diagnostics_truncated": false
+    },
+    "baseline_build_failure": null,
+    "candidate_build": {
+      "strategy": "thin-lto",
+      "stage": "confirmation",
+      "target_directory": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct/.temper/runs/1785256861-279706949-564831/target/confirmation/thin-lto",
+      "cargo_arguments": [
+        "build",
+        "--release",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--message-format=json",
+        "--package",
+        "temper-include-loss",
+        "--bin",
+        "temper-include-loss",
+        "--target-dir",
+        "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct/.temper/runs/1785256861-279706949-564831/target/confirmation/thin-lto",
+        "--config",
+        "profile.release.lto=\"thin\""
+      ],
+      "cargo_config_overrides": [
+        "profile.release.lto=\"thin\""
+      ],
+      "environment_overrides": [],
+      "outcome": "built",
+      "executable_path": "/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct/.temper/runs/1785256861-279706949-564831/target/confirmation/thin-lto/x86_64-unknown-linux-gnu/release/temper-include-loss",
+      "sha256": "83ecb64cdca0e9fae37a197d03351979a079d210f92847cafc514985bd48f00c",
+      "size_bytes": 434184,
+      "build_duration_ms": 1528,
+      "bounded_diagnostics": "build-finished: success=true\n   Compiling temper-include-loss v0.1.0 (/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us003-detect-workspace-wrapper-direct)\n\n    Finished `release` profile [optimized] target(s) in 1.52s\n",
+      "compiler_diagnostics": [],
+      "diagnostics_truncated": false
+    },
+    "candidate_build_failure": null,
+    "measurement": {
+      "baseline_durations_ns": [
+        111438566,
+        106353719,
+        106378078,
+        111414136,
+        107009198,
+        106428668,
+        111464016,
+        106308909,
+        106468059,
+        111743255,
+        111462926,
+        111538396,
+        111447915,
+        111467475,
+        111436996,
+        111404356,
+        111447676,
+        111452726,
+        111369915,
+        111493106
+      ],
+      "candidate_durations_ns": [
+        106386388,
+        111436706,
+        111447396,
+        106453288,
+        106399089,
+        111457366,
+        111523276,
+        111686745,
+        106584448,
+        106524499,
+        111445296,
+        106430508,
+        111922766,
+        111452256,
+        111410116,
+        106498148,
+        106402818,
+        111490456,
+        106386289,
+        111386256
+      ],
+      "median_ratio": 0.9998003091420686,
+      "baseline_relative_mad": 0.00039820426790443717,
+      "candidate_relative_mad": 0.003649691387254726,
+      "confidence_interval_95": {
+        "lower": 0.9557170792595714,
+        "upper": 1.0008124168605046
+      },
+      "threshold_ratio": 0.98,
+      "outcome": "insufficient_improvement"
+    },
+    "workload_failure": null,
+    "rejection_reason": "insufficient_improvement"
+  },
+  "promotion": null,
+  "failure": null
+}

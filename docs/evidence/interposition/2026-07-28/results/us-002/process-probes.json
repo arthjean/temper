@@ -1,0 +1,278 @@
+{
+  "checks": [
+    {
+      "check": "shim forwards non-UTF-8 argument bytes without conversion",
+      "detail": {
+        "equal": true,
+        "expected_sha_len": 160,
+        "received_len": 160
+      },
+      "passed": true
+    },
+    {
+      "check": "shim preserves stdin, stdout and stderr across process replacement",
+      "detail": {
+        "stderr": "fake-rustc-stderr-marker",
+        "stdout": "fake-stdout-prefix:stdin-bytes-\u0000\\xff-end"
+      },
+      "passed": true
+    },
+    {
+      "check": "a non-UTF-8 argument is still digested and recorded",
+      "detail": {
+        "argv_display_tail": "--cfg=temper_\ufffd\ufffd_sentinel"
+      },
+      "passed": true
+    },
+    {
+      "check": "process replacement preserves the `ok` termination status",
+      "detail": {
+        "direct": 0,
+        "through_shim": 0
+      },
+      "passed": true
+    },
+    {
+      "check": "process replacement preserves the `exit42` termination status",
+      "detail": {
+        "direct": 42,
+        "through_shim": 42
+      },
+      "passed": true
+    },
+    {
+      "check": "process replacement preserves the `abort` termination status",
+      "detail": {
+        "direct": -6,
+        "through_shim": -6
+      },
+      "passed": true
+    },
+    {
+      "check": "protocol failure `missing_real_rustc` fails closed without a fallback compiler",
+      "detail": {
+        "canary_executed": false,
+        "exit": 97,
+        "stderr": "temper shim protocol failure (temper-exp-shim-1): missing private protocol value TEMPER_EXP_REAL_RUSTC"
+      },
+      "passed": true
+    },
+    {
+      "check": "protocol failure `empty_real_rustc` fails closed without a fallback compiler",
+      "detail": {
+        "canary_executed": false,
+        "exit": 97,
+        "stderr": "temper shim protocol failure (temper-exp-shim-1): missing private protocol value TEMPER_EXP_REAL_RUSTC"
+      },
+      "passed": true
+    },
+    {
+      "check": "protocol failure `relative_real_rustc` fails closed without a fallback compiler",
+      "detail": {
+        "canary_executed": false,
+        "exit": 97,
+        "stderr": "temper shim protocol failure (temper-exp-shim-1): TEMPER_EXP_REAL_RUSTC must be an absolute path"
+      },
+      "passed": true
+    },
+    {
+      "check": "protocol failure `absent_real_rustc` fails closed without a fallback compiler",
+      "detail": {
+        "canary_executed": false,
+        "exit": 97,
+        "stderr": "temper shim protocol failure (temper-exp-shim-1): could not replace the shim with /nonexistent/rustc: No such file or directory (os error 2)"
+      },
+      "passed": true
+    },
+    {
+      "check": "protocol failure `missing_capture_dir` fails closed without a fallback compiler",
+      "detail": {
+        "canary_executed": false,
+        "exit": 97,
+        "stderr": "temper shim protocol failure (temper-exp-shim-1): missing private protocol value TEMPER_EXP_CAPTURE_DIR"
+      },
+      "passed": true
+    },
+    {
+      "check": "protocol failure `absent_capture_dir` fails closed without a fallback compiler",
+      "detail": {
+        "canary_executed": false,
+        "exit": 97,
+        "stderr": "temper shim protocol failure (temper-exp-shim-1): TEMPER_EXP_CAPTURE_DIR must be an existing directory"
+      },
+      "passed": true
+    },
+    {
+      "check": "protocol failure `missing_stage` fails closed without a fallback compiler",
+      "detail": {
+        "canary_executed": false,
+        "exit": 97,
+        "stderr": "temper shim protocol failure (temper-exp-shim-1): missing private protocol value TEMPER_EXP_STAGE"
+      },
+      "passed": true
+    },
+    {
+      "check": "protocol failure `missing_target` fails closed without a fallback compiler",
+      "detail": {
+        "canary_executed": false,
+        "exit": 97,
+        "stderr": "temper shim protocol failure (temper-exp-shim-1): missing private protocol value TEMPER_EXP_TARGET"
+      },
+      "passed": true
+    },
+    {
+      "check": "protocol failure `malformed_injection` fails closed without a fallback compiler",
+      "detail": {
+        "canary_executed": false,
+        "exit": 97,
+        "stderr": "temper shim protocol failure (temper-exp-shim-1): TEMPER_EXP_INJECT must be none, generate=<abs> or use=<abs>"
+      },
+      "passed": true
+    },
+    {
+      "check": "protocol failure `relative_injection` fails closed without a fallback compiler",
+      "detail": {
+        "canary_executed": false,
+        "exit": 97,
+        "stderr": "temper shim protocol failure (temper-exp-shim-1): TEMPER_EXP_INJECT requires an absolute profile path"
+      },
+      "passed": true
+    },
+    {
+      "check": "classification `target_compile` injects PGO controls only when it must",
+      "detail": {
+        "class": "target_compile",
+        "expected_injection": true,
+        "injected": [
+          "-Cprofile-generate=/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us002-probe/profiles"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "check": "classification `target_compile` appends exactly one control after the Cargo arguments",
+      "detail": {
+        "equal": true
+      },
+      "passed": true
+    },
+    {
+      "check": "classification `target_compile_equals_form` injects PGO controls only when it must",
+      "detail": {
+        "class": "target_compile",
+        "expected_injection": true,
+        "injected": [
+          "-Cprofile-generate=/tmp/claude-1000/-home-arthur-dev-temper/e25b6714-1d4e-43d7-84c3-faac94c80a52/scratchpad/ep001/work/us002-probe/profiles"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "check": "classification `target_compile_equals_form` appends exactly one control after the Cargo arguments",
+      "detail": {
+        "equal": true
+      },
+      "passed": true
+    },
+    {
+      "check": "classification `print_probe_with_target` injects PGO controls only when it must",
+      "detail": {
+        "class": "probe",
+        "expected_injection": false,
+        "injected": []
+      },
+      "passed": true
+    },
+    {
+      "check": "classification `print_probe_with_target` forwards the original argv unchanged",
+      "detail": {
+        "equal": true
+      },
+      "passed": true
+    },
+    {
+      "check": "classification `print_probe_crate_name` injects PGO controls only when it must",
+      "detail": {
+        "class": "probe",
+        "expected_injection": false,
+        "injected": []
+      },
+      "passed": true
+    },
+    {
+      "check": "classification `print_probe_crate_name` forwards the original argv unchanged",
+      "detail": {
+        "equal": true
+      },
+      "passed": true
+    },
+    {
+      "check": "classification `host_compile` injects PGO controls only when it must",
+      "detail": {
+        "class": "host_compile",
+        "expected_injection": false,
+        "injected": []
+      },
+      "passed": true
+    },
+    {
+      "check": "classification `host_compile` forwards the original argv unchanged",
+      "detail": {
+        "equal": true
+      },
+      "passed": true
+    },
+    {
+      "check": "classification `other_target_triple` injects PGO controls only when it must",
+      "detail": {
+        "class": "host_compile",
+        "expected_injection": false,
+        "injected": []
+      },
+      "passed": true
+    },
+    {
+      "check": "classification `other_target_triple` forwards the original argv unchanged",
+      "detail": {
+        "equal": true
+      },
+      "passed": true
+    },
+    {
+      "check": "classification `host_triple_only_in_a_path` injects PGO controls only when it must",
+      "detail": {
+        "class": "host_compile",
+        "expected_injection": false,
+        "injected": []
+      },
+      "passed": true
+    },
+    {
+      "check": "classification `host_triple_only_in_a_path` forwards the original argv unchanged",
+      "detail": {
+        "equal": true
+      },
+      "passed": true
+    },
+    {
+      "check": "classification `no_emit` injects PGO controls only when it must",
+      "detail": {
+        "class": "other",
+        "expected_injection": false,
+        "injected": []
+      },
+      "passed": true
+    },
+    {
+      "check": "classification `no_emit` forwards the original argv unchanged",
+      "detail": {
+        "equal": true
+      },
+      "passed": true
+    }
+  ],
+  "checks_failed": [],
+  "checks_total": 32,
+  "passed": true,
+  "probe": "us-002-process"
+}

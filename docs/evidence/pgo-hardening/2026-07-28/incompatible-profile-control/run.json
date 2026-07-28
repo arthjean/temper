@@ -1,0 +1,602 @@
+{
+  "schema_version": 2,
+  "experimental": true,
+  "compatibility": "No backward-compatibility promise during 0.x.",
+  "cli_version": "0.0.1",
+  "run_id": "1785229318-268144558-2262649",
+  "status": "no_improvement",
+  "completed_phases": [
+    "preflight",
+    "baseline_build",
+    "static_builds",
+    "screening",
+    "pgo_training",
+    "pgo_build",
+    "candidate_selection",
+    "confirmation"
+  ],
+  "final_decision": "no_improvement",
+  "source_reproducibility": "dirty",
+  "request": {
+    "minimum_improvement_percent": 2.0,
+    "timeout_seconds": 300,
+    "workload": {
+      "executable": "/tmp/.tmpSpP6tz/dogfood-workload",
+      "arguments": []
+    }
+  },
+  "preflight": {
+    "host_triple": "x86_64-unknown-linux-gnu",
+    "kernel": "Linux 7.1.5-200.fc44.x86_64",
+    "cpu_model": "AMD Ryzen 7 7800X3D 8-Core Processor",
+    "logical_core_count": 16,
+    "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+    "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+    "manifest_path": "/tmp/.tmpSpP6tz/Cargo.toml",
+    "lockfile_path": "/tmp/.tmpSpP6tz/Cargo.lock",
+    "lockfile_sha256": "3f88896a5d9b24650aeef80740dfa8ad6d67d241251128322e40262cea748193"
+  },
+  "target": {
+    "package_id": "path+file:///tmp/.tmpSpP6tz#pgo-missing-function@0.1.0",
+    "package_name": "pgo-missing-function",
+    "binary_name": "pgo-missing-function",
+    "workspace_root": "/tmp/.tmpSpP6tz"
+  },
+  "baseline": {
+    "strategy": "baseline",
+    "stage": "baseline",
+    "target_directory": "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/baseline",
+    "cargo_arguments": [
+      "build",
+      "--release",
+      "--locked",
+      "--target",
+      "x86_64-unknown-linux-gnu",
+      "--message-format=json",
+      "--package",
+      "pgo-missing-function",
+      "--bin",
+      "pgo-missing-function",
+      "--target-dir",
+      "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/baseline"
+    ],
+    "cargo_config_overrides": [],
+    "environment_overrides": [],
+    "outcome": "built",
+    "executable_path": "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/baseline/x86_64-unknown-linux-gnu/release/pgo-missing-function",
+    "sha256": "37851698e1baef2cb523c9c93d70edea6dc58c241afa4579fa0893b845d31b70",
+    "size_bytes": 445720,
+    "build_duration_ms": 98,
+    "bounded_diagnostics": "build-finished: success=true\n   Compiling pgo-missing-function v0.1.0 (/tmp/.tmpSpP6tz)\n\n    Finished `release` profile [optimized] target(s) in 0.08s\n",
+    "compiler_diagnostics": [],
+    "diagnostics_truncated": false
+  },
+  "baseline_measurement": {
+    "sample_durations_ns": [
+      5215425,
+      5215465,
+      5206804,
+      5265265,
+      5237715,
+      5233235,
+      5207514
+    ],
+    "median_duration_ns": 5215465,
+    "relative_mad": 0.0016606381214330842,
+    "outcome": "stable"
+  },
+  "strategies": [
+    {
+      "identity": "thin-lto",
+      "build": {
+        "strategy": "thin-lto",
+        "stage": "static_candidate",
+        "target_directory": "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/thin-lto",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "pgo-missing-function",
+          "--bin",
+          "pgo-missing-function",
+          "--target-dir",
+          "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/thin-lto",
+          "--config",
+          "profile.release.lto=\"thin\""
+        ],
+        "cargo_config_overrides": [
+          "profile.release.lto=\"thin\""
+        ],
+        "environment_overrides": [],
+        "outcome": "built",
+        "executable_path": "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/thin-lto/x86_64-unknown-linux-gnu/release/pgo-missing-function",
+        "sha256": "953dfff49697da59f67ff9804970d1d360eaa5c3867ab38c3917b9621100d3aa",
+        "size_bytes": 433688,
+        "build_duration_ms": 1518,
+        "bounded_diagnostics": "build-finished: success=true\n   Compiling pgo-missing-function v0.1.0 (/tmp/.tmpSpP6tz)\n\n    Finished `release` profile [optimized] target(s) in 1.50s\n",
+        "compiler_diagnostics": [],
+        "diagnostics_truncated": false
+      },
+      "build_failure": null,
+      "screening": {
+        "sample_durations_ns": [
+          5208575,
+          5216134,
+          5247055,
+          5207835,
+          5197765,
+          5216815,
+          5248865
+        ],
+        "median_duration_ns": 5216134,
+        "relative_mad": 0.0015910250771931857,
+        "outcome": "stable"
+      },
+      "workload_failure": null,
+      "rejection_reason": "confirmation_rejected"
+    },
+    {
+      "identity": "fat-lto-cgu1",
+      "build": {
+        "strategy": "fat-lto-cgu1",
+        "stage": "static_candidate",
+        "target_directory": "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/fat-lto-cgu1",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "pgo-missing-function",
+          "--bin",
+          "pgo-missing-function",
+          "--target-dir",
+          "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/fat-lto-cgu1",
+          "--config",
+          "profile.release.lto=\"fat\"",
+          "--config",
+          "profile.release.codegen-units=1"
+        ],
+        "cargo_config_overrides": [
+          "profile.release.lto=\"fat\"",
+          "profile.release.codegen-units=1"
+        ],
+        "environment_overrides": [],
+        "outcome": "built",
+        "executable_path": "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/fat-lto-cgu1/x86_64-unknown-linux-gnu/release/pgo-missing-function",
+        "sha256": "f3e48b28601e93d0b9d09448e8504bc3e81bb9ca94852a2f6ce66970c88ca981",
+        "size_bytes": 378704,
+        "build_duration_ms": 1607,
+        "bounded_diagnostics": "build-finished: success=true\n   Compiling pgo-missing-function v0.1.0 (/tmp/.tmpSpP6tz)\n\n    Finished `release` profile [optimized] target(s) in 1.59s\n",
+        "compiler_diagnostics": [],
+        "diagnostics_truncated": false
+      },
+      "build_failure": null,
+      "screening": {
+        "sample_durations_ns": [
+          5230055,
+          5237445,
+          5218955,
+          5219765,
+          5232814,
+          5248985,
+          5222955
+        ],
+        "median_duration_ns": 5230055,
+        "relative_mad": 0.0014129870527174189,
+        "outcome": "stable"
+      },
+      "workload_failure": null,
+      "rejection_reason": null
+    },
+    {
+      "identity": "pgo",
+      "build": null,
+      "build_failure": {
+        "strategy": "pgo",
+        "stage": "pgo_optimized",
+        "target_directory": "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/pgo",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "pgo-missing-function",
+          "--bin",
+          "pgo-missing-function",
+          "--target-dir",
+          "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/pgo"
+        ],
+        "cargo_config_overrides": [],
+        "environment_overrides": [
+          {
+            "name": "CARGO_ENCODED_RUSTFLAGS",
+            "arguments": [
+              "-Cprofile-use=/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/pgo/merged.profdata",
+              "-Cllvm-args=-pgo-warn-missing-function"
+            ]
+          }
+        ],
+        "outcome": "failed",
+        "reason": "pgo_missing_profile_data",
+        "build_duration_ms": 89,
+        "message": "PGO rejected: LLVM reported missing profile data.",
+        "bounded_diagnostics": "warning: function `unrelated_dead_code_warning` is never used\n  --> src/main.rs:11:4\n   |\n11 | fn unrelated_dead_code_warning() {}\n   |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n   |\n   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default\n\n\nwarning: pgo_missing_function.6f10b3d499e4fdaa-cgu.0: no profile data available for function _RNvCs9xcfUuZuJOU_20pgo_missing_function24missing_profile_function Hash = 742261418966908927 up to 0 count discarded\n\n\nbuild-finished: success=true\n   Compiling pgo-missing-function v0.1.0 (/tmp/.tmpSpP6tz)\n\n    Finished `release` profile [optimized] target(s) in 0.08s\n",
+        "compiler_diagnostics": [
+          {
+            "package_id": "path+file:///tmp/.tmpSpP6tz#pgo-missing-function@0.1.0",
+            "target_name": "pgo-missing-function",
+            "target_kind": [
+              "bin"
+            ],
+            "target_src_path": "/tmp/.tmpSpP6tz/src/main.rs",
+            "level": "warning",
+            "code": "dead_code",
+            "message": "function `unrelated_dead_code_warning` is never used",
+            "rendered": "warning: function `unrelated_dead_code_warning` is never used\n  --> src/main.rs:11:4\n   |\n11 | fn unrelated_dead_code_warning() {}\n   |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n   |\n   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default\n\n"
+          },
+          {
+            "package_id": "path+file:///tmp/.tmpSpP6tz#pgo-missing-function@0.1.0",
+            "target_name": "pgo-missing-function",
+            "target_kind": [
+              "bin"
+            ],
+            "target_src_path": "/tmp/.tmpSpP6tz/src/main.rs",
+            "level": "warning",
+            "code": null,
+            "message": "pgo_missing_function.6f10b3d499e4fdaa-cgu.0: no profile data available for function _RNvCs9xcfUuZuJOU_20pgo_missing_function24missing_profile_function Hash = 742261418966908927 up to 0 count discarded",
+            "rendered": "warning: pgo_missing_function.6f10b3d499e4fdaa-cgu.0: no profile data available for function _RNvCs9xcfUuZuJOU_20pgo_missing_function24missing_profile_function Hash = 742261418966908927 up to 0 count discarded\n\n"
+          }
+        ],
+        "diagnostics_truncated": false
+      },
+      "screening": null,
+      "workload_failure": null,
+      "rejection_reason": "pgo_missing_profile_data"
+    }
+  ],
+  "pgo_base_strategy": "baseline",
+  "pgo_training": {
+    "outcome": "trained",
+    "base_strategy": "baseline",
+    "prerequisites": {
+      "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+      "target_libdir": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+      "preserved_target_rustflags": [],
+      "inspected_config_sources": [],
+      "tool_identity": {
+        "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+        "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+        "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+        "llvm_profdata_sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+        "llvm_profdata_version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+      }
+    },
+    "instrumentation_build": {
+      "strategy": "pgo",
+      "stage": "pgo_instrumentation",
+      "target_directory": "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/pgo-instrumented",
+      "cargo_arguments": [
+        "build",
+        "--release",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--message-format=json",
+        "--package",
+        "pgo-missing-function",
+        "--bin",
+        "pgo-missing-function",
+        "--target-dir",
+        "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/pgo-instrumented"
+      ],
+      "cargo_config_overrides": [],
+      "environment_overrides": [
+        {
+          "name": "CARGO_ENCODED_RUSTFLAGS",
+          "arguments": [
+            "-Cprofile-generate=/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/pgo/raw"
+          ]
+        }
+      ],
+      "outcome": "built",
+      "executable_path": "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/pgo-instrumented/x86_64-unknown-linux-gnu/release/pgo-missing-function",
+      "sha256": "d91b2c85fcdf6a910971b7b1aba22cb1fdecacd0332fd19bd7d1f9d3809fa930",
+      "size_bytes": 1350992,
+      "build_duration_ms": 123,
+      "bounded_diagnostics": "build-finished: success=true\n   Compiling pgo-missing-function v0.1.0 (/tmp/.tmpSpP6tz)\n\n    Finished `release` profile [optimized] target(s) in 0.08s\n",
+      "compiler_diagnostics": [],
+      "diagnostics_truncated": false
+    },
+    "instrumentation_failure": null,
+    "training_duration_ns": 5244085,
+    "raw_profile_files": [
+      {
+        "path": "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/pgo/raw/temper-13868219893151919339_0-2263729.profraw",
+        "size_bytes": 952,
+        "sha256": "aa5e5ab5a2829dbdc6379ed2b2941e3e9ed0704d5a870a70e7342cee937017be"
+      }
+    ],
+    "merge": {
+      "outcome": "merged",
+      "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+      "arguments": [
+        "merge",
+        "--failure-mode=any",
+        "-o",
+        "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/pgo/merged.profdata",
+        "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/pgo/raw/temper-13868219893151919339_0-2263729.profraw"
+      ],
+      "profraw_files": [
+        {
+          "path": "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/pgo/raw/temper-13868219893151919339_0-2263729.profraw",
+          "size_bytes": 952,
+          "sha256": "aa5e5ab5a2829dbdc6379ed2b2941e3e9ed0704d5a870a70e7342cee937017be"
+        }
+      ],
+      "profdata_path": "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/pgo/merged.profdata",
+      "profdata_size_bytes": 1912,
+      "profdata_sha256": "5b1c5a6405b060faa2e5af9acdb8a555232aa5d22f455bc0abddf19039b5d56e",
+      "bounded_diagnostics": "",
+      "diagnostics_truncated": false,
+      "message": null
+    },
+    "phase_parity": {
+      "permitted_differences": [
+        "target_directory",
+        "profile_generate_vs_use",
+        "pgo_warn_missing_function_in_use"
+      ],
+      "instrumentation": {
+        "package_id": "path+file:///tmp/.tmpSpP6tz#pgo-missing-function@0.1.0",
+        "binary_target": "pgo-missing-function",
+        "target_triple": "x86_64-unknown-linux-gnu",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "pgo-missing-function",
+          "--bin",
+          "pgo-missing-function",
+          "--target-dir",
+          "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/pgo-instrumented"
+        ],
+        "base_profile_overrides": [],
+        "project_rustflags": [],
+        "config_sources": [],
+        "cargo_identity": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+        "rustc_identity": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+        "llvm_profdata_identity": {
+          "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+          "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+          "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "llvm_profdata_sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+          "llvm_profdata_version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+        },
+        "target_directory": "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/pgo-instrumented",
+        "environment_overrides": [
+          {
+            "name": "CARGO_ENCODED_RUSTFLAGS",
+            "arguments": [
+              "-Cprofile-generate=/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/pgo/raw"
+            ]
+          }
+        ]
+      },
+      "optimization": {
+        "package_id": "path+file:///tmp/.tmpSpP6tz#pgo-missing-function@0.1.0",
+        "binary_target": "pgo-missing-function",
+        "target_triple": "x86_64-unknown-linux-gnu",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "pgo-missing-function",
+          "--bin",
+          "pgo-missing-function",
+          "--target-dir",
+          "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/pgo"
+        ],
+        "base_profile_overrides": [],
+        "project_rustflags": [],
+        "config_sources": [],
+        "cargo_identity": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+        "rustc_identity": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+        "llvm_profdata_identity": {
+          "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+          "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+          "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "llvm_profdata_sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+          "llvm_profdata_version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+        },
+        "target_directory": "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/pgo",
+        "environment_overrides": [
+          {
+            "name": "CARGO_ENCODED_RUSTFLAGS",
+            "arguments": [
+              "-Cprofile-use=/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/pgo/merged.profdata",
+              "-Cllvm-args=-pgo-warn-missing-function"
+            ]
+          }
+        ]
+      },
+      "matched": true,
+      "unexpected_differences": []
+    },
+    "failure_stage": null,
+    "rejection_reason": null,
+    "message": null,
+    "remediation": null
+  },
+  "selected_candidate": "thin-lto",
+  "confirmation": {
+    "strategy": "thin-lto",
+    "outcome": "rejected",
+    "baseline_build": {
+      "strategy": "baseline",
+      "stage": "confirmation",
+      "target_directory": "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/confirmation/baseline",
+      "cargo_arguments": [
+        "build",
+        "--release",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--message-format=json",
+        "--package",
+        "pgo-missing-function",
+        "--bin",
+        "pgo-missing-function",
+        "--target-dir",
+        "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/confirmation/baseline"
+      ],
+      "cargo_config_overrides": [],
+      "environment_overrides": [],
+      "outcome": "built",
+      "executable_path": "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/confirmation/baseline/x86_64-unknown-linux-gnu/release/pgo-missing-function",
+      "sha256": "384423dbf1567b8b4bdea43f0e4e494698967c386ea4863c745f43948dd7983c",
+      "size_bytes": 445720,
+      "build_duration_ms": 96,
+      "bounded_diagnostics": "warning: function `unrelated_dead_code_warning` is never used\n  --> src/main.rs:11:4\n   |\n11 | fn unrelated_dead_code_warning() {}\n   |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n   |\n   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default\n\n\nbuild-finished: success=true\n   Compiling pgo-missing-function v0.1.0 (/tmp/.tmpSpP6tz)\n\n    Finished `release` profile [optimized] target(s) in 0.08s\n",
+      "compiler_diagnostics": [
+        {
+          "package_id": "path+file:///tmp/.tmpSpP6tz#pgo-missing-function@0.1.0",
+          "target_name": "pgo-missing-function",
+          "target_kind": [
+            "bin"
+          ],
+          "target_src_path": "/tmp/.tmpSpP6tz/src/main.rs",
+          "level": "warning",
+          "code": "dead_code",
+          "message": "function `unrelated_dead_code_warning` is never used",
+          "rendered": "warning: function `unrelated_dead_code_warning` is never used\n  --> src/main.rs:11:4\n   |\n11 | fn unrelated_dead_code_warning() {}\n   |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n   |\n   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default\n\n"
+        }
+      ],
+      "diagnostics_truncated": false
+    },
+    "baseline_build_failure": null,
+    "candidate_build": {
+      "strategy": "thin-lto",
+      "stage": "confirmation",
+      "target_directory": "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/confirmation/thin-lto",
+      "cargo_arguments": [
+        "build",
+        "--release",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--message-format=json",
+        "--package",
+        "pgo-missing-function",
+        "--bin",
+        "pgo-missing-function",
+        "--target-dir",
+        "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/confirmation/thin-lto",
+        "--config",
+        "profile.release.lto=\"thin\""
+      ],
+      "cargo_config_overrides": [
+        "profile.release.lto=\"thin\""
+      ],
+      "environment_overrides": [],
+      "outcome": "built",
+      "executable_path": "/tmp/.tmpSpP6tz/.temper/runs/1785229318-268144558-2262649/target/confirmation/thin-lto/x86_64-unknown-linux-gnu/release/pgo-missing-function",
+      "sha256": "b5fca30720690b06c0b14c4a3571e022cfa1a15f65bfcc7364683e47e66e3569",
+      "size_bytes": 433688,
+      "build_duration_ms": 1535,
+      "bounded_diagnostics": "warning: function `unrelated_dead_code_warning` is never used\n  --> src/main.rs:11:4\n   |\n11 | fn unrelated_dead_code_warning() {}\n   |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n   |\n   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default\n\n\nbuild-finished: success=true\n   Compiling pgo-missing-function v0.1.0 (/tmp/.tmpSpP6tz)\n\n    Finished `release` profile [optimized] target(s) in 1.52s\n",
+      "compiler_diagnostics": [
+        {
+          "package_id": "path+file:///tmp/.tmpSpP6tz#pgo-missing-function@0.1.0",
+          "target_name": "pgo-missing-function",
+          "target_kind": [
+            "bin"
+          ],
+          "target_src_path": "/tmp/.tmpSpP6tz/src/main.rs",
+          "level": "warning",
+          "code": "dead_code",
+          "message": "function `unrelated_dead_code_warning` is never used",
+          "rendered": "warning: function `unrelated_dead_code_warning` is never used\n  --> src/main.rs:11:4\n   |\n11 | fn unrelated_dead_code_warning() {}\n   |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n   |\n   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default\n\n"
+        }
+      ],
+      "diagnostics_truncated": false
+    },
+    "candidate_build_failure": null,
+    "measurement": {
+      "baseline_durations_ns": [
+        5251465,
+        5227675,
+        5240275,
+        5219635,
+        5231745,
+        5228305,
+        5218955,
+        5259385,
+        5216155,
+        5253814,
+        5224775,
+        5234475,
+        5180484,
+        5218925,
+        5216024,
+        5176545,
+        5234675,
+        5219095,
+        5237475,
+        5230305
+      ],
+      "candidate_durations_ns": [
+        5236744,
+        5247595,
+        5233845,
+        5250954,
+        5237254,
+        5214845,
+        5230315,
+        5223384,
+        5226445,
+        5218375,
+        5209725,
+        5224885,
+        5233935,
+        5225745,
+        5233905,
+        5229865,
+        5234834,
+        5180265,
+        5239985,
+        5221294
+      ],
+      "median_ratio": 1.0002548064714638,
+      "baseline_relative_mad": 0.0017310668153535107,
+      "candidate_relative_mad": 0.001277224674909992,
+      "confidence_interval_95": {
+        "lower": 0.9977967337369148,
+        "upper": 1.0020746992078746
+      },
+      "threshold_ratio": 0.98,
+      "outcome": "insufficient_improvement"
+    },
+    "workload_failure": null,
+    "rejection_reason": "insufficient_improvement"
+  },
+  "promotion": null,
+  "failure": null
+}

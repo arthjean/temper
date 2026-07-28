@@ -1,0 +1,4 @@
+[workspace]
+members = ["app", "temper-macro"]
+resolver = "3"
+

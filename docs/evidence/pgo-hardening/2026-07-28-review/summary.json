@@ -1,0 +1,54 @@
+{
+  "cases": [
+    {
+      "artifact_checksums_rechecked": 7,
+      "merged_profile_checksums_rechecked": 1,
+      "name": "single-binary",
+      "outcome": "full_pgo",
+      "raw_profile_checksums_rechecked": 2
+    },
+    {
+      "artifact_checksums_rechecked": 7,
+      "merged_profile_checksums_rechecked": 1,
+      "name": "string-rustflags",
+      "outcome": "full_pgo",
+      "raw_profile_checksums_rechecked": 2
+    },
+    {
+      "artifact_checksums_rechecked": 7,
+      "merged_profile_checksums_rechecked": 1,
+      "name": "workspace-host-tools",
+      "outcome": "full_pgo",
+      "raw_profile_checksums_rechecked": 2
+    },
+    {
+      "artifact_checksums_rechecked": 7,
+      "merged_profile_checksums_rechecked": 1,
+      "name": "array-rustflags-space-path",
+      "outcome": "full_pgo",
+      "raw_profile_checksums_rechecked": 2
+    },
+    {
+      "artifact_checksums_rechecked": 6,
+      "merged_profile_checksums_rechecked": 1,
+      "name": "incompatible-profile-control",
+      "outcome": "pgo_missing_profile_data",
+      "raw_profile_checksums_rechecked": 2
+    }
+  ],
+  "classification": "correctness_only",
+  "evidence_date": "2026-07-28",
+  "evidence_harness_tree_sha256": "17e216125fafa94f52d8ce24c715a92f75aa69f62ff101c1135081604743f45e",
+  "implementation_tree_sha256": "980625bea61ce6cdfbfa6499946678b0ac1d3e7255153c84106932ed51479cbd",
+  "performance_claim": null,
+  "tested_binary_sha256": "353478f50a81e09a60f0ebd0b093a080bd629a15dea67cdc54e08cf0d31a02be",
+  "tested_commit": "024b3899fd64a25084eaeff33301acf76b5f4d94",
+  "toolchain": {
+    "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+    "host": "Linux dune 7.1.5-200.fc44.x86_64 #1 SMP PREEMPT_DYNAMIC Fri Jul 24 20:44:56 UTC 2026 x86_64 GNU/Linux",
+    "llvm_profdata": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build.",
+    "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+    "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6"
+  },
+  "worktree_dirty": true
+}

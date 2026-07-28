@@ -1,0 +1,779 @@
+{
+  "schema_version": 2,
+  "experimental": true,
+  "compatibility": "No backward-compatibility promise during 0.x.",
+  "cli_version": "0.0.1",
+  "run_id": "1785230603-275901624-2550112",
+  "status": "no_improvement",
+  "completed_phases": [
+    "preflight",
+    "baseline_build",
+    "static_builds",
+    "screening",
+    "pgo_training",
+    "pgo_build",
+    "candidate_selection",
+    "confirmation"
+  ],
+  "final_decision": "no_improvement",
+  "source_reproducibility": "dirty",
+  "request": {
+    "minimum_improvement_percent": 2.0,
+    "timeout_seconds": 300,
+    "workload": {
+      "executable": "/tmp/.tmpDtmUmE/dogfood-workload",
+      "arguments": []
+    }
+  },
+  "preflight": {
+    "host_triple": "x86_64-unknown-linux-gnu",
+    "kernel": "Linux 7.1.5-200.fc44.x86_64",
+    "cpu_model": "AMD Ryzen 7 7800X3D 8-Core Processor",
+    "logical_core_count": 16,
+    "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+    "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+    "manifest_path": "/tmp/.tmpDtmUmE/Cargo.toml",
+    "lockfile_path": "/tmp/.tmpDtmUmE/Cargo.lock",
+    "lockfile_sha256": "d4553f904d25f5aee08f322e5fd4a20731996d5a0dc1ed39f16e4268dc5a9bb8"
+  },
+  "target": {
+    "package_id": "path+file:///tmp/.tmpDtmUmE/app#pgo-workspace-app@0.1.0",
+    "package_name": "pgo-workspace-app",
+    "binary_name": "pgo-workspace-app",
+    "workspace_root": "/tmp/.tmpDtmUmE"
+  },
+  "baseline": {
+    "strategy": "baseline",
+    "stage": "baseline",
+    "target_directory": "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/baseline",
+    "cargo_arguments": [
+      "build",
+      "--release",
+      "--locked",
+      "--target",
+      "x86_64-unknown-linux-gnu",
+      "--message-format=json",
+      "--package",
+      "pgo-workspace-app",
+      "--bin",
+      "pgo-workspace-app",
+      "--target-dir",
+      "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/baseline"
+    ],
+    "cargo_config_overrides": [],
+    "environment_overrides": [],
+    "outcome": "built",
+    "executable_path": "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/baseline/x86_64-unknown-linux-gnu/release/pgo-workspace-app",
+    "sha256": "34c2ec6c24f602ef27bfa33034a7801cd36a50fb073a2eee3669a1975c29d3f9",
+    "size_bytes": 445672,
+    "build_duration_ms": 149,
+    "bounded_diagnostics": "warning: unexpected `cfg` condition name: `temper_target`\n --> temper-macro/src/lib.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = help: or consider adding `println!(\"cargo::rustc-check-cfg=cfg(temper_target)\");` to the top of the `build.rs`\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n\nwarning: unexpected `cfg` condition name: `temper_target`\n --> app/build.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n\nbuild-script-executed: path+file:///tmp/.tmpDtmUmE/app#pgo-workspace-app@0.1.0\nbuild-finished: success=true\n   Compiling pgo-workspace-app v0.1.0 (/tmp/.tmpDtmUmE/app)\n\n   Compiling temper-macro v0.1.0 (/tmp/.tmpDtmUmE/temper-macro)\n\n    Finished `release` profile [optimized] target(s) in 0.13s\n",
+    "compiler_diagnostics": [
+      {
+        "package_id": "path+file:///tmp/.tmpDtmUmE/temper-macro#0.1.0",
+        "target_name": "temper_macro",
+        "target_kind": [
+          "procmacro"
+        ],
+        "target_src_path": "/tmp/.tmpDtmUmE/temper-macro/src/lib.rs",
+        "level": "warning",
+        "code": "unexpected_cfgs",
+        "message": "unexpected `cfg` condition name: `temper_target`",
+        "rendered": "warning: unexpected `cfg` condition name: `temper_target`\n --> temper-macro/src/lib.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = help: or consider adding `println!(\"cargo::rustc-check-cfg=cfg(temper_target)\");` to the top of the `build.rs`\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n"
+      },
+      {
+        "package_id": "path+file:///tmp/.tmpDtmUmE/app#pgo-workspace-app@0.1.0",
+        "target_name": "build-script-build",
+        "target_kind": [
+          "custombuild"
+        ],
+        "target_src_path": "/tmp/.tmpDtmUmE/app/build.rs",
+        "level": "warning",
+        "code": "unexpected_cfgs",
+        "message": "unexpected `cfg` condition name: `temper_target`",
+        "rendered": "warning: unexpected `cfg` condition name: `temper_target`\n --> app/build.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n"
+      }
+    ],
+    "diagnostics_truncated": false
+  },
+  "baseline_measurement": {
+    "sample_durations_ns": [
+      5222385,
+      5229316,
+      5227875,
+      5224425,
+      5226075,
+      5238995,
+      5221725
+    ],
+    "median_duration_ns": 5226075,
+    "relative_mad": 0.0006201594887176322,
+    "outcome": "stable"
+  },
+  "strategies": [
+    {
+      "identity": "thin-lto",
+      "build": {
+        "strategy": "thin-lto",
+        "stage": "static_candidate",
+        "target_directory": "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/thin-lto",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "pgo-workspace-app",
+          "--bin",
+          "pgo-workspace-app",
+          "--target-dir",
+          "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/thin-lto",
+          "--config",
+          "profile.release.lto=\"thin\""
+        ],
+        "cargo_config_overrides": [
+          "profile.release.lto=\"thin\""
+        ],
+        "environment_overrides": [],
+        "outcome": "built",
+        "executable_path": "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/thin-lto/x86_64-unknown-linux-gnu/release/pgo-workspace-app",
+        "sha256": "3ee60c7597925a8e921ffb83d0c7f8fcd116ba757304906582f8b4f17b280314",
+        "size_bytes": 433640,
+        "build_duration_ms": 1526,
+        "bounded_diagnostics": "warning: unexpected `cfg` condition name: `temper_target`\n --> app/build.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n\nwarning: unexpected `cfg` condition name: `temper_target`\n --> temper-macro/src/lib.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = help: or consider adding `println!(\"cargo::rustc-check-cfg=cfg(temper_target)\");` to the top of the `build.rs`\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n\nbuild-script-executed: path+file:///tmp/.tmpDtmUmE/app#pgo-workspace-app@0.1.0\nbuild-finished: success=true\n   Compiling pgo-workspace-app v0.1.0 (/tmp/.tmpDtmUmE/app)\n\n   Compiling temper-macro v0.1.0 (/tmp/.tmpDtmUmE/temper-macro)\n\n    Finished `release` profile [optimized] target(s) in 1.51s\n",
+        "compiler_diagnostics": [
+          {
+            "package_id": "path+file:///tmp/.tmpDtmUmE/app#pgo-workspace-app@0.1.0",
+            "target_name": "build-script-build",
+            "target_kind": [
+              "custombuild"
+            ],
+            "target_src_path": "/tmp/.tmpDtmUmE/app/build.rs",
+            "level": "warning",
+            "code": "unexpected_cfgs",
+            "message": "unexpected `cfg` condition name: `temper_target`",
+            "rendered": "warning: unexpected `cfg` condition name: `temper_target`\n --> app/build.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n"
+          },
+          {
+            "package_id": "path+file:///tmp/.tmpDtmUmE/temper-macro#0.1.0",
+            "target_name": "temper_macro",
+            "target_kind": [
+              "procmacro"
+            ],
+            "target_src_path": "/tmp/.tmpDtmUmE/temper-macro/src/lib.rs",
+            "level": "warning",
+            "code": "unexpected_cfgs",
+            "message": "unexpected `cfg` condition name: `temper_target`",
+            "rendered": "warning: unexpected `cfg` condition name: `temper_target`\n --> temper-macro/src/lib.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = help: or consider adding `println!(\"cargo::rustc-check-cfg=cfg(temper_target)\");` to the top of the `build.rs`\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n"
+          }
+        ],
+        "diagnostics_truncated": false
+      },
+      "build_failure": null,
+      "screening": {
+        "sample_durations_ns": [
+          5244575,
+          5241135,
+          5253665,
+          5269336,
+          5235806,
+          5234635,
+          5226856
+        ],
+        "median_duration_ns": 5241135,
+        "relative_mad": 0.0012401893864592308,
+        "outcome": "stable"
+      },
+      "workload_failure": null,
+      "rejection_reason": "confirmation_rejected"
+    },
+    {
+      "identity": "fat-lto-cgu1",
+      "build": {
+        "strategy": "fat-lto-cgu1",
+        "stage": "static_candidate",
+        "target_directory": "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/fat-lto-cgu1",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "pgo-workspace-app",
+          "--bin",
+          "pgo-workspace-app",
+          "--target-dir",
+          "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/fat-lto-cgu1",
+          "--config",
+          "profile.release.lto=\"fat\"",
+          "--config",
+          "profile.release.codegen-units=1"
+        ],
+        "cargo_config_overrides": [
+          "profile.release.lto=\"fat\"",
+          "profile.release.codegen-units=1"
+        ],
+        "environment_overrides": [],
+        "outcome": "built",
+        "executable_path": "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/fat-lto-cgu1/x86_64-unknown-linux-gnu/release/pgo-workspace-app",
+        "sha256": "086bd80d162a75b6d9a1088b7e5fa0039039bd1ceedd46eadcba15c76331b9c0",
+        "size_bytes": 376968,
+        "build_duration_ms": 1629,
+        "bounded_diagnostics": "warning: unexpected `cfg` condition name: `temper_target`\n --> app/build.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n\nwarning: unexpected `cfg` condition name: `temper_target`\n --> temper-macro/src/lib.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = help: or consider adding `println!(\"cargo::rustc-check-cfg=cfg(temper_target)\");` to the top of the `build.rs`\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n\nbuild-script-executed: path+file:///tmp/.tmpDtmUmE/app#pgo-workspace-app@0.1.0\nbuild-finished: success=true\n   Compiling pgo-workspace-app v0.1.0 (/tmp/.tmpDtmUmE/app)\n\n   Compiling temper-macro v0.1.0 (/tmp/.tmpDtmUmE/temper-macro)\n\n    Finished `release` profile [optimized] target(s) in 1.61s\n",
+        "compiler_diagnostics": [
+          {
+            "package_id": "path+file:///tmp/.tmpDtmUmE/app#pgo-workspace-app@0.1.0",
+            "target_name": "build-script-build",
+            "target_kind": [
+              "custombuild"
+            ],
+            "target_src_path": "/tmp/.tmpDtmUmE/app/build.rs",
+            "level": "warning",
+            "code": "unexpected_cfgs",
+            "message": "unexpected `cfg` condition name: `temper_target`",
+            "rendered": "warning: unexpected `cfg` condition name: `temper_target`\n --> app/build.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n"
+          },
+          {
+            "package_id": "path+file:///tmp/.tmpDtmUmE/temper-macro#0.1.0",
+            "target_name": "temper_macro",
+            "target_kind": [
+              "procmacro"
+            ],
+            "target_src_path": "/tmp/.tmpDtmUmE/temper-macro/src/lib.rs",
+            "level": "warning",
+            "code": "unexpected_cfgs",
+            "message": "unexpected `cfg` condition name: `temper_target`",
+            "rendered": "warning: unexpected `cfg` condition name: `temper_target`\n --> temper-macro/src/lib.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = help: or consider adding `println!(\"cargo::rustc-check-cfg=cfg(temper_target)\");` to the top of the `build.rs`\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n"
+          }
+        ],
+        "diagnostics_truncated": false
+      },
+      "build_failure": null,
+      "screening": {
+        "sample_durations_ns": [
+          5253115,
+          5246125,
+          5245585,
+          5249955,
+          5232665,
+          5243155,
+          5240195
+        ],
+        "median_duration_ns": 5245585,
+        "relative_mad": 0.0008330815342807332,
+        "outcome": "stable"
+      },
+      "workload_failure": null,
+      "rejection_reason": null
+    },
+    {
+      "identity": "pgo",
+      "build": {
+        "strategy": "pgo",
+        "stage": "pgo_optimized",
+        "target_directory": "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/pgo",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "pgo-workspace-app",
+          "--bin",
+          "pgo-workspace-app",
+          "--target-dir",
+          "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/pgo"
+        ],
+        "cargo_config_overrides": [],
+        "environment_overrides": [
+          {
+            "name": "CARGO_ENCODED_RUSTFLAGS",
+            "arguments": [
+              "--cfg",
+              "temper_target",
+              "--check-cfg=cfg(temper_target)",
+              "-Cprofile-use=/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/pgo/merged.profdata",
+              "-Cllvm-args=-pgo-warn-missing-function"
+            ]
+          }
+        ],
+        "outcome": "built",
+        "executable_path": "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/pgo/x86_64-unknown-linux-gnu/release/pgo-workspace-app",
+        "sha256": "29dfd1f54e7fc981a8b645b3fa65c1d4206c0773a55df03b01d4402340cd4bf0",
+        "size_bytes": 445704,
+        "build_duration_ms": 149,
+        "bounded_diagnostics": "warning: unexpected `cfg` condition name: `temper_target`\n --> app/build.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n\nwarning: unexpected `cfg` condition name: `temper_target`\n --> temper-macro/src/lib.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = help: or consider adding `println!(\"cargo::rustc-check-cfg=cfg(temper_target)\");` to the top of the `build.rs`\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n\nbuild-script-executed: path+file:///tmp/.tmpDtmUmE/app#pgo-workspace-app@0.1.0\nbuild-finished: success=true\n   Compiling pgo-workspace-app v0.1.0 (/tmp/.tmpDtmUmE/app)\n   Compiling temper-macro v0.1.0 (/tmp/.tmpDtmUmE/temper-macro)\n\n    Finished `release` profile [optimized] target(s) in 0.13s\n",
+        "compiler_diagnostics": [
+          {
+            "package_id": "path+file:///tmp/.tmpDtmUmE/app#pgo-workspace-app@0.1.0",
+            "target_name": "build-script-build",
+            "target_kind": [
+              "custombuild"
+            ],
+            "target_src_path": "/tmp/.tmpDtmUmE/app/build.rs",
+            "level": "warning",
+            "code": "unexpected_cfgs",
+            "message": "unexpected `cfg` condition name: `temper_target`",
+            "rendered": "warning: unexpected `cfg` condition name: `temper_target`\n --> app/build.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n"
+          },
+          {
+            "package_id": "path+file:///tmp/.tmpDtmUmE/temper-macro#0.1.0",
+            "target_name": "temper_macro",
+            "target_kind": [
+              "procmacro"
+            ],
+            "target_src_path": "/tmp/.tmpDtmUmE/temper-macro/src/lib.rs",
+            "level": "warning",
+            "code": "unexpected_cfgs",
+            "message": "unexpected `cfg` condition name: `temper_target`",
+            "rendered": "warning: unexpected `cfg` condition name: `temper_target`\n --> temper-macro/src/lib.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = help: or consider adding `println!(\"cargo::rustc-check-cfg=cfg(temper_target)\");` to the top of the `build.rs`\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n"
+          }
+        ],
+        "diagnostics_truncated": false
+      },
+      "build_failure": null,
+      "screening": {
+        "sample_durations_ns": [
+          5238335,
+          5254765,
+          5246475,
+          5279845,
+          5275825,
+          5235635,
+          5267485
+        ],
+        "median_duration_ns": 5254765,
+        "relative_mad": 0.0031266859697817125,
+        "outcome": "stable"
+      },
+      "workload_failure": null,
+      "rejection_reason": null
+    }
+  ],
+  "pgo_base_strategy": "baseline",
+  "pgo_training": {
+    "outcome": "trained",
+    "base_strategy": "baseline",
+    "prerequisites": {
+      "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+      "target_libdir": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+      "preserved_target_rustflags": [
+        "--cfg",
+        "temper_target",
+        "--check-cfg=cfg(temper_target)"
+      ],
+      "inspected_config_sources": [
+        {
+          "path": "/tmp/.tmpDtmUmE/.cargo/config.toml",
+          "sha256": "d6ebf7420c4cefd7959f1f349df2abe34d4549f2e4898265f09da3c0880b9e03"
+        }
+      ],
+      "tool_identity": {
+        "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+        "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+        "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+        "llvm_profdata_sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+        "llvm_profdata_version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+      }
+    },
+    "instrumentation_build": {
+      "strategy": "pgo",
+      "stage": "pgo_instrumentation",
+      "target_directory": "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/pgo-instrumented",
+      "cargo_arguments": [
+        "build",
+        "--release",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--message-format=json",
+        "--package",
+        "pgo-workspace-app",
+        "--bin",
+        "pgo-workspace-app",
+        "--target-dir",
+        "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/pgo-instrumented"
+      ],
+      "cargo_config_overrides": [],
+      "environment_overrides": [
+        {
+          "name": "CARGO_ENCODED_RUSTFLAGS",
+          "arguments": [
+            "--cfg",
+            "temper_target",
+            "--check-cfg=cfg(temper_target)",
+            "-Cprofile-generate=/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/pgo/raw"
+          ]
+        }
+      ],
+      "outcome": "built",
+      "executable_path": "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/pgo-instrumented/x86_64-unknown-linux-gnu/release/pgo-workspace-app",
+      "sha256": "caa3417e32d41c7aff42f486c12da1bc860a81afc6d03d7bcc0fdd27c91e4fee",
+      "size_bytes": 1350720,
+      "build_duration_ms": 174,
+      "bounded_diagnostics": "warning: unexpected `cfg` condition name: `temper_target`\n --> app/build.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n\nwarning: unexpected `cfg` condition name: `temper_target`\n --> temper-macro/src/lib.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = help: or consider adding `println!(\"cargo::rustc-check-cfg=cfg(temper_target)\");` to the top of the `build.rs`\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n\nbuild-script-executed: path+file:///tmp/.tmpDtmUmE/app#pgo-workspace-app@0.1.0\nbuild-finished: success=true\n   Compiling pgo-workspace-app v0.1.0 (/tmp/.tmpDtmUmE/app)\n\n   Compiling temper-macro v0.1.0 (/tmp/.tmpDtmUmE/temper-macro)\n\n    Finished `release` profile [optimized] target(s) in 0.13s\n",
+      "compiler_diagnostics": [
+        {
+          "package_id": "path+file:///tmp/.tmpDtmUmE/app#pgo-workspace-app@0.1.0",
+          "target_name": "build-script-build",
+          "target_kind": [
+            "custombuild"
+          ],
+          "target_src_path": "/tmp/.tmpDtmUmE/app/build.rs",
+          "level": "warning",
+          "code": "unexpected_cfgs",
+          "message": "unexpected `cfg` condition name: `temper_target`",
+          "rendered": "warning: unexpected `cfg` condition name: `temper_target`\n --> app/build.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n"
+        },
+        {
+          "package_id": "path+file:///tmp/.tmpDtmUmE/temper-macro#0.1.0",
+          "target_name": "temper_macro",
+          "target_kind": [
+            "procmacro"
+          ],
+          "target_src_path": "/tmp/.tmpDtmUmE/temper-macro/src/lib.rs",
+          "level": "warning",
+          "code": "unexpected_cfgs",
+          "message": "unexpected `cfg` condition name: `temper_target`",
+          "rendered": "warning: unexpected `cfg` condition name: `temper_target`\n --> temper-macro/src/lib.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = help: or consider adding `println!(\"cargo::rustc-check-cfg=cfg(temper_target)\");` to the top of the `build.rs`\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n"
+        }
+      ],
+      "diagnostics_truncated": false
+    },
+    "instrumentation_failure": null,
+    "training_duration_ns": 5238805,
+    "raw_profile_files": [
+      {
+        "path": "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/pgo/raw/temper-1014008048857394223_0-2551357.profraw",
+        "size_bytes": 872,
+        "sha256": "99f6d3944ffab2c3c24a45639fbc183b5bc1b9aea4f0e3153046056a7168301e"
+      }
+    ],
+    "merge": {
+      "outcome": "merged",
+      "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+      "arguments": [
+        "merge",
+        "--failure-mode=any",
+        "-o",
+        "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/pgo/merged.profdata",
+        "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/pgo/raw/temper-1014008048857394223_0-2551357.profraw"
+      ],
+      "profraw_files": [
+        {
+          "path": "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/pgo/raw/temper-1014008048857394223_0-2551357.profraw",
+          "size_bytes": 872,
+          "sha256": "99f6d3944ffab2c3c24a45639fbc183b5bc1b9aea4f0e3153046056a7168301e"
+        }
+      ],
+      "profdata_path": "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/pgo/merged.profdata",
+      "profdata_size_bytes": 1720,
+      "profdata_sha256": "5bbe5ede998087e73337942eb9a70b89886b4e4f6527077cd9bbc508309ac495",
+      "bounded_diagnostics": "",
+      "diagnostics_truncated": false,
+      "message": null
+    },
+    "phase_parity": {
+      "permitted_differences": [
+        "target_directory",
+        "profile_generate_vs_use",
+        "pgo_warn_missing_function_in_use"
+      ],
+      "instrumentation": {
+        "package_id": "path+file:///tmp/.tmpDtmUmE/app#pgo-workspace-app@0.1.0",
+        "binary_target": "pgo-workspace-app",
+        "target_triple": "x86_64-unknown-linux-gnu",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "pgo-workspace-app",
+          "--bin",
+          "pgo-workspace-app",
+          "--target-dir",
+          "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/pgo-instrumented"
+        ],
+        "base_profile_overrides": [],
+        "project_rustflags": [
+          "--cfg",
+          "temper_target",
+          "--check-cfg=cfg(temper_target)"
+        ],
+        "config_sources": [
+          {
+            "path": "/tmp/.tmpDtmUmE/.cargo/config.toml",
+            "sha256": "d6ebf7420c4cefd7959f1f349df2abe34d4549f2e4898265f09da3c0880b9e03"
+          }
+        ],
+        "cargo_identity": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+        "rustc_identity": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+        "llvm_profdata_identity": {
+          "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+          "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+          "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "llvm_profdata_sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+          "llvm_profdata_version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+        },
+        "target_directory": "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/pgo-instrumented",
+        "environment_overrides": [
+          {
+            "name": "CARGO_ENCODED_RUSTFLAGS",
+            "arguments": [
+              "--cfg",
+              "temper_target",
+              "--check-cfg=cfg(temper_target)",
+              "-Cprofile-generate=/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/pgo/raw"
+            ]
+          }
+        ]
+      },
+      "optimization": {
+        "package_id": "path+file:///tmp/.tmpDtmUmE/app#pgo-workspace-app@0.1.0",
+        "binary_target": "pgo-workspace-app",
+        "target_triple": "x86_64-unknown-linux-gnu",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "pgo-workspace-app",
+          "--bin",
+          "pgo-workspace-app",
+          "--target-dir",
+          "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/pgo"
+        ],
+        "base_profile_overrides": [],
+        "project_rustflags": [
+          "--cfg",
+          "temper_target",
+          "--check-cfg=cfg(temper_target)"
+        ],
+        "config_sources": [
+          {
+            "path": "/tmp/.tmpDtmUmE/.cargo/config.toml",
+            "sha256": "d6ebf7420c4cefd7959f1f349df2abe34d4549f2e4898265f09da3c0880b9e03"
+          }
+        ],
+        "cargo_identity": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+        "rustc_identity": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+        "llvm_profdata_identity": {
+          "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+          "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+          "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "llvm_profdata_sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+          "llvm_profdata_version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+        },
+        "target_directory": "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/pgo",
+        "environment_overrides": [
+          {
+            "name": "CARGO_ENCODED_RUSTFLAGS",
+            "arguments": [
+              "--cfg",
+              "temper_target",
+              "--check-cfg=cfg(temper_target)",
+              "-Cprofile-use=/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/pgo/merged.profdata",
+              "-Cllvm-args=-pgo-warn-missing-function"
+            ]
+          }
+        ]
+      },
+      "matched": true,
+      "unexpected_differences": []
+    },
+    "failure_stage": null,
+    "rejection_reason": null,
+    "message": null,
+    "remediation": null
+  },
+  "selected_candidate": "thin-lto",
+  "confirmation": {
+    "strategy": "thin-lto",
+    "outcome": "rejected",
+    "baseline_build": {
+      "strategy": "baseline",
+      "stage": "confirmation",
+      "target_directory": "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/confirmation/baseline",
+      "cargo_arguments": [
+        "build",
+        "--release",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--message-format=json",
+        "--package",
+        "pgo-workspace-app",
+        "--bin",
+        "pgo-workspace-app",
+        "--target-dir",
+        "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/confirmation/baseline"
+      ],
+      "cargo_config_overrides": [],
+      "environment_overrides": [],
+      "outcome": "built",
+      "executable_path": "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/confirmation/baseline/x86_64-unknown-linux-gnu/release/pgo-workspace-app",
+      "sha256": "34c2ec6c24f602ef27bfa33034a7801cd36a50fb073a2eee3669a1975c29d3f9",
+      "size_bytes": 445672,
+      "build_duration_ms": 145,
+      "bounded_diagnostics": "warning: unexpected `cfg` condition name: `temper_target`\n --> app/build.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n\nwarning: unexpected `cfg` condition name: `temper_target`\n --> temper-macro/src/lib.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = help: or consider adding `println!(\"cargo::rustc-check-cfg=cfg(temper_target)\");` to the top of the `build.rs`\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n\nbuild-script-executed: path+file:///tmp/.tmpDtmUmE/app#pgo-workspace-app@0.1.0\nbuild-finished: success=true\n   Compiling pgo-workspace-app v0.1.0 (/tmp/.tmpDtmUmE/app)\n\n   Compiling temper-macro v0.1.0 (/tmp/.tmpDtmUmE/temper-macro)\n\n    Finished `release` profile [optimized] target(s) in 0.13s\n",
+      "compiler_diagnostics": [
+        {
+          "package_id": "path+file:///tmp/.tmpDtmUmE/app#pgo-workspace-app@0.1.0",
+          "target_name": "build-script-build",
+          "target_kind": [
+            "custombuild"
+          ],
+          "target_src_path": "/tmp/.tmpDtmUmE/app/build.rs",
+          "level": "warning",
+          "code": "unexpected_cfgs",
+          "message": "unexpected `cfg` condition name: `temper_target`",
+          "rendered": "warning: unexpected `cfg` condition name: `temper_target`\n --> app/build.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n"
+        },
+        {
+          "package_id": "path+file:///tmp/.tmpDtmUmE/temper-macro#0.1.0",
+          "target_name": "temper_macro",
+          "target_kind": [
+            "procmacro"
+          ],
+          "target_src_path": "/tmp/.tmpDtmUmE/temper-macro/src/lib.rs",
+          "level": "warning",
+          "code": "unexpected_cfgs",
+          "message": "unexpected `cfg` condition name: `temper_target`",
+          "rendered": "warning: unexpected `cfg` condition name: `temper_target`\n --> temper-macro/src/lib.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = help: or consider adding `println!(\"cargo::rustc-check-cfg=cfg(temper_target)\");` to the top of the `build.rs`\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n"
+        }
+      ],
+      "diagnostics_truncated": false
+    },
+    "baseline_build_failure": null,
+    "candidate_build": {
+      "strategy": "thin-lto",
+      "stage": "confirmation",
+      "target_directory": "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/confirmation/thin-lto",
+      "cargo_arguments": [
+        "build",
+        "--release",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--message-format=json",
+        "--package",
+        "pgo-workspace-app",
+        "--bin",
+        "pgo-workspace-app",
+        "--target-dir",
+        "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/confirmation/thin-lto",
+        "--config",
+        "profile.release.lto=\"thin\""
+      ],
+      "cargo_config_overrides": [
+        "profile.release.lto=\"thin\""
+      ],
+      "environment_overrides": [],
+      "outcome": "built",
+      "executable_path": "/tmp/.tmpDtmUmE/.temper/runs/1785230603-275901624-2550112/target/confirmation/thin-lto/x86_64-unknown-linux-gnu/release/pgo-workspace-app",
+      "sha256": "3ee60c7597925a8e921ffb83d0c7f8fcd116ba757304906582f8b4f17b280314",
+      "size_bytes": 433640,
+      "build_duration_ms": 1555,
+      "bounded_diagnostics": "warning: unexpected `cfg` condition name: `temper_target`\n --> app/build.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n\nwarning: unexpected `cfg` condition name: `temper_target`\n --> temper-macro/src/lib.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = help: or consider adding `println!(\"cargo::rustc-check-cfg=cfg(temper_target)\");` to the top of the `build.rs`\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n\nbuild-script-executed: path+file:///tmp/.tmpDtmUmE/app#pgo-workspace-app@0.1.0\nbuild-finished: success=true\n   Compiling pgo-workspace-app v0.1.0 (/tmp/.tmpDtmUmE/app)\n\n   Compiling temper-macro v0.1.0 (/tmp/.tmpDtmUmE/temper-macro)\n\n    Finished `release` profile [optimized] target(s) in 1.54s\n",
+      "compiler_diagnostics": [
+        {
+          "package_id": "path+file:///tmp/.tmpDtmUmE/app#pgo-workspace-app@0.1.0",
+          "target_name": "build-script-build",
+          "target_kind": [
+            "custombuild"
+          ],
+          "target_src_path": "/tmp/.tmpDtmUmE/app/build.rs",
+          "level": "warning",
+          "code": "unexpected_cfgs",
+          "message": "unexpected `cfg` condition name: `temper_target`",
+          "rendered": "warning: unexpected `cfg` condition name: `temper_target`\n --> app/build.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n"
+        },
+        {
+          "package_id": "path+file:///tmp/.tmpDtmUmE/temper-macro#0.1.0",
+          "target_name": "temper_macro",
+          "target_kind": [
+            "procmacro"
+          ],
+          "target_src_path": "/tmp/.tmpDtmUmE/temper-macro/src/lib.rs",
+          "level": "warning",
+          "code": "unexpected_cfgs",
+          "message": "unexpected `cfg` condition name: `temper_target`",
+          "rendered": "warning: unexpected `cfg` condition name: `temper_target`\n --> temper-macro/src/lib.rs:1:7\n  |\n1 | #[cfg(temper_target)]\n  |       ^^^^^^^^^^^^^\n  |\n  = help: expected names are: `docsrs`, `feature`, and `test` and 32 more\n  = help: consider using a Cargo feature instead\n  = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:\n           [lints.rust]\n           unexpected_cfgs = { level = \"warn\", check-cfg = ['cfg(temper_target)'] }\n  = help: or consider adding `println!(\"cargo::rustc-check-cfg=cfg(temper_target)\");` to the top of the `build.rs`\n  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration\n  = note: `#[warn(unexpected_cfgs)]` on by default\n\n"
+        }
+      ],
+      "diagnostics_truncated": false
+    },
+    "candidate_build_failure": null,
+    "measurement": {
+      "baseline_durations_ns": [
+        5293575,
+        5258835,
+        5243255,
+        5233305,
+        5280965,
+        5259815,
+        5249395,
+        5271205,
+        5232625,
+        5237425,
+        5235805,
+        5236996,
+        5215995,
+        5229155,
+        5189775,
+        5265575,
+        5205315,
+        5249235,
+        5315835,
+        5260895
+      ],
+      "candidate_durations_ns": [
+        5244055,
+        5288445,
+        5237475,
+        5236575,
+        5226095,
+        5245745,
+        5253745,
+        5248125,
+        5236925,
+        5256675,
+        5241215,
+        5252065,
+        5237965,
+        5262735,
+        5227255,
+        5230605,
+        5250385,
+        5293035,
+        5233235,
+        5251935
+      ],
+      "median_ratio": 1.0008252170999938,
+      "baseline_relative_mad": 0.0026943080241201085,
+      "candidate_relative_mad": 0.0015538904459570248,
+      "confidence_interval_95": {
+        "lower": 0.9978109343563264,
+        "upper": 1.003943757104025
+      },
+      "threshold_ratio": 0.98,
+      "outcome": "insufficient_improvement"
+    },
+    "workload_failure": null,
+    "rejection_reason": "insufficient_improvement"
+  },
+  "promotion": null,
+  "failure": null
+}

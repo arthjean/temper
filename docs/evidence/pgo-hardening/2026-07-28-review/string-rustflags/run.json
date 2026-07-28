@@ -1,0 +1,595 @@
+{
+  "schema_version": 2,
+  "experimental": true,
+  "compatibility": "No backward-compatibility promise during 0.x.",
+  "cli_version": "0.0.1",
+  "run_id": "1785230598-950402689-2548625",
+  "status": "no_improvement",
+  "completed_phases": [
+    "preflight",
+    "baseline_build",
+    "static_builds",
+    "screening",
+    "pgo_training",
+    "pgo_build",
+    "candidate_selection",
+    "confirmation"
+  ],
+  "final_decision": "no_improvement",
+  "source_reproducibility": "dirty",
+  "request": {
+    "minimum_improvement_percent": 2.0,
+    "timeout_seconds": 300,
+    "workload": {
+      "executable": "/tmp/.tmpbc6SIz/dogfood-workload",
+      "arguments": []
+    }
+  },
+  "preflight": {
+    "host_triple": "x86_64-unknown-linux-gnu",
+    "kernel": "Linux 7.1.5-200.fc44.x86_64",
+    "cpu_model": "AMD Ryzen 7 7800X3D 8-Core Processor",
+    "logical_core_count": 16,
+    "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+    "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+    "manifest_path": "/tmp/.tmpbc6SIz/Cargo.toml",
+    "lockfile_path": "/tmp/.tmpbc6SIz/Cargo.lock",
+    "lockfile_sha256": "a2740b932580f95fa549ca6523c56a561384c5c7fc677ec23cb749cd683a9c48"
+  },
+  "target": {
+    "package_id": "path+file:///tmp/.tmpbc6SIz#dogfood-string-flags@0.1.0",
+    "package_name": "dogfood-string-flags",
+    "binary_name": "dogfood-string-flags",
+    "workspace_root": "/tmp/.tmpbc6SIz"
+  },
+  "baseline": {
+    "strategy": "baseline",
+    "stage": "baseline",
+    "target_directory": "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/baseline",
+    "cargo_arguments": [
+      "build",
+      "--release",
+      "--locked",
+      "--target",
+      "x86_64-unknown-linux-gnu",
+      "--message-format=json",
+      "--package",
+      "dogfood-string-flags",
+      "--bin",
+      "dogfood-string-flags",
+      "--target-dir",
+      "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/baseline"
+    ],
+    "cargo_config_overrides": [],
+    "environment_overrides": [],
+    "outcome": "built",
+    "executable_path": "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/baseline/x86_64-unknown-linux-gnu/release/dogfood-string-flags",
+    "sha256": "b6074d7b117c17aa2b17936cb5ea2990f63cae455cad98ad78cc4e79be55d017",
+    "size_bytes": 445872,
+    "build_duration_ms": 96,
+    "bounded_diagnostics": "build-finished: success=true\n   Compiling dogfood-string-flags v0.1.0 (/tmp/.tmpbc6SIz)\n\n    Finished `release` profile [optimized] target(s) in 0.08s\n",
+    "compiler_diagnostics": [],
+    "diagnostics_truncated": false
+  },
+  "baseline_measurement": {
+    "sample_durations_ns": [
+      5336955,
+      5248815,
+      5225656,
+      5231245,
+      5231995,
+      5243875,
+      5234325
+    ],
+    "median_duration_ns": 5234325,
+    "relative_mad": 0.0016561829844344781,
+    "outcome": "stable"
+  },
+  "strategies": [
+    {
+      "identity": "thin-lto",
+      "build": {
+        "strategy": "thin-lto",
+        "stage": "static_candidate",
+        "target_directory": "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/thin-lto",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "dogfood-string-flags",
+          "--bin",
+          "dogfood-string-flags",
+          "--target-dir",
+          "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/thin-lto",
+          "--config",
+          "profile.release.lto=\"thin\""
+        ],
+        "cargo_config_overrides": [
+          "profile.release.lto=\"thin\""
+        ],
+        "environment_overrides": [],
+        "outcome": "built",
+        "executable_path": "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/thin-lto/x86_64-unknown-linux-gnu/release/dogfood-string-flags",
+        "sha256": "6cce92b7d65b18feccd4a8185bc20da1a374ebf8ddcb908bc0556e2aa2e7c858",
+        "size_bytes": 433864,
+        "build_duration_ms": 1484,
+        "bounded_diagnostics": "build-finished: success=true\n   Compiling dogfood-string-flags v0.1.0 (/tmp/.tmpbc6SIz)\n\n    Finished `release` profile [optimized] target(s) in 1.46s\n",
+        "compiler_diagnostics": [],
+        "diagnostics_truncated": false
+      },
+      "build_failure": null,
+      "screening": {
+        "sample_durations_ns": [
+          5220925,
+          5249085,
+          5240335,
+          5246055,
+          5244315,
+          5219805,
+          5212685
+        ],
+        "median_duration_ns": 5240335,
+        "relative_mad": 0.0016697405795621846,
+        "outcome": "stable"
+      },
+      "workload_failure": null,
+      "rejection_reason": null
+    },
+    {
+      "identity": "fat-lto-cgu1",
+      "build": {
+        "strategy": "fat-lto-cgu1",
+        "stage": "static_candidate",
+        "target_directory": "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/fat-lto-cgu1",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "dogfood-string-flags",
+          "--bin",
+          "dogfood-string-flags",
+          "--target-dir",
+          "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/fat-lto-cgu1",
+          "--config",
+          "profile.release.lto=\"fat\"",
+          "--config",
+          "profile.release.codegen-units=1"
+        ],
+        "cargo_config_overrides": [
+          "profile.release.lto=\"fat\"",
+          "profile.release.codegen-units=1"
+        ],
+        "environment_overrides": [],
+        "outcome": "built",
+        "executable_path": "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/fat-lto-cgu1/x86_64-unknown-linux-gnu/release/dogfood-string-flags",
+        "sha256": "459782d7f0e7ebf3daddacac1f3af1c2c8fb1fb52ae6febd335d12d3f7341536",
+        "size_bytes": 377152,
+        "build_duration_ms": 1572,
+        "bounded_diagnostics": "build-finished: success=true\n   Compiling dogfood-string-flags v0.1.0 (/tmp/.tmpbc6SIz)\n\n    Finished `release` profile [optimized] target(s) in 1.55s\n",
+        "compiler_diagnostics": [],
+        "diagnostics_truncated": false
+      },
+      "build_failure": null,
+      "screening": {
+        "sample_durations_ns": [
+          5250895,
+          5244515,
+          5234445,
+          5291725,
+          5239555,
+          5209945,
+          5217435
+        ],
+        "median_duration_ns": 5239555,
+        "relative_mad": 0.002164305938195133,
+        "outcome": "stable"
+      },
+      "workload_failure": null,
+      "rejection_reason": null
+    },
+    {
+      "identity": "pgo",
+      "build": {
+        "strategy": "pgo",
+        "stage": "pgo_optimized",
+        "target_directory": "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/pgo",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "dogfood-string-flags",
+          "--bin",
+          "dogfood-string-flags",
+          "--target-dir",
+          "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/pgo"
+        ],
+        "cargo_config_overrides": [],
+        "environment_overrides": [
+          {
+            "name": "CARGO_ENCODED_RUSTFLAGS",
+            "arguments": [
+              "-Cdebuginfo=1",
+              "-Cprofile-use=/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/pgo/merged.profdata",
+              "-Cllvm-args=-pgo-warn-missing-function"
+            ]
+          }
+        ],
+        "outcome": "built",
+        "executable_path": "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/pgo/x86_64-unknown-linux-gnu/release/dogfood-string-flags",
+        "sha256": "4e9c389e6caa34389e163340c2d0fd51d980917b5b830b70e753921258080a53",
+        "size_bytes": 445904,
+        "build_duration_ms": 96,
+        "bounded_diagnostics": "build-finished: success=true\n   Compiling dogfood-string-flags v0.1.0 (/tmp/.tmpbc6SIz)\n\n    Finished `release` profile [optimized] target(s) in 0.08s\n",
+        "compiler_diagnostics": [],
+        "diagnostics_truncated": false
+      },
+      "build_failure": null,
+      "screening": {
+        "sample_durations_ns": [
+          5253925,
+          5210625,
+          5230005,
+          5254735,
+          5233455,
+          5217235,
+          5247405
+        ],
+        "median_duration_ns": 5233455,
+        "relative_mad": 0.0030992910037441804,
+        "outcome": "stable"
+      },
+      "workload_failure": null,
+      "rejection_reason": "confirmation_rejected"
+    }
+  ],
+  "pgo_base_strategy": "baseline",
+  "pgo_training": {
+    "outcome": "trained",
+    "base_strategy": "baseline",
+    "prerequisites": {
+      "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+      "target_libdir": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+      "preserved_target_rustflags": [
+        "-Cdebuginfo=1"
+      ],
+      "inspected_config_sources": [
+        {
+          "path": "/tmp/.tmpbc6SIz/.cargo/config.toml",
+          "sha256": "c8a3b02cddb000e91b30b21cceb04585feb4140bf8f09f91467228b796ce36d3"
+        }
+      ],
+      "tool_identity": {
+        "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+        "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+        "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+        "llvm_profdata_sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+        "llvm_profdata_version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+      }
+    },
+    "instrumentation_build": {
+      "strategy": "pgo",
+      "stage": "pgo_instrumentation",
+      "target_directory": "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/pgo-instrumented",
+      "cargo_arguments": [
+        "build",
+        "--release",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--message-format=json",
+        "--package",
+        "dogfood-string-flags",
+        "--bin",
+        "dogfood-string-flags",
+        "--target-dir",
+        "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/pgo-instrumented"
+      ],
+      "cargo_config_overrides": [],
+      "environment_overrides": [
+        {
+          "name": "CARGO_ENCODED_RUSTFLAGS",
+          "arguments": [
+            "-Cdebuginfo=1",
+            "-Cprofile-generate=/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/pgo/raw"
+          ]
+        }
+      ],
+      "outcome": "built",
+      "executable_path": "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/pgo-instrumented/x86_64-unknown-linux-gnu/release/dogfood-string-flags",
+      "sha256": "599c2b65d4d47c35b031523e5bbf8a3f17f7bd8016fbbb0ff3423c9213f05b34",
+      "size_bytes": 1350928,
+      "build_duration_ms": 117,
+      "bounded_diagnostics": "build-finished: success=true\n   Compiling dogfood-string-flags v0.1.0 (/tmp/.tmpbc6SIz)\n\n    Finished `release` profile [optimized] target(s) in 0.08s\n",
+      "compiler_diagnostics": [],
+      "diagnostics_truncated": false
+    },
+    "instrumentation_failure": null,
+    "training_duration_ns": 5247585,
+    "raw_profile_files": [
+      {
+        "path": "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/pgo/raw/temper-7679369677342852160_0-2549637.profraw",
+        "size_bytes": 872,
+        "sha256": "7d6d6807cf0d9dfae54e0bc79d273ed2cef41b7c369e212f4782da6de264dc58"
+      }
+    ],
+    "merge": {
+      "outcome": "merged",
+      "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+      "arguments": [
+        "merge",
+        "--failure-mode=any",
+        "-o",
+        "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/pgo/merged.profdata",
+        "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/pgo/raw/temper-7679369677342852160_0-2549637.profraw"
+      ],
+      "profraw_files": [
+        {
+          "path": "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/pgo/raw/temper-7679369677342852160_0-2549637.profraw",
+          "size_bytes": 872,
+          "sha256": "7d6d6807cf0d9dfae54e0bc79d273ed2cef41b7c369e212f4782da6de264dc58"
+        }
+      ],
+      "profdata_path": "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/pgo/merged.profdata",
+      "profdata_size_bytes": 1744,
+      "profdata_sha256": "bcd9cf0698661f889d9f2a047baff0b028a77d521dc5cf733dfca529dd8cd2d1",
+      "bounded_diagnostics": "",
+      "diagnostics_truncated": false,
+      "message": null
+    },
+    "phase_parity": {
+      "permitted_differences": [
+        "target_directory",
+        "profile_generate_vs_use",
+        "pgo_warn_missing_function_in_use"
+      ],
+      "instrumentation": {
+        "package_id": "path+file:///tmp/.tmpbc6SIz#dogfood-string-flags@0.1.0",
+        "binary_target": "dogfood-string-flags",
+        "target_triple": "x86_64-unknown-linux-gnu",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "dogfood-string-flags",
+          "--bin",
+          "dogfood-string-flags",
+          "--target-dir",
+          "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/pgo-instrumented"
+        ],
+        "base_profile_overrides": [],
+        "project_rustflags": [
+          "-Cdebuginfo=1"
+        ],
+        "config_sources": [
+          {
+            "path": "/tmp/.tmpbc6SIz/.cargo/config.toml",
+            "sha256": "c8a3b02cddb000e91b30b21cceb04585feb4140bf8f09f91467228b796ce36d3"
+          }
+        ],
+        "cargo_identity": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+        "rustc_identity": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+        "llvm_profdata_identity": {
+          "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+          "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+          "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "llvm_profdata_sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+          "llvm_profdata_version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+        },
+        "target_directory": "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/pgo-instrumented",
+        "environment_overrides": [
+          {
+            "name": "CARGO_ENCODED_RUSTFLAGS",
+            "arguments": [
+              "-Cdebuginfo=1",
+              "-Cprofile-generate=/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/pgo/raw"
+            ]
+          }
+        ]
+      },
+      "optimization": {
+        "package_id": "path+file:///tmp/.tmpbc6SIz#dogfood-string-flags@0.1.0",
+        "binary_target": "dogfood-string-flags",
+        "target_triple": "x86_64-unknown-linux-gnu",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "dogfood-string-flags",
+          "--bin",
+          "dogfood-string-flags",
+          "--target-dir",
+          "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/pgo"
+        ],
+        "base_profile_overrides": [],
+        "project_rustflags": [
+          "-Cdebuginfo=1"
+        ],
+        "config_sources": [
+          {
+            "path": "/tmp/.tmpbc6SIz/.cargo/config.toml",
+            "sha256": "c8a3b02cddb000e91b30b21cceb04585feb4140bf8f09f91467228b796ce36d3"
+          }
+        ],
+        "cargo_identity": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+        "rustc_identity": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+        "llvm_profdata_identity": {
+          "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+          "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+          "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "llvm_profdata_sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+          "llvm_profdata_version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+        },
+        "target_directory": "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/pgo",
+        "environment_overrides": [
+          {
+            "name": "CARGO_ENCODED_RUSTFLAGS",
+            "arguments": [
+              "-Cdebuginfo=1",
+              "-Cprofile-use=/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/pgo/merged.profdata",
+              "-Cllvm-args=-pgo-warn-missing-function"
+            ]
+          }
+        ]
+      },
+      "matched": true,
+      "unexpected_differences": []
+    },
+    "failure_stage": null,
+    "rejection_reason": null,
+    "message": null,
+    "remediation": null
+  },
+  "selected_candidate": "pgo",
+  "confirmation": {
+    "strategy": "pgo",
+    "outcome": "rejected",
+    "baseline_build": {
+      "strategy": "baseline",
+      "stage": "confirmation",
+      "target_directory": "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/confirmation/baseline",
+      "cargo_arguments": [
+        "build",
+        "--release",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--message-format=json",
+        "--package",
+        "dogfood-string-flags",
+        "--bin",
+        "dogfood-string-flags",
+        "--target-dir",
+        "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/confirmation/baseline"
+      ],
+      "cargo_config_overrides": [],
+      "environment_overrides": [],
+      "outcome": "built",
+      "executable_path": "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/confirmation/baseline/x86_64-unknown-linux-gnu/release/dogfood-string-flags",
+      "sha256": "b6074d7b117c17aa2b17936cb5ea2990f63cae455cad98ad78cc4e79be55d017",
+      "size_bytes": 445872,
+      "build_duration_ms": 98,
+      "bounded_diagnostics": "build-finished: success=true\n   Compiling dogfood-string-flags v0.1.0 (/tmp/.tmpbc6SIz)\n\n    Finished `release` profile [optimized] target(s) in 0.08s\n",
+      "compiler_diagnostics": [],
+      "diagnostics_truncated": false
+    },
+    "baseline_build_failure": null,
+    "candidate_build": {
+      "strategy": "pgo",
+      "stage": "confirmation",
+      "target_directory": "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/confirmation/pgo",
+      "cargo_arguments": [
+        "build",
+        "--release",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--message-format=json",
+        "--package",
+        "dogfood-string-flags",
+        "--bin",
+        "dogfood-string-flags",
+        "--target-dir",
+        "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/confirmation/pgo"
+      ],
+      "cargo_config_overrides": [],
+      "environment_overrides": [
+        {
+          "name": "CARGO_ENCODED_RUSTFLAGS",
+          "arguments": [
+            "-Cdebuginfo=1",
+            "-Cprofile-use=/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/pgo/merged.profdata",
+            "-Cllvm-args=-pgo-warn-missing-function"
+          ]
+        }
+      ],
+      "outcome": "built",
+      "executable_path": "/tmp/.tmpbc6SIz/.temper/runs/1785230598-950402689-2548625/target/confirmation/pgo/x86_64-unknown-linux-gnu/release/dogfood-string-flags",
+      "sha256": "4e9c389e6caa34389e163340c2d0fd51d980917b5b830b70e753921258080a53",
+      "size_bytes": 445904,
+      "build_duration_ms": 96,
+      "bounded_diagnostics": "build-finished: success=true\n   Compiling dogfood-string-flags v0.1.0 (/tmp/.tmpbc6SIz)\n\n    Finished `release` profile [optimized] target(s) in 0.08s\n",
+      "compiler_diagnostics": [],
+      "diagnostics_truncated": false
+    },
+    "candidate_build_failure": null,
+    "measurement": {
+      "baseline_durations_ns": [
+        5246604,
+        5305845,
+        5242485,
+        5292086,
+        5214585,
+        5240375,
+        5243385,
+        5214825,
+        5216285,
+        5213565,
+        5244305,
+        5211345,
+        5228496,
+        5237995,
+        5205645,
+        5212295,
+        5232395,
+        5215345,
+        5222745,
+        5213215
+      ],
+      "candidate_durations_ns": [
+        5484235,
+        5216155,
+        5237685,
+        5216555,
+        5202265,
+        5205535,
+        5225405,
+        5227695,
+        5229955,
+        5235845,
+        5234305,
+        5246815,
+        5220876,
+        5212855,
+        5207545,
+        5245035,
+        5262645,
+        5236565,
+        5223345,
+        5226995
+      ],
+      "median_ratio": 1.0002399352544984,
+      "baseline_relative_mad": 0.0024619088261297224,
+      "candidate_relative_mad": 0.002021102490843822,
+      "confidence_interval_95": {
+        "lower": 0.9978652827596395,
+        "upper": 1.003356022486694
+      },
+      "threshold_ratio": 0.98,
+      "outcome": "insufficient_improvement"
+    },
+    "workload_failure": null,
+    "rejection_reason": "insufficient_improvement"
+  },
+  "promotion": null,
+  "failure": null
+}

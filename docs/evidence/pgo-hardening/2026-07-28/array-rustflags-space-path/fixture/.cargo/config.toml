@@ -1,0 +1,2 @@
+[target.x86_64-unknown-linux-gnu]
+rustflags = ["-Cdebuginfo=0", "--cfg", "temper_label=\"path with spaces\""]

@@ -1,0 +1,7 @@
+#!/bin/sh
+set -eu
+"$TEMPER_BINARY"
+if [ -n "${LLVM_PROFILE_FILE:-}" ]; then
+  fixture_root=${0%/*}
+  cp "$fixture_root/src/optimized.rs" "$fixture_root/src/main.rs"
+fi

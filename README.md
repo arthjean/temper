@@ -8,9 +8,27 @@ compilation strategies, and produce a faster binary only when the improvement
 can be reproduced.
 
 > [!IMPORTANT]
-> Temper is currently in the design and prototyping stage. There is no usable
-> release yet. The interface described below represents the intended experience
-> and may change.
+> Temper v0.0.1 is implemented as an experimental Linux Cargo subcommand. It is
+> installable from source but is not published, licensed for public release, or
+> covered by a stable interface promise.
+
+## Current implementation
+
+The implemented v0.0.1 loop builds the existing release baseline, screens
+ThinLTO and Fat LTO with one codegen unit, trains one LLVM PGO candidate, and
+promotes a binary only after independent confirmation:
+
+```shell
+cargo temper optimize \
+  --package my-package \
+  --bin my-binary \
+  -- ./scripts/temper-workload --dataset representative
+```
+
+See the [v0.0.1 user contract](docs/v0.0.1.md), the
+[measurement protocol](docs/measurement-v1.md), and the
+[verification ledger](docs/verification-v0.0.1.md). The ledger distinguishes
+automated tests, synthetic dogfooding, and performance claims.
 
 ## Why Temper?
 

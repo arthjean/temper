@@ -1,0 +1,297 @@
+# Temper v0.0.1 verification ledger
+
+This document records completed validation and its evidentiary limits. It is
+the durable source for test, dogfooding, and benchmark status. Product behavior
+remains specified by [`../tasks/prd-temper-v0.0.1.md`](../tasks/prd-temper-v0.0.1.md)
+and [`measurement-v1.md`](measurement-v1.md).
+
+## Status snapshot
+
+| Field | Value |
+|---|---|
+| Verification date | 2026-07-28 |
+| Tested commit | `024b3899fd64a25084eaeff33301acf76b5f4d94` |
+| PRD status | `DONE`, 4 epics and 16 stories complete |
+| Host | Linux 7.1.5, `x86_64-unknown-linux-gnu` |
+| CPU | AMD Ryzen 7 7800X3D, 16 logical cores |
+| Rust | rustc 1.97.1, LLVM 22.1.6 |
+| Cargo | cargo 1.97.1 |
+| Verdict | All required gates and the documented dogfooding matrix passed |
+
+The implementation was tested from a clean `main` worktree. Documentation added
+after this snapshot did not change Rust source or test behavior.
+
+## PRD quality gates
+
+All four commands required by the PRD passed:
+
+```sh
+cargo fmt --check
+cargo check --all-targets --locked
+cargo clippy --all-targets --all-features --locked --no-deps -- -D warnings
+cargo test --all-targets --locked
+```
+
+The Rust suite executed 40 tests with 40 passes, 0 failures, and 0 ignored:
+
+| Suite | Tests |
+|---|---:|
+| Unit tests across `src/` | 19 |
+| EP-001 Cargo integration | 5 |
+| EP-001 CLI integration | 2 |
+| EP-002 workload integration | 3 |
+| EP-003 strategy and PGO integration | 6 |
+| EP-004 confirmation and promotion integration | 5 |
+
+`cargo test --doc --locked` is not applicable because Temper is currently a
+binary-only package with no library target. It is not a PRD quality gate.
+
+## Dogfooding matrix
+
+Five dependency-free, temporary Rust repositories were created outside the
+Temper worktree:
+
+1. A single CPU-bound binary.
+2. A two-package workspace with `alpha/alpha` and `beta/beta-tool`.
+3. A binary with a custom release profile and literal workload arguments.
+4. A valid binary with nonzero, timeout, and output-limit workloads.
+5. A deliberately non-compiling binary.
+
+The repositories were committed locally before execution so clean and dirty
+source handling could be tested. After verification they were moved to the
+system trash. Their raw manifests and build trees are therefore not repository
+artifacts.
+
+Twelve scenarios were executed:
+
+| Scenario | Expected boundary | Result |
+|---|---|---|
+| CPU-bound complete search | Baseline, ThinLTO, Fat LTO, PGO, confirmation | `no_improvement` |
+| Explicit workspace selection | Select `beta/beta-tool` through Cargo metadata | `no_improvement` |
+| Custom release profile and literal argv | Preserve profile and spaces, `$`, `*`, quote | `no_improvement` |
+| Ambiguous workspace | Reject before run creation or build | Passed |
+| Dirty source by default | Reject before run creation or build | Passed |
+| Dirty source with `--allow-dirty` | Record dirty reproducibility and continue | `no_improvement` |
+| Nonzero workload | Persist failure, skip confirmation and promotion | Passed |
+| One-second timeout | Kill and reap the descendant process group | Passed |
+| Missing `Cargo.lock` | Reject before run creation or build | Passed |
+| Forced promotion | Confirm, copy, checksum, and update `latest.json` | `confirmed` |
+| Stdout above 1 MiB | Terminate and persist bounded diagnostics | Passed |
+| Invalid baseline source | Stop before strategies and workload | Passed |
+
+### Measurement results
+
+Durations are wall-clock nanoseconds for the whole workload process.
+
+| Workload | Baseline screening median | Selected candidate | Confirmation median ratio | 95% CI | Decision |
+|---|---:|---|---:|---|---|
+| CPU-bound | 20,381,218 | PGO | 1.000215 | [0.999432, 1.001071] | `no_improvement` |
+| Workspace `beta-tool` | 10,255,389 | ThinLTO | 1.000954 | [1.000017, 1.001488] | `no_improvement` |
+| Custom release profile | 10,262,370 | ThinLTO | 1.000101 | [0.998909, 1.000966] | `no_improvement` |
+| Dirty source with `/bin/true` | 5,189,685 | ThinLTO | 1.000411 | [0.997571, 1.001389] | `no_improvement` |
+| Forced promotion | 55,793,646 | Fat LTO, CGU 1 | 0.184302 | [0.184050, 0.184550] | `confirmed` |
+
+The acceptance threshold was 0.98. The first four results demonstrate
+conservative rejection under synthetic workloads, not production performance.
+The dirty `/bin/true` workload mostly measures process overhead and did not
+produce PGO data.
+
+The forced-promotion workload slept for 50 ms when the executable path denoted a
+baseline and 5 ms otherwise. It exists only to verify the promotion machinery.
+Its apparent 81.6% improvement is intentionally manufactured and must never be
+reported as a compiler or strategy speedup.
+
+### PGO evidence
+
+Four full real-toolchain PGO paths completed:
+
+- instrumented Cargo build;
+- workload execution producing at least one `.profraw`;
+- merge through the `llvm-profdata` adjacent to active rustc;
+- optimized rebuild with `-Cprofile-use`;
+- PGO candidate screening.
+
+The dirty `/bin/true` scenario correctly rejected only PGO because the workload
+did not execute `TEMPER_BINARY` and produced no `.profraw`.
+
+## Cross-run audit
+
+The nine scenarios that created run directories produced:
+
+- 9 parseable schema-v1 manifests with unique run IDs;
+- statuses: 1 `confirmed`, 4 `no_improvement`, and 4 `failed`;
+- 43 recorded build artifacts whose on-disk SHA-256 values matched;
+- 4 merged `.profdata` files whose SHA-256 values matched;
+- exactly one `latest.json`, belonging to the confirmed run;
+- no confirmation or promotion for nonzero, timeout, output-limit, or baseline
+  build failures;
+- no surviving timeout descendant process;
+- no source, manifest, or lockfile mutation;
+- no detected secret-like inherited environment assignment in persisted output.
+
+For the custom profile project, a separate standard
+`cargo build --release --locked` produced the same binary SHA-256 as Temper's
+baseline. This confirms that the baseline preserved the effective release
+profile in that scenario.
+
+## What has not been benchmarked
+
+Temper has no checked-in benchmark corpus, `benches/` directory, Cargo bench
+target, or production application result. No claim has been established for:
+
+- speedup on a representative real application;
+- the PRD month-1 or month-6 project and user targets;
+- cross-machine reproducibility;
+- false-promotion behavior under live scheduler noise beyond the deterministic
+  measurement cohorts in the test suite;
+- macOS, Windows, musl, non-x86_64, or cross-compilation.
+
+The next meaningful performance milestone is a versioned, checked-in benchmark
+corpus with correctness-checking workloads and retained raw run records.
+
+## 2026-07-28 v0.0.2 PGO-hardening evidence
+
+This append-only section records correctness evidence for EP-002. It makes no
+optimization-gain, representative-benchmark or release-readiness claim.
+
+| Field | Value |
+|---|---|
+| Baseline commit | `024b3899fd64a25084eaeff33301acf76b5f4d94` |
+| Tested worktree | Dirty EP-002 implementation, tree SHA-256 `726f10f73179d5753d8dd724984aa9eb7c88b78c816b19202199e570ad942859` |
+| Host | Linux 7.1.5, `x86_64-unknown-linux-gnu` |
+| Rust | rustc 1.97.1, LLVM 22.1.6 |
+| Cargo | cargo 1.97.1 |
+| Raw evidence | [`evidence/pgo-hardening/2026-07-28`](evidence/pgo-hardening/2026-07-28) |
+| Classification | Synthetic correctness fixtures and one deliberately incompatible-profile control |
+
+The four PRD quality gates passed:
+
+```sh
+cargo fmt --check
+cargo check --all-targets --locked
+cargo clippy --all-targets --all-features --locked --no-deps -- -D warnings
+cargo test --all-targets --locked
+```
+
+The full suite executed 62 tests with 62 passes, 0 failures and 1 ignored
+collector test. The collector was then run explicitly and passed.
+
+Four real-toolchain paths completed instrumentation, training, strict merge,
+optimized build and PGO screening: a single binary, string target rustflags, a
+multi-package workspace with a build script and proc macro, and array rustflags
+under a path containing spaces. A fifth path changed fixture source only after
+instrumented training. The resulting real LLVM warning was classified as
+`pgo_missing_profile_data`; that PGO candidate received zero screening samples
+and static candidates remained eligible.
+
+Five raw `run.json` files, exact fixture inputs, workloads and the full
+toolchain fingerprint are retained. Before temporary build directories were
+released, 34 artifact checksum references, 10 raw-profile checksum references
+and 5 merged-profile checksum references were independently recomputed and
+matched. Counts include repeated references to the same raw profile in training
+and merge records.
+
+These results identify an uncommitted implementation by its baseline commit and
+tree checksum. A clean committed-state rerun remains required before a release
+claim. The synthetic timing decisions in the retained runs are controls and
+support no performance claim.
+
+## Repeating or extending verification
+
+For code validation, run the four PRD gates above. For future dogfooding:
+
+1. Record the current commit, kernel, CPU, rustc, LLVM, and Cargo versions.
+2. Use a clean Git repository with an existing `Cargo.lock`.
+3. Make the workload execute and validate `TEMPER_BINARY`.
+4. Classify the workload as synthetic or production-representative before
+   interpreting any score.
+5. Retain `run.json`, workload source, project revision, and promoted artifact
+   checksum in a stable evidence directory.
+6. Append a dated result section here. Never replace historical results
+   silently.
+
+## 2026-07-28 EP-002 review remediation evidence
+
+This append-only section records the post-review correction and rerun. It
+supersedes the earlier dirty-tree evidence for EP-002 completion, but does not
+alter or remove that historical record.
+
+| Field | Value |
+|---|---|
+| Baseline commit | `024b3899fd64a25084eaeff33301acf76b5f4d94` |
+| Production inputs | SHA-256 `980625bea61ce6cdfbfa6499946678b0ac1d3e7255153c84106932ed51479cbd` |
+| Evidence harness | SHA-256 `17e216125fafa94f52d8ce24c715a92f75aa69f62ff101c1135081604743f45e` |
+| Tested binary | SHA-256 `353478f50a81e09a60f0ebd0b093a080bd629a15dea67cdc54e08cf0d31a02be` |
+| Host | Linux 7.1.5, `x86_64-unknown-linux-gnu` |
+| Rust | rustc 1.97.1, LLVM 22.1.6 |
+| Cargo | cargo 1.97.1 |
+| Raw evidence | [`evidence/pgo-hardening/2026-07-28-review`](evidence/pgo-hardening/2026-07-28-review) |
+| Classification | Synthetic correctness fixtures and one deliberately incompatible-profile control |
+
+The review corrected missing-profile classification during PGO confirmation and
+moved the JSON-looking, zero-artifact and multiple-artifact compatibility cases
+into independently named PGO-phase tests. The four PRD quality gates then
+passed. The full suite executed 66 tests with 66 passes, 0 failures and 1
+ignored collector test. The collector was run explicitly and passed.
+
+The retained rerun contains four complete real-toolchain PGO paths and one
+incompatible-profile control rejected as `pgo_missing_profile_data` with zero
+PGO screening samples. Its 34 artifact, 10 raw-profile and 5 merged-profile
+checksum references were independently recomputed and matched before temporary
+build directories were released. These are correctness controls only and
+support no optimization-gain, representative-benchmark or release-readiness
+claim.
+
+## 2026-07-28 corpus-v1 reference baseline
+
+This append-only section records the first `temper-corpus-v1` reference-host
+collection. It reports each real application independently. No arithmetic mean,
+geometric mean, ranking, composite score or universal speedup was computed.
+
+| Field | Value |
+|---|---|
+| Baseline commit | `024b3899fd64a25084eaeff33301acf76b5f4d94` |
+| Tested worktree | Dirty v0.0.2 implementation, production-input SHA-256 `980625bea61ce6cdfbfa6499946678b0ac1d3e7255153c84106932ed51479cbd` |
+| Corpus | `temper-corpus-v1`, changelog `1.0.0` |
+| Host | Linux 7.1.5, AMD Ryzen 7 7800X3D, 16 logical cores |
+| Rust | rustc 1.97.1, LLVM 22.1.6 |
+| Cargo | cargo 1.97.1 |
+| Raw evidence | [`../benchmarks/corpus/v1/results/reference/2026-07-28`](../benchmarks/corpus/v1/results/reference/2026-07-28) |
+| Evidence count | 12 parseable schema-v2 `run.json` records, 12 metadata records, 12 checksum audits |
+
+The real workload cases are bounded local proxies for expected application use,
+not production traffic: BLAKE3 hashes its upstream 31 KiB test-vector corpus at
+32-byte and 64-byte output lengths with weights 60/40; `xsv` computes full
+statistics and a two-column projection over deterministic CSV data with weights
+55/45; `hexyl` streams a complete upstream ELF fixture and a bounded slice with
+weights 60/40. One workload invocation executes every scenario exactly its
+weight and verifies each process exit plus its semantic output SHA-256. Curated
+baseline workload medians were 280 ms, 420 ms and 230 ms respectively.
+
+| Case | Run | Baseline median | Selected candidate | Confirmation ratio | 95% CI | Decision |
+|---|---:|---:|---|---:|---|---|
+| BLAKE3 `b3sum` | 1 | 288.470 ms | ThinLTO | 1.000674 | [0.995120, 1.015795] | `no_improvement` |
+| BLAKE3 `b3sum` | 2 | 288.445 ms | FatLTO, CGU 1 | 0.988767 | [0.978179, 0.999949] | `no_improvement` |
+| BLAKE3 `b3sum` | 3 | 283.426 ms | PGO | 0.999922 | [0.982727, 1.003828] | `no_improvement` |
+| `xsv` | 1 | 431.089 ms | PGO | 0.952620 | [0.941101, 0.956382] | `confirmed` |
+| `xsv` | 2 | 432.867 ms | PGO | 0.963293 | [0.943980, 0.964902] | `confirmed` |
+| `xsv` | 3 | 430.042 ms | PGO | 0.952486 | [0.941844, 0.954220] | `confirmed` |
+| `hexyl` | 1 | 237.908 ms | PGO | 0.979217 | [0.978600, 0.999785] | `no_improvement` |
+| `hexyl` | 2 | 237.833 ms | FatLTO, CGU 1 | 0.999363 | [0.989188, 0.999975] | `no_improvement` |
+| `hexyl` | 3 | 237.843 ms | PGO | 0.981490 | [0.979237, 1.000026] | `no_improvement` |
+
+All nine real runs and all three synthetic-control runs passed their correctness
+oracles. The three `xsv` observations confirmed PGO for this exact pinned
+source, input, workload, host and toolchain only. They do not establish a
+cross-application, cross-machine or universal gain. The synthetic control is
+non-representative harness evidence and has no performance interpretation.
+
+Before each temporary worktree was released, the collector rechecked every
+available referenced checksum: 84 artifact references, 2,400 raw-profile
+references and 12 merged-profile references matched. Source, Cargo manifest,
+lockfile and input checksums were unchanged. The collector forced Cargo offline,
+retained no failure record and wrote an explicit null aggregate score.
+
+The evidence identifies an uncommitted implementation through both its baseline
+commit and production-input hash. A clean committed-state rerun remains required
+before any release-readiness claim.

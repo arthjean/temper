@@ -51,7 +51,7 @@ fn main() {
 
 fn optimize(arguments: cli::OptimizeArgs) -> Result<()> {
     eprintln!(
-        "Temper CLI {} and report schema 1 are experimental; 0.x provides no backward-compatibility promise.",
+        "Temper CLI {} and report schema 2 are experimental; 0.x provides no backward-compatibility promise.",
         env!("CARGO_PKG_VERSION")
     );
     let preflight = preflight::run(
@@ -350,7 +350,7 @@ fn emit_pre_run_failure(json: bool, error: TemperError) -> TemperError {
         return error;
     }
     let report = serde_json::json!({
-        "schema_version": 1,
+        "schema_version": 2,
         "experimental": true,
         "status": "failed",
         "final_decision": "failed",

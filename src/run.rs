@@ -15,7 +15,7 @@ use crate::promotion::PromotionRecord;
 use crate::strategy::{BuildPlan, PgoTrainingRecord, Strategy};
 use crate::workload::{WorkloadFailure, WorkloadFailureKind};
 
-const SCHEMA_VERSION: u8 = 1;
+const SCHEMA_VERSION: u8 = 2;
 const HUMAN_REPORT_LINE_LIMIT: usize = 25;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
@@ -411,13 +411,18 @@ impl Run {
     }
 
     pub(crate) fn reject_pgo_build(&mut self, failure: BuildFailure) -> Result<()> {
+        let rejection_reason = if failure.reason == "pgo_missing_profile_data" {
+            "pgo_missing_profile_data"
+        } else {
+            "pgo_build_failed"
+        };
         self.manifest.strategies.push(StrategyRecord {
             identity: Strategy::Pgo,
             build: None,
             build_failure: Some(failure),
             screening: None,
             workload_failure: None,
-            rejection_reason: Some("pgo_build_failed".to_owned()),
+            rejection_reason: Some(rejection_reason.to_owned()),
         });
         self.persist()
     }
@@ -466,16 +471,24 @@ impl Run {
             .as_ref()
             .map(|record| record.invocation.cargo_config_overrides.clone())
             .ok_or_else(|| TemperError::new("Baseline build record is unavailable."))?;
+        let baseline_environment = self
+            .manifest
+            .baseline
+            .as_ref()
+            .map(|record| record.invocation.environment_overrides.clone())
+            .ok_or_else(|| TemperError::new("Baseline build record is unavailable."))?;
         Ok(Some(ConfirmationPlans {
             baseline: BuildPlan::confirmation(
                 Strategy::Baseline,
                 &self.target_root,
                 baseline_overrides,
+                baseline_environment,
             ),
             candidate: BuildPlan::confirmation(
                 candidate,
                 &self.target_root,
                 candidate_record.invocation.cargo_config_overrides.clone(),
+                candidate_record.invocation.environment_overrides.clone(),
             ),
         }))
     }
@@ -704,7 +717,7 @@ impl Run {
 
     fn human_report_lines(&self) -> Vec<String> {
         let mut lines = vec![format!(
-            "Temper {} schema 1 (experimental)",
+            "Temper {} schema 2 (experimental)",
             env!("CARGO_PKG_VERSION")
         )];
         if let Some(baseline) = &self.manifest.baseline {

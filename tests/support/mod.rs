@@ -74,10 +74,16 @@ impl Fixture {
     }
 
     pub(crate) fn checked_in_workspace() -> Self {
+        Self::checked_in_fixture("workspace")
+    }
+
+    pub(crate) fn checked_in_fixture(name: &str) -> Self {
         let temporary_directory = tempfile::tempdir().expect("create fixture directory");
         let root = temporary_directory.path().to_path_buf();
         copy_directory(
-            Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/workspace"),
+            Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("tests/fixtures")
+                .join(name),
             &root,
         );
         initialize_git(&root);

@@ -52,7 +52,7 @@ fn aa_confirmation_is_a_successful_no_improvement_json_run() {
     let json = stdout(&output);
     assert!(!json.contains('\u{1b}'));
     let report: Value = serde_json::from_str(&json).expect("one final JSON object");
-    assert_eq!(report["schema_version"], 1);
+    assert_eq!(report["schema_version"], 2);
     assert_eq!(report["status"], "no_improvement");
     assert_eq!(report["final_decision"], "no_improvement");
     assert_eq!(
@@ -190,12 +190,12 @@ fn candidate_confirmation_failure_rejects_without_promotion() {
 }
 
 #[test]
-fn failed_runs_still_emit_schema_v1_and_preflight_json_is_single_object() {
+fn failed_runs_still_emit_schema_v2_and_preflight_json_is_single_object() {
     let fixture = Fixture::single("nonzero-workload", true, true);
     let output = fixture.optimize_workload(&[], &[OsStr::new("/bin/false")]);
     assert_eq!(output.status.code(), Some(1));
     let manifest = fixture.manifest();
-    assert_eq!(manifest["schema_version"], 1);
+    assert_eq!(manifest["schema_version"], 2);
     assert_eq!(manifest["status"], "failed");
     assert_eq!(manifest["final_decision"], "failed");
     assert_eq!(manifest["failure"]["outcome"], "nonzero_exit");
@@ -210,7 +210,7 @@ fn failed_runs_still_emit_schema_v1_and_preflight_json_is_single_object() {
         .expect("run JSON preflight failure");
     assert_eq!(output.status.code(), Some(1));
     let report: Value = serde_json::from_slice(&output.stdout).expect("one preflight JSON object");
-    assert_eq!(report["schema_version"], 1);
+    assert_eq!(report["schema_version"], 2);
     assert_eq!(report["status"], "failed");
     assert!(!stdout(&output).contains('\u{1b}'));
 }

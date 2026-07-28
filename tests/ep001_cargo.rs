@@ -14,10 +14,10 @@ fn builds_and_records_a_single_clean_baseline_without_source_mutation() {
     let fixture = Fixture::single("single-fixture", true, true);
     let output = fixture.optimize(&[]);
     assert!(output.status.success(), "{}", stderr(&output));
-    assert!(stdout(&output).contains("Temper 0.0.1 schema 1 (experimental)"));
+    assert!(stdout(&output).contains("Temper 0.0.1 schema 2 (experimental)"));
 
     let manifest = fixture.manifest();
-    assert_eq!(manifest["schema_version"], 1);
+    assert_eq!(manifest["schema_version"], 2);
     assert_eq!(manifest["experimental"], true);
     assert_ne!(manifest["final_decision"], "pending");
     assert_eq!(manifest["source_reproducibility"], "clean");

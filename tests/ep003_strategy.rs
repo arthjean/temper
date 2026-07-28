@@ -99,10 +99,14 @@ fn ambient_rustflags_reject_only_pgo() {
 
     let manifest = fixture.manifest();
     assert_eq!(manifest["pgo_training"]["outcome"], "rejected");
+    assert_eq!(
+        manifest["pgo_training"]["rejection_reason"],
+        "ambient_rustflags"
+    );
     assert!(
-        manifest["pgo_training"]["rejection_reason"]
+        manifest["pgo_training"]["message"]
             .as_str()
-            .is_some_and(|reason| reason.contains("RUSTFLAGS"))
+            .is_some_and(|message| message.contains("RUSTFLAGS"))
     );
     let strategies = manifest["strategies"].as_array().expect("strategy records");
     assert_eq!(strategies[0]["build"]["outcome"], "built");
@@ -136,7 +140,7 @@ fn a_static_build_failure_does_not_stop_remaining_strategies() {
     fs::write(
         &wrapper,
         format!(
-            "#!/bin/sh\nfor argument in \"$@\"; do\n  case \"$argument\" in\n    'profile.release.lto=\"thin\"') exit 97 ;;\n    *-Cprofile-generate=*) exit 98 ;;\n  esac\ndone\nexec '{real_cargo}' \"$@\"\n"
+            "#!/bin/sh\nfor argument in \"$@\"; do\n  case \"$argument\" in\n    'profile.release.lto=\"thin\"') exit 97 ;;\n  esac\ndone\ncase \"${{CARGO_ENCODED_RUSTFLAGS:-}}\" in\n  *-Cprofile-generate=*) exit 98 ;;\nesac\nexec '{real_cargo}' \"$@\"\n"
         ),
     )
     .expect("write Cargo wrapper");
@@ -221,10 +225,14 @@ fn pgo_never_falls_back_to_path_for_llvm_profdata() {
 
     let manifest = fixture.manifest();
     assert_eq!(manifest["pgo_training"]["outcome"], "rejected");
+    assert_eq!(
+        manifest["pgo_training"]["rejection_reason"],
+        "llvm_profdata_unavailable"
+    );
     assert!(
-        manifest["pgo_training"]["rejection_reason"]
+        manifest["pgo_training"]["message"]
             .as_str()
-            .is_some_and(|reason| reason.contains("fake-toolchain/host/bin/llvm-profdata"))
+            .is_some_and(|message| message.contains("fake-toolchain/host/bin/llvm-profdata"))
     );
     assert!(
         manifest["pgo_training"]["remediation"]
@@ -297,6 +305,24 @@ fn trains_merges_rebuilds_and_screens_pgo() {
             .as_str()
             .is_some_and(|checksum| checksum.len() == 64)
     );
+    assert_eq!(manifest["pgo_training"]["phase_parity"]["matched"], true);
+    assert_eq!(
+        manifest["pgo_training"]["phase_parity"]["unexpected_differences"],
+        serde_json::json!([])
+    );
+    assert_eq!(
+        manifest["pgo_training"]["phase_parity"]["permitted_differences"],
+        serde_json::json!([
+            "target_directory",
+            "profile_generate_vs_use",
+            "pgo_warn_missing_function_in_use"
+        ])
+    );
+    assert!(
+        manifest["pgo_training"]["phase_parity"]["instrumentation"]["config_sources"][0]["sha256"]
+            .as_str()
+            .is_some_and(|checksum| checksum.len() == 64)
+    );
 
     let pgo = manifest["strategies"]
         .as_array()
@@ -312,10 +338,81 @@ fn trains_merges_rebuilds_and_screens_pgo() {
     assert!(
         pgo["build"]["cargo_config_overrides"]
             .as_array()
-            .is_some_and(|overrides| overrides.iter().any(|value| {
-                value
+            .is_some_and(|overrides| overrides.iter().all(|override_value| {
+                override_value
                     .as_str()
-                    .is_some_and(|value| value.contains("-Cprofile-use="))
+                    .is_none_or(|value| !value.contains("rustflags"))
             }))
+    );
+    let environment = &pgo["build"]["environment_overrides"][0];
+    assert_eq!(environment["name"], "CARGO_ENCODED_RUSTFLAGS");
+    assert_eq!(environment["arguments"][0], "-Cdebuginfo=0");
+    assert!(
+        environment["arguments"]
+            .as_array()
+            .is_some_and(|arguments| {
+                arguments.iter().any(|argument| {
+                    argument
+                        .as_str()
+                        .is_some_and(|argument| argument.starts_with("-Cprofile-use="))
+                }) && arguments.last()
+                    == Some(&serde_json::json!("-Cllvm-args=-pgo-warn-missing-function"))
+            })
+    );
+}
+
+#[test]
+fn changed_config_hash_rejects_only_pgo_before_optimization() {
+    let fixture = Fixture::single("pgo-parity", true, true);
+    let cargo_config = fixture.root.join(".cargo");
+    fs::create_dir(&cargo_config).expect("Cargo config directory");
+    let config_path = cargo_config.join("config.toml");
+    fs::write(
+        &config_path,
+        "[target.x86_64-unknown-linux-gnu]\nrustflags = [\"-Cdebuginfo=0\"]\n",
+    )
+    .expect("target-specific rustflags");
+    let workload = fixture.root.join("mutate-config-during-training");
+    fs::write(
+        &workload,
+        format!(
+            "#!/bin/sh\nif [ -n \"${{LLVM_PROFILE_FILE:-}}\" ]; then\n  printf '%s\\n' '# changed during PGO training' '[target.x86_64-unknown-linux-gnu]' 'rustflags = [\"-Cdebuginfo=0\"]' > '{}'\nfi\nexec \"$TEMPER_BINARY\"\n",
+            config_path.display()
+        ),
+    )
+    .expect("write parity workload");
+    let mut permissions = fs::metadata(&workload)
+        .expect("workload metadata")
+        .permissions();
+    permissions.set_mode(0o755);
+    fs::set_permissions(&workload, permissions).expect("make workload executable");
+
+    let output = Command::new(env!("CARGO_BIN_EXE_cargo-temper"))
+        .current_dir(&fixture.root)
+        .args(["temper", "optimize", "--allow-dirty", "--manifest-path"])
+        .arg(fixture.root.join("Cargo.toml"))
+        .arg("--")
+        .arg(&workload)
+        .output()
+        .expect("run parity rejection");
+    assert!(output.status.success(), "{}", stderr(&output));
+
+    let manifest = fixture.manifest();
+    assert_eq!(
+        manifest["pgo_training"]["rejection_reason"],
+        "pgo_phase_parity_mismatch"
+    );
+    assert_eq!(manifest["pgo_training"]["phase_parity"]["matched"], false);
+    assert!(
+        manifest["pgo_training"]["phase_parity"]["unexpected_differences"]
+            .as_array()
+            .is_some_and(|fields| fields.iter().any(|field| field == "config_sources"))
+    );
+    assert_eq!(
+        manifest["strategies"]
+            .as_array()
+            .and_then(|strategies| strategies.last())
+            .and_then(|strategy| strategy["rejection_reason"].as_str()),
+        Some("pgo_training_rejected")
     );
 }

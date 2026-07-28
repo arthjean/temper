@@ -14,7 +14,7 @@ fn builds_and_records_a_single_clean_baseline_without_source_mutation() {
     let fixture = Fixture::single("single-fixture", true, true);
     let output = fixture.optimize(&[]);
     assert!(output.status.success(), "{}", stderr(&output));
-    assert!(stdout(&output).contains("Temper 0.0.1 schema 2 (experimental)"));
+    assert!(stdout(&output).contains("Temper 0.0.2 schema 2 (experimental)"));
 
     let manifest = fixture.manifest();
     assert_eq!(manifest["schema_version"], 2);
@@ -128,7 +128,7 @@ fn rejects_cross_targets_and_ignores_nested_workspace_run_output() {
     assert_eq!(rejected.status.code(), Some(1));
     assert!(
         stderr(&rejected)
-            .contains("Temper v0.0.1 supports only x86_64-unknown-linux-gnu host binaries")
+            .contains("Temper v0.0.2 supports only x86_64-unknown-linux-gnu host binaries")
     );
     assert!(!cross_target.root.join(".temper").exists());
 
@@ -145,7 +145,7 @@ fn prerequisite_and_baseline_failures_stop_before_later_phases() {
     let missing_lock_output = missing_lock.optimize(&[]);
     assert_eq!(missing_lock_output.status.code(), Some(1));
     assert!(
-        stderr(&missing_lock_output).contains("Temper v0.0.1 requires an existing Cargo.lock.")
+        stderr(&missing_lock_output).contains("Temper v0.0.2 requires an existing Cargo.lock.")
     );
     assert!(!missing_lock.root.join(".temper").exists());
 

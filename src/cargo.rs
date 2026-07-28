@@ -178,7 +178,10 @@ pub(crate) fn resolve_target(
 fn validate_workspace_lockfile(preflight: &Preflight, metadata: &Metadata) -> Result<()> {
     let workspace_lockfile = metadata.workspace_root.join("Cargo.lock");
     let workspace_lockfile = std::fs::canonicalize(workspace_lockfile).map_err(|_| {
-        TemperError::new("Temper v0.0.1 requires an existing Cargo.lock at the workspace root.")
+        TemperError::new(format!(
+            "Temper v{} requires an existing Cargo.lock at the workspace root.",
+            env!("CARGO_PKG_VERSION")
+        ))
     })?;
     if workspace_lockfile == preflight.record.lockfile_path {
         Ok(())
@@ -253,7 +256,8 @@ fn selection_error(message: &str, metadata: &Metadata) -> TemperError {
         valid_choices.join(", ")
     };
     TemperError::new(format!(
-        "{message} Temper v0.0.1 supports only host Cargo binary targets. Valid package/binary choices: {choices}"
+        "{message} Temper v{} supports only host Cargo binary targets. Valid package/binary choices: {choices}",
+        env!("CARGO_PKG_VERSION")
     ))
 }
 

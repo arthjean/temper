@@ -60,8 +60,12 @@ pub(crate) fn run(
         )));
     }
 
-    let lockfile_path = find_lockfile(&manifest_path)
-        .ok_or_else(|| TemperError::new("Temper v0.0.1 requires an existing Cargo.lock."))?;
+    let lockfile_path = find_lockfile(&manifest_path).ok_or_else(|| {
+        TemperError::new(format!(
+            "Temper v{} requires an existing Cargo.lock.",
+            env!("CARGO_PKG_VERSION")
+        ))
+    })?;
     let lockfile_sha256 = sha256_file(&lockfile_path)?;
     let source_reproducibility = inspect_source(&manifest_path, &lockfile_path, allow_dirty)?;
 
@@ -130,7 +134,8 @@ fn validate_supported_host(host_triple: &str) -> Result<()> {
         Ok(())
     } else {
         Err(TemperError::new(format!(
-            "Unsupported host triple {host_triple}; Temper v0.0.1 supports only {SUPPORTED_HOST}."
+            "Unsupported host triple {host_triple}; Temper v{} supports only {SUPPORTED_HOST}.",
+            env!("CARGO_PKG_VERSION")
         )))
     }
 }
@@ -138,7 +143,8 @@ fn validate_supported_host(host_triple: &str) -> Result<()> {
 fn validate_requested_target(requested_target: Option<&str>) -> Result<()> {
     match requested_target {
         Some(target) if target != SUPPORTED_HOST => Err(TemperError::new(format!(
-            "Cross-target selection {target} is unsupported; Temper v0.0.1 supports only {SUPPORTED_HOST} host binaries."
+            "Cross-target selection {target} is unsupported; Temper v{} supports only {SUPPORTED_HOST} host binaries.",
+            env!("CARGO_PKG_VERSION")
         ))),
         _ => Ok(()),
     }

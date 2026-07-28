@@ -43,7 +43,7 @@ pub(crate) struct OptimizeArgs {
     #[arg(long = "bin", value_name = "BINARY")]
     pub(crate) binary: Option<String>,
 
-    /// Compilation target. v0.0.1 accepts only x86_64-unknown-linux-gnu.
+    /// Compilation target. This release accepts only x86_64-unknown-linux-gnu.
     #[arg(long, value_name = "TRIPLE")]
     pub(crate) target: Option<String>,
 

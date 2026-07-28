@@ -1,0 +1,224 @@
+{
+  "prd": {
+    "file": "tasks/prd-temper-v0.0.2.md",
+    "title": "Temper v0.0.2, PGO integrity and benchmark corpus v1",
+    "created_at": "2026-07-28",
+    "status": "DONE"
+  },
+  "epics": [
+    {
+      "id": "EP-001",
+      "title": "Cargo configuration and evidence contract",
+      "status": "DONE",
+      "priority": "P0",
+      "stories_total": 4,
+      "stories_done": 4
+    },
+    {
+      "id": "EP-002",
+      "title": "Fail-closed PGO integrity and validation",
+      "status": "DONE",
+      "priority": "P0",
+      "stories_total": 5,
+      "stories_done": 5
+    },
+    {
+      "id": "EP-003",
+      "title": "Gated benchmark corpus v1",
+      "status": "DONE",
+      "priority": "P1",
+      "stories_total": 4,
+      "stories_done": 4
+    }
+  ],
+  "stories": [
+    {
+      "id": "US-001",
+      "title": "Validate Cargo rustflags composition",
+      "epic": "EP-001",
+      "status": "DONE",
+      "priority": "P0",
+      "size": "M",
+      "blocked_by": [],
+      "started_at": "2026-07-28T10:00:22+02:00",
+      "completed_at": "2026-07-28T10:18:44+02:00",
+      "reviewed_at": "2026-07-28T10:18:44+02:00"
+    },
+    {
+      "id": "US-002",
+      "title": "Compose PGO flags through one owned environment channel",
+      "epic": "EP-001",
+      "status": "DONE",
+      "priority": "P0",
+      "size": "L",
+      "blocked_by": [
+        "US-001"
+      ],
+      "started_at": "2026-07-28T10:00:22+02:00",
+      "completed_at": "2026-07-28T10:18:44+02:00",
+      "reviewed_at": "2026-07-28T10:18:44+02:00"
+    },
+    {
+      "id": "US-003",
+      "title": "Fail closed on incompatible Cargo build messages",
+      "epic": "EP-001",
+      "status": "DONE",
+      "priority": "P0",
+      "size": "M",
+      "blocked_by": [],
+      "started_at": "2026-07-28T10:00:22+02:00",
+      "completed_at": "2026-07-28T10:18:44+02:00",
+      "reviewed_at": "2026-07-28T10:18:44+02:00"
+    },
+    {
+      "id": "US-004",
+      "title": "Persist and enforce schema-v2 PGO phase parity",
+      "epic": "EP-001",
+      "status": "DONE",
+      "priority": "P0",
+      "size": "L",
+      "blocked_by": [
+        "US-002",
+        "US-003"
+      ],
+      "started_at": "2026-07-28T10:00:22+02:00",
+      "completed_at": "2026-07-28T10:18:44+02:00",
+      "reviewed_at": "2026-07-28T10:18:44+02:00"
+    },
+    {
+      "id": "US-005",
+      "title": "Validate the missing-function diagnostic contract",
+      "epic": "EP-002",
+      "status": "DONE",
+      "priority": "P0",
+      "size": "M",
+      "blocked_by": [
+        "US-004"
+      ],
+      "started_at": "2026-07-28T10:26:44+02:00",
+      "completed_at": "2026-07-28T11:03:54+02:00",
+      "reviewed_at": "2026-07-28T11:24:18+02:00"
+    },
+    {
+      "id": "US-006",
+      "title": "Reject PGO on missing-profile diagnostics",
+      "epic": "EP-002",
+      "status": "DONE",
+      "priority": "P0",
+      "size": "M",
+      "blocked_by": [
+        "US-005"
+      ],
+      "started_at": "2026-07-28T10:36:00+02:00",
+      "completed_at": "2026-07-28T11:03:54+02:00",
+      "reviewed_at": "2026-07-28T11:24:18+02:00"
+    },
+    {
+      "id": "US-007",
+      "title": "Validate raw profiles and enforce strict merge",
+      "epic": "EP-002",
+      "status": "DONE",
+      "priority": "P0",
+      "size": "M",
+      "blocked_by": [
+        "US-004"
+      ],
+      "started_at": "2026-07-28T10:36:00+02:00",
+      "completed_at": "2026-07-28T11:03:54+02:00",
+      "reviewed_at": "2026-07-28T11:24:18+02:00"
+    },
+    {
+      "id": "US-008",
+      "title": "Execute the PGO compatibility integration matrix",
+      "epic": "EP-002",
+      "status": "DONE",
+      "priority": "P0",
+      "size": "L",
+      "blocked_by": [
+        "US-006",
+        "US-007"
+      ],
+      "started_at": "2026-07-28T10:40:57+02:00",
+      "completed_at": "2026-07-28T11:03:54+02:00",
+      "reviewed_at": "2026-07-28T11:24:18+02:00"
+    },
+    {
+      "id": "US-009",
+      "title": "Close PGO hardening with retained dogfooding evidence",
+      "epic": "EP-002",
+      "status": "DONE",
+      "priority": "P0",
+      "size": "L",
+      "blocked_by": [
+        "US-008"
+      ],
+      "started_at": "2026-07-28T10:42:59+02:00",
+      "completed_at": "2026-07-28T11:03:54+02:00",
+      "reviewed_at": "2026-07-28T11:24:18+02:00"
+    },
+    {
+      "id": "US-010",
+      "title": "Enforce the corpus gate and define manifest schema 1",
+      "epic": "EP-003",
+      "status": "DONE",
+      "priority": "P1",
+      "size": "M",
+      "blocked_by": [
+        "US-001",
+        "US-002",
+        "US-003",
+        "US-004",
+        "US-005",
+        "US-006",
+        "US-007",
+        "US-008",
+        "US-009"
+      ],
+      "started_at": "2026-07-28T11:35:42+02:00",
+      "completed_at": "2026-07-28T12:24:59+02:00",
+      "reviewed_at": "2026-07-28T12:24:59+02:00"
+    },
+    {
+      "id": "US-011",
+      "title": "Curate representative and licensed corpus cases",
+      "epic": "EP-003",
+      "status": "DONE",
+      "priority": "P1",
+      "size": "L",
+      "blocked_by": [
+        "US-010"
+      ],
+      "started_at": "2026-07-28T11:50:04+02:00",
+      "completed_at": "2026-07-28T12:24:59+02:00",
+      "reviewed_at": "2026-07-28T12:24:59+02:00"
+    },
+    {
+      "id": "US-012",
+      "title": "Execute weighted workloads through correctness oracles",
+      "epic": "EP-003",
+      "status": "DONE",
+      "priority": "P1",
+      "size": "L",
+      "blocked_by": [
+        "US-011"
+      ],
+      "started_at": "2026-07-28T11:50:04+02:00",
+      "completed_at": "2026-07-28T12:24:59+02:00",
+      "reviewed_at": "2026-07-28T12:24:59+02:00"
+    },
+    {
+      "id": "US-013",
+      "title": "Establish the corpus-v1 reference baseline",
+      "epic": "EP-003",
+      "status": "DONE",
+      "priority": "P1",
+      "size": "L",
+      "blocked_by": [
+        "US-012"
+      ],
+      "started_at": "2026-07-28T11:50:51+02:00",
+      "completed_at": "2026-07-28T12:24:59+02:00",
+      "reviewed_at": "2026-07-28T12:24:59+02:00"
+    }
+  ]
+}

@@ -3,16 +3,16 @@
     "file": "tasks/prd-temper-v0.0.3.md",
     "title": "Temper v0.0.3, Cargo-effective PGO inputs",
     "created_at": "2026-07-28",
-    "status": "READY"
+    "status": "IN_PROGRESS"
   },
   "epics": [
     {
       "id": "EP-001",
       "title": "Prove the compiler-interposition contract",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "stories_total": 3,
-      "stories_done": 0
+      "stories_done": 3
     },
     {
       "id": "EP-002",
@@ -44,38 +44,38 @@
       "id": "US-001",
       "title": "Reproduce the stable Cargo include loss",
       "epic": "EP-001",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "size": "S",
       "blocked_by": [],
-      "started_at": null,
-      "completed_at": null,
+      "started_at": "2026-07-28",
+      "completed_at": "2026-07-28",
       "reviewed_at": null
     },
     {
       "id": "US-002",
       "title": "Validate shim classification, transparency and parity inputs",
       "epic": "EP-001",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "size": "L",
       "blocked_by": [],
-      "started_at": null,
-      "completed_at": null,
+      "started_at": "2026-07-28",
+      "completed_at": "2026-07-28",
       "reviewed_at": null
     },
     {
       "id": "US-003",
       "title": "Validate the wrapper-cache boundary, fingerprints and overhead",
       "epic": "EP-001",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "size": "L",
       "blocked_by": [
         "US-002"
       ],
-      "started_at": null,
-      "completed_at": null,
+      "started_at": "2026-07-28",
+      "completed_at": "2026-07-28",
       "reviewed_at": null
     },
     {

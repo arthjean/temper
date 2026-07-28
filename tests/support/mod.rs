@@ -73,6 +73,49 @@ impl Fixture {
         }
     }
 
+    pub(crate) fn workspace_with_packages(package_count: usize) -> Self {
+        assert!(package_count > 0, "workspace requires at least one package");
+        let temporary_directory = tempfile::tempdir().expect("create fixture directory");
+        let root = temporary_directory.path().to_path_buf();
+        let packages: Vec<String> = (0..package_count)
+            .map(|index| format!("package-{index:03}"))
+            .collect();
+        let members = packages
+            .iter()
+            .map(|package| format!("\"{package}\""))
+            .collect::<Vec<_>>()
+            .join(", ");
+        fs::write(
+            root.join("Cargo.toml"),
+            format!("[workspace]\nmembers = [{members}]\nresolver = \"3\"\n"),
+        )
+        .expect("write large workspace manifest");
+        fs::write(root.join(".gitignore"), ".temper/\n").expect("write fixture gitignore");
+        for package in &packages {
+            let package_root = root.join(package);
+            fs::create_dir_all(package_root.join("src")).expect("create package source");
+            fs::write(
+                package_root.join("Cargo.toml"),
+                format!(
+                    "[package]\nname = \"{package}\"\nversion = \"0.1.0\"\nedition = \"2024\"\n"
+                ),
+            )
+            .expect("write package manifest");
+            fs::write(
+                package_root.join("src/main.rs"),
+                format!("fn main() {{ println!(\"{package}\"); }}\n"),
+            )
+            .expect("write package source");
+        }
+        let package_names: Vec<&str> = packages.iter().map(String::as_str).collect();
+        write_lockfile(&root, &package_names);
+        initialize_git(&root);
+        Self {
+            _temporary_directory: temporary_directory,
+            root,
+        }
+    }
+
     pub(crate) fn checked_in_workspace() -> Self {
         Self::checked_in_fixture("workspace")
     }

@@ -17,10 +17,10 @@
     {
       "id": "EP-002",
       "title": "Interpose rustc without replacing Cargo inputs",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "stories_total": 4,
-      "stories_done": 0
+      "stories_done": 4
     },
     {
       "id": "EP-003",
@@ -82,7 +82,7 @@
       "id": "US-004",
       "title": "Add private same-binary rustc dispatch",
       "epic": "EP-002",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "size": "M",
       "blocked_by": [
@@ -90,51 +90,51 @@
         "US-002",
         "US-003"
       ],
-      "started_at": null,
-      "completed_at": null,
+      "started_at": "2026-07-28",
+      "completed_at": "2026-07-28",
       "reviewed_at": null
     },
     {
       "id": "US-005",
       "title": "Append PGO flags to resolved target compilations",
       "epic": "EP-002",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "size": "L",
       "blocked_by": [
         "US-004"
       ],
-      "started_at": null,
-      "completed_at": null,
+      "started_at": "2026-07-28",
+      "completed_at": "2026-07-28",
       "reviewed_at": null
     },
     {
       "id": "US-006",
       "title": "Capture compiler invocations safely under concurrency",
       "epic": "EP-002",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "size": "L",
       "blocked_by": [
         "US-004"
       ],
-      "started_at": null,
-      "completed_at": null,
+      "started_at": "2026-07-28",
+      "completed_at": "2026-07-28",
       "reviewed_at": null
     },
     {
       "id": "US-007",
       "title": "Integrate interposition with each isolated PGO stage",
       "epic": "EP-002",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "size": "M",
       "blocked_by": [
         "US-005",
         "US-006"
       ],
-      "started_at": null,
-      "completed_at": null,
+      "started_at": "2026-07-28",
+      "completed_at": "2026-07-28",
       "reviewed_at": null
     },
     {

@@ -17,6 +17,9 @@ use crate::workload::{WorkloadFailure, WorkloadFailureKind};
 
 const SCHEMA_VERSION: u8 = 2;
 const HUMAN_REPORT_LINE_LIMIT: usize = 25;
+const PROMOTION_FAILURE_RESERVE: &str = ".promotion-failure-reserve";
+const PROMOTION_FAILURE_HEADROOM_BYTES: usize = 64 * 1024;
+const EMERGENCY_PROMOTION_FAILURE: &str = ".promotion-failure.json";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -173,6 +176,71 @@ struct RunManifest {
     failure: Option<FailureRecord>,
 }
 
+#[derive(Serialize)]
+struct EmergencyRunManifest<'a> {
+    schema_version: u8,
+    experimental: bool,
+    compatibility: &'static str,
+    cli_version: &'static str,
+    run_id: &'a str,
+    status: RunStatus,
+    completed_phases: Vec<CompletedPhase>,
+    final_decision: FinalDecision,
+    source_reproducibility: SourceReproducibility,
+    request: &'a RequestRecord,
+    preflight: &'a crate::preflight::PreflightRecord,
+    target: &'a TargetSelection,
+    baseline: &'a Option<BuildRecord>,
+    baseline_measurement: &'a Option<ScreeningResult>,
+    strategies: &'a [StrategyRecord],
+    pgo_base_strategy: Option<Strategy>,
+    pgo_training: &'a Option<PgoTrainingRecord>,
+    selected_candidate: Option<Strategy>,
+    confirmation: &'a Option<ConfirmationRecord>,
+    promotion: Option<&'a PromotionRecord>,
+    failure: FailureRecord,
+}
+
+impl<'a> EmergencyRunManifest<'a> {
+    fn preserving(manifest: &'a RunManifest) -> Self {
+        Self {
+            schema_version: manifest.schema_version,
+            experimental: manifest.experimental,
+            compatibility: manifest.compatibility,
+            cli_version: manifest.cli_version,
+            run_id: &manifest.run_id,
+            status: RunStatus::Failed,
+            completed_phases: manifest
+                .completed_phases
+                .iter()
+                .copied()
+                .filter(|phase| *phase != CompletedPhase::Promotion)
+                .collect(),
+            final_decision: FinalDecision::Failed,
+            source_reproducibility: manifest.source_reproducibility,
+            request: &manifest.request,
+            preflight: &manifest.preflight,
+            target: &manifest.target,
+            baseline: &manifest.baseline,
+            baseline_measurement: &manifest.baseline_measurement,
+            strategies: &manifest.strategies,
+            pgo_base_strategy: manifest.pgo_base_strategy,
+            pgo_training: &manifest.pgo_training,
+            selected_candidate: manifest.selected_candidate,
+            confirmation: &manifest.confirmation,
+            promotion: None,
+            failure: FailureRecord {
+                phase: emergency_phase(manifest.status),
+                outcome: None,
+                message: "Atomic state persistence could not complete; this recovery manifest preserves every previously durable build and measurement record.".to_owned(),
+                bounded_diagnostics: String::new(),
+                diagnostics_truncated: false,
+                build_failure: None,
+            },
+        }
+    }
+}
+
 pub(crate) struct ConfirmationPlans {
     pub(crate) baseline: BuildPlan,
     pub(crate) candidate: BuildPlan,
@@ -184,6 +252,7 @@ pub(crate) struct Run {
     temper_directory: AnchoredDirectory,
     run_directory: AnchoredDirectory,
     manifest: RunManifest,
+    emergency_promotion_failure_available: bool,
 }
 
 pub(crate) struct LatestPublishError {
@@ -239,7 +308,18 @@ impl Run {
             arguments.workload.split_first().ok_or_else(|| {
                 TemperError::new("The validated workload unexpectedly had no executable.")
             })?;
-        let run = Self {
+        let request = RequestRecord {
+            minimum_improvement_percent: arguments.minimum_improvement,
+            timeout_seconds: arguments.timeout,
+            workload: WorkloadRecord {
+                executable: workload_executable.to_string_lossy().into_owned(),
+                arguments: workload_arguments
+                    .iter()
+                    .map(|value| value.to_string_lossy().into_owned())
+                    .collect(),
+            },
+        };
+        let mut run = Self {
             directory,
             target_root,
             temper_directory,
@@ -254,17 +334,7 @@ impl Run {
                 completed_phases: vec![CompletedPhase::Preflight],
                 final_decision: FinalDecision::Pending,
                 source_reproducibility: preflight.source_reproducibility,
-                request: RequestRecord {
-                    minimum_improvement_percent: arguments.minimum_improvement,
-                    timeout_seconds: arguments.timeout,
-                    workload: WorkloadRecord {
-                        executable: workload_executable.to_string_lossy().into_owned(),
-                        arguments: workload_arguments
-                            .iter()
-                            .map(|value| value.to_string_lossy().into_owned())
-                            .collect(),
-                    },
-                },
+                request,
                 preflight: preflight.record,
                 target: selection,
                 baseline: None,
@@ -277,6 +347,7 @@ impl Run {
                 promotion: None,
                 failure: None,
             },
+            emergency_promotion_failure_available: false,
         };
         run.persist()?;
         Ok(run)
@@ -631,6 +702,63 @@ impl Run {
         self.persist()
     }
 
+    pub(crate) fn reserve_promotion_failure_space(&self) -> Result<()> {
+        let manifest_bytes = serde_json::to_vec_pretty(&self.manifest)
+            .map_err(|error| TemperError::new(format!("Could not size run state: {error}")))?;
+        let reserve_bytes = manifest_bytes
+            .len()
+            .checked_add(PROMOTION_FAILURE_HEADROOM_BYTES)
+            .and_then(|bytes| u64::try_from(bytes).ok())
+            .ok_or_else(|| TemperError::new("Promotion failure reserve size overflowed."))?;
+        self.run_directory
+            .reserve_space(PROMOTION_FAILURE_RESERVE, reserve_bytes)
+            .map_err(|error| TemperError::new(error.message))
+    }
+
+    pub(crate) fn activate_emergency_promotion_failure(&mut self) -> Result<()> {
+        let replacement = self
+            .run_directory
+            .replace_and_sync(EMERGENCY_PROMOTION_FAILURE, "run.json");
+        if replacement.is_ok() || replacement.as_ref().is_err_and(|error| error.committed) {
+            let failure_phase = emergency_phase(self.manifest.status);
+            self.manifest.status = RunStatus::Failed;
+            self.manifest.final_decision = FinalDecision::Failed;
+            self.manifest.promotion = None;
+            self.manifest
+                .completed_phases
+                .retain(|phase| *phase != CompletedPhase::Promotion);
+            self.manifest.failure = Some(FailureRecord {
+                phase: failure_phase,
+                outcome: None,
+                message: "Atomic state persistence could not complete; this recovery manifest preserves every previously durable build and measurement record.".to_owned(),
+                bounded_diagnostics: String::new(),
+                diagnostics_truncated: false,
+                build_failure: None,
+            });
+            self.emergency_promotion_failure_available = false;
+        }
+        replacement.map_err(|error| TemperError::new(error.message))
+    }
+
+    pub(crate) fn release_promotion_failure_space(&self) -> Result<()> {
+        self.run_directory
+            .unlink(PROMOTION_FAILURE_RESERVE)
+            .and_then(|()| self.run_directory.sync())
+            .map_err(|error| TemperError::new(error.message))
+    }
+
+    pub(crate) fn release_emergency_promotion_failure(&mut self) -> Result<()> {
+        if !self.emergency_promotion_failure_available {
+            return Ok(());
+        }
+        self.run_directory
+            .unlink(EMERGENCY_PROMOTION_FAILURE)
+            .and_then(|()| self.run_directory.sync())
+            .map_err(|error| TemperError::new(error.message))?;
+        self.emergency_promotion_failure_available = false;
+        Ok(())
+    }
+
     pub(crate) fn publish_latest(
         &self,
         interrupt: &dyn Fn() -> bool,
@@ -661,7 +789,7 @@ impl Run {
             source_strategy: promotion.source_strategy,
         };
         self.temper_directory
-            .write_json_atomic("latest.json", &latest, Some(interrupt))
+            .write_json_atomic_preserving_previous("latest.json", &latest, Some(interrupt))
             .map_err(|error| LatestPublishError {
                 message: error.message,
                 committed: error.committed,
@@ -670,8 +798,23 @@ impl Run {
     }
 
     pub(crate) fn fail_promotion(&mut self, message: String, interrupted: bool) -> Result<()> {
+        self.manifest.promotion = None;
+        self.manifest
+            .completed_phases
+            .retain(|phase| *phase != CompletedPhase::Promotion);
         let outcome = interrupted.then_some(WorkloadFailureKind::Interrupted);
         self.fail("promotion", outcome, message, String::new(), false, None)
+    }
+
+    pub(crate) fn fail_interrupted(&mut self, phase: &'static str, message: String) -> Result<()> {
+        self.fail(
+            phase,
+            Some(WorkloadFailureKind::Interrupted),
+            message,
+            String::new(),
+            false,
+            None,
+        )
     }
 
     pub(crate) fn fail_workload(
@@ -826,7 +969,8 @@ impl Run {
         self.push_completed(CompletedPhase::Confirmation);
         self.manifest.status = RunStatus::NoImprovement;
         self.manifest.final_decision = FinalDecision::NoImprovement;
-        self.persist()
+        self.persist()?;
+        self.release_emergency_promotion_failure()
     }
 
     fn transition(&mut self, completed: CompletedPhase, next: RunStatus) -> Result<()> {
@@ -869,13 +1013,39 @@ impl Run {
             diagnostics_truncated,
             build_failure,
         });
-        self.persist()
+        self.persist()?;
+        self.release_emergency_promotion_failure()
     }
 
-    fn persist(&self) -> Result<()> {
-        self.run_directory
+    fn persist(&mut self) -> Result<()> {
+        let emergency = EmergencyRunManifest::preserving(&self.manifest);
+        if let Err(error) =
+            self.run_directory
+                .write_json_atomic(EMERGENCY_PROMOTION_FAILURE, &emergency, None)
+        {
+            let mut message = error.message;
+            self.emergency_promotion_failure_available |= error.committed;
+            if self.emergency_promotion_failure_available
+                && let Err(activation_error) = self.activate_emergency_promotion_failure()
+            {
+                message.push_str(" Previous emergency manifest activation also failed: ");
+                message.push_str(&activation_error.to_string());
+            }
+            return Err(TemperError::new(message));
+        }
+        self.emergency_promotion_failure_available = true;
+        if let Err(error) = self
+            .run_directory
             .write_json_atomic("run.json", &self.manifest, None)
-            .map_err(|error| TemperError::new(error.message))
+        {
+            let mut message = error.message;
+            if let Err(activation_error) = self.activate_emergency_promotion_failure() {
+                message.push_str(" Emergency manifest activation also failed: ");
+                message.push_str(&activation_error.to_string());
+            }
+            return Err(TemperError::new(message));
+        }
+        Ok(())
     }
 }
 
@@ -888,6 +1058,20 @@ struct LatestRecord<'a> {
     artifact_path: &'a Path,
     artifact_sha256: &'a str,
     source_strategy: Strategy,
+}
+
+fn emergency_phase(status: RunStatus) -> &'static str {
+    match status {
+        RunStatus::BaselineBuild => "baseline_build",
+        RunStatus::StaticBuilds => "static_builds",
+        RunStatus::Screening => "screening",
+        RunStatus::PgoTraining => "pgo_training",
+        RunStatus::PgoBuild => "pgo_build",
+        RunStatus::CandidateSelection => "candidate_selection",
+        RunStatus::Confirmation | RunStatus::NoImprovement => "confirmation",
+        RunStatus::Promotion | RunStatus::Confirmed => "promotion",
+        RunStatus::Interrupted | RunStatus::Failed => "state_persistence",
+    }
 }
 
 fn workload_rejection_reason(kind: WorkloadFailureKind) -> &'static str {

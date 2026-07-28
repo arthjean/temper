@@ -3,7 +3,10 @@
 mod support;
 
 use std::fs;
-use std::process::Command;
+use std::os::unix::process::CommandExt;
+use std::process::{Command, Stdio};
+use std::thread;
+use std::time::{Duration, Instant};
 
 use serde_json::Value;
 use sha2::{Digest, Sha256};
@@ -179,4 +182,85 @@ fn prerequisite_and_baseline_failures_stop_before_later_phases() {
     assert_eq!(manifest["status"], "failed");
     assert_eq!(manifest["failure"]["phase"], "baseline_build");
     assert!(manifest["baseline"].is_null());
+}
+
+#[test]
+fn sigint_during_baseline_build_persists_an_interrupted_manifest() {
+    let fixture = Fixture::single("interrupted-baseline", true, true);
+    let marker = fixture.root.join(".baseline-build-started");
+    fs::write(
+        fixture.root.join("build.rs"),
+        format!(
+            "fn main() {{\n\
+                 std::fs::write({marker:?}, b\"started\").expect(\"write marker\");\n\
+                 std::thread::sleep(std::time::Duration::from_secs(30));\n\
+             }}\n"
+        ),
+    )
+    .expect("write slow build script");
+    fs::write(
+        fixture.root.join(".gitignore"),
+        ".temper/\n.baseline-build-started\n",
+    )
+    .expect("ignore build marker");
+    commit_fixture_change(&fixture.root, &["build.rs", ".gitignore"]);
+
+    let mut child = Command::new(env!("CARGO_BIN_EXE_cargo-temper"));
+    child
+        .process_group(0)
+        .current_dir(&fixture.root)
+        .args(["temper", "optimize", "--manifest-path"])
+        .arg(fixture.root.join("Cargo.toml"))
+        .args(["--", "/bin/true"])
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
+    let mut child = child.spawn().expect("start interrupted baseline fixture");
+
+    let deadline = Instant::now() + Duration::from_secs(15);
+    while !marker.exists() {
+        assert!(
+            child
+                .try_wait()
+                .expect("inspect interrupted baseline fixture")
+                .is_none(),
+            "Temper exited before starting the baseline build"
+        );
+        assert!(
+            Instant::now() < deadline,
+            "baseline build did not expose its marker"
+        );
+        thread::sleep(Duration::from_millis(10));
+    }
+
+    let process_group = i32::try_from(child.id()).expect("PID fits Linux pid_t");
+    assert_eq!(unsafe { libc::kill(-process_group, libc::SIGINT) }, 0);
+    let output = child
+        .wait_with_output()
+        .expect("wait for interrupted baseline fixture");
+    assert_eq!(output.status.code(), Some(1));
+    assert!(stderr(&output).contains("interrupted by SIGINT during baseline_build"));
+
+    let manifest = fixture.manifest();
+    assert_eq!(manifest["status"], "interrupted");
+    assert_eq!(manifest["final_decision"], "interrupted");
+    assert_eq!(manifest["failure"]["phase"], "baseline_build");
+    assert_eq!(manifest["failure"]["outcome"], "interrupted");
+    assert!(manifest["promotion"].is_null());
+    assert!(fixture.latest().is_none());
+}
+
+fn commit_fixture_change(root: &std::path::Path, paths: &[&str]) {
+    let add = Command::new("git")
+        .current_dir(root)
+        .arg("add")
+        .args(paths)
+        .status()
+        .expect("stage fixture change");
+    assert!(add.success(), "git add failed");
+    let commit = Command::new("git")
+        .current_dir(root)
+        .args(["commit", "--quiet", "-m", "slow baseline fixture"])
+        .status()
+        .expect("commit fixture change");
+    assert!(commit.success(), "git commit failed");
 }

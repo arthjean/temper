@@ -54,6 +54,7 @@ fn optimize(arguments: cli::OptimizeArgs) -> Result<()> {
         "Temper CLI {} and report schema 2 are experimental; 0.x provides no backward-compatibility promise.",
         env!("CARGO_PKG_VERSION")
     );
+    workload::install_interrupt_handler()?;
     let preflight = preflight::run(
         &arguments.manifest_path,
         arguments.allow_dirty,
@@ -71,8 +72,15 @@ fn optimize(arguments: cli::OptimizeArgs) -> Result<()> {
     let json = arguments.json;
     let mut run = run::Run::create(&arguments, preflight, selection)
         .map_err(|error| emit_pre_run_failure(json, error))?;
+    if let Some(error) = interrupted_run(&mut run, json, "preflight") {
+        return Err(error);
+    }
     let baseline_plan = BuildPlan::baseline(run.target_root());
-    let baseline = match cargo::build(run.target(), &baseline_plan) {
+    let baseline_result = cargo::build(run.target(), &baseline_plan);
+    if let Some(error) = interrupted_run(&mut run, json, "baseline_build") {
+        return Err(error);
+    }
+    let baseline = match baseline_result {
         Ok(baseline) => baseline,
         Err(failure) => {
             let message = failure.message.clone();
@@ -86,7 +94,11 @@ fn optimize(arguments: cli::OptimizeArgs) -> Result<()> {
     let mut static_artifacts = Vec::new();
     for strategy in Strategy::STATIC_CANDIDATES {
         let plan = BuildPlan::candidate(strategy, run.target_root());
-        match cargo::build(run.target(), &plan) {
+        let build_result = cargo::build(run.target(), &plan);
+        if let Some(error) = interrupted_run(&mut run, json, "static_builds") {
+            return Err(error);
+        }
+        match build_result {
             Ok(build) => {
                 let executable = build.executable_path.clone();
                 run.record_static_build(build)?;
@@ -96,7 +108,6 @@ fn optimize(arguments: cli::OptimizeArgs) -> Result<()> {
         }
     }
 
-    workload::install_interrupt_handler()?;
     run.begin_screening()?;
     let baseline_measurement = match workload.screen(&baseline_path) {
         Ok(measurement) => measurement,
@@ -149,13 +160,14 @@ fn optimize(arguments: cli::OptimizeArgs) -> Result<()> {
     let pgo_base = strategy::lowest_median_strategy(&valid_measurements)
         .ok_or_else(|| TemperError::new("No valid pre-PGO strategy remained after screening."))?;
     run.complete_screening(pgo_base)?;
-    match strategy::train_pgo(
+    let pgo_training = strategy::train_pgo(
         run.target(),
         &workload,
         run.directory(),
         run.target_root(),
         pgo_base,
-    ) {
+    );
+    match pgo_training {
         PgoTrainingOutcome::Interrupted(record, failure) => {
             run.fail_pgo_training(record, &failure)?;
             return Err(emit_run_failure(
@@ -165,13 +177,23 @@ fn optimize(arguments: cli::OptimizeArgs) -> Result<()> {
             ));
         }
         PgoTrainingOutcome::Rejected(record) => {
+            if let Some(error) = interrupted_run(&mut run, json, "pgo_training") {
+                return Err(error);
+            }
             run.record_pgo_training(record)?;
             run.skip_pgo_build()?;
         }
         PgoTrainingOutcome::Trained(success) => {
+            if let Some(error) = interrupted_run(&mut run, json, "pgo_training") {
+                return Err(error);
+            }
             let optimized_plan = success.optimized_plan;
             run.record_pgo_training(success.record)?;
-            match cargo::build(run.target(), &optimized_plan) {
+            let build_result = cargo::build(run.target(), &optimized_plan);
+            if let Some(error) = interrupted_run(&mut run, json, "pgo_build") {
+                return Err(error);
+            }
+            match build_result {
                 Ok(build) => {
                     let executable = build.executable_path.clone();
                     run.record_pgo_build(build)?;
@@ -215,7 +237,11 @@ fn optimize(arguments: cli::OptimizeArgs) -> Result<()> {
         run.emit_report(json)?;
         return Ok(());
     };
-    let confirmation_baseline = match cargo::build(run.target(), &plans.baseline) {
+    let confirmation_baseline_result = cargo::build(run.target(), &plans.baseline);
+    if let Some(error) = interrupted_run(&mut run, json, "confirmation") {
+        return Err(error);
+    }
+    let confirmation_baseline = match confirmation_baseline_result {
         Ok(build) => build,
         Err(failure) => {
             let message = failure.message.clone();
@@ -227,7 +253,11 @@ fn optimize(arguments: cli::OptimizeArgs) -> Result<()> {
     let confirmation_baseline_sha256 = confirmation_baseline.sha256.clone();
     run.record_confirmation_baseline(confirmation_baseline)?;
 
-    let confirmation_candidate = match cargo::build(run.target(), &plans.candidate) {
+    let confirmation_candidate_result = cargo::build(run.target(), &plans.candidate);
+    if let Some(error) = interrupted_run(&mut run, json, "confirmation") {
+        return Err(error);
+    }
+    let confirmation_candidate = match confirmation_candidate_result {
         Ok(build) => build,
         Err(failure) => {
             run.reject_confirmation_build(failure)?;
@@ -295,15 +325,31 @@ fn optimize(arguments: cli::OptimizeArgs) -> Result<()> {
         run.emit_report(json)?;
         return Ok(());
     }
+    if let Err(error) = run.reserve_promotion_failure_space() {
+        let mut message =
+            format!("Could not reserve space for an atomic promotion failure record: {error}");
+        if let Err(emergency_error) = run.activate_emergency_promotion_failure() {
+            message.push_str(" Emergency manifest activation also failed: ");
+            message.push_str(&emergency_error.to_string());
+        }
+        return Err(emit_run_failure(&run, json, TemperError::new(message)));
+    }
 
-    let source_strategy = {
-        let (strategy, build) = run.confirmation_candidate()?;
-        if build.sha256 != confirmation_candidate_sha256 {
-            return Err(TemperError::new(
-                "Accepted confirmation candidate checksum changed in run state.",
+    let source_strategy = match run.confirmation_candidate() {
+        Ok((strategy, build)) if build.sha256 == confirmation_candidate_sha256 => strategy,
+        Ok(_) => {
+            let message =
+                "Accepted confirmation candidate checksum changed in run state.".to_owned();
+            return Err(fail_reserved_promotion(&mut run, json, message, false));
+        }
+        Err(error) => {
+            return Err(fail_reserved_promotion(
+                &mut run,
+                json,
+                error.to_string(),
+                false,
             ));
         }
-        strategy
     };
     let promotion = match promotion::promote_artifact(
         run.directory(),
@@ -315,25 +361,108 @@ fn optimize(arguments: cli::OptimizeArgs) -> Result<()> {
         Ok(promotion) => promotion,
         Err(error) => {
             let interrupted = error.kind == PromotionErrorKind::Interrupted;
-            let message = error.message;
-            run.fail_promotion(message.clone(), interrupted)?;
-            return Err(emit_run_failure(&run, json, TemperError::new(message)));
-        }
-    };
-    run.record_promotion(promotion)?;
-    if let Err(error) = run.publish_latest(&workload::interrupted) {
-        if error.committed {
-            return Err(emit_run_failure(
-                &run,
+            return Err(fail_reserved_promotion(
+                &mut run,
                 json,
-                TemperError::new(error.message),
+                error.message,
+                interrupted,
             ));
         }
-        let message = error.message;
-        run.fail_promotion(message.clone(), error.interrupted)?;
+    };
+    if let Err(error) = run.record_promotion(promotion) {
+        let message = error.to_string();
+        return Err(rollback_promotion(&mut run, json, message, false));
+    }
+    if let Err(error) = run.publish_latest(&workload::interrupted) {
+        if error.committed {
+            let mut message = error.message;
+            release_promotion_reserve(&run, &mut message);
+            release_emergency_promotion_failure(&mut run, &mut message);
+            return Err(emit_run_failure(&run, json, TemperError::new(message)));
+        }
+        return Err(rollback_promotion(
+            &mut run,
+            json,
+            error.message,
+            error.interrupted,
+        ));
+    }
+    if let Err(error) = run.release_promotion_failure_space() {
+        let mut message = format!(
+            "Confirmed promotion succeeded, but its failure-space reserve could not be released: {error}"
+        );
+        release_emergency_promotion_failure(&mut run, &mut message);
         return Err(emit_run_failure(&run, json, TemperError::new(message)));
     }
+    if let Err(error) = run.release_emergency_promotion_failure() {
+        return Err(emit_run_failure(
+            &run,
+            json,
+            TemperError::new(format!(
+                "Confirmed promotion succeeded, but its emergency failure manifest could not be released: {error}"
+            )),
+        ));
+    }
     run.emit_report(json)
+}
+
+fn rollback_promotion(
+    run: &mut run::Run,
+    json: bool,
+    mut message: String,
+    interrupted: bool,
+) -> TemperError {
+    if let Err(error) = promotion::discard_promoted_artifact(run.anchored_directory()) {
+        message.push_str(" Promoted artifact cleanup also failed: ");
+        message.push_str(&error.message);
+    }
+    release_promotion_reserve(run, &mut message);
+    if let Err(error) = run.fail_promotion(message.clone(), interrupted) {
+        message.push_str(" Promotion failure persistence also failed: ");
+        message.push_str(&error.to_string());
+    }
+    emit_run_failure(run, json, TemperError::new(message))
+}
+
+fn fail_reserved_promotion(
+    run: &mut run::Run,
+    json: bool,
+    mut message: String,
+    interrupted: bool,
+) -> TemperError {
+    release_promotion_reserve(run, &mut message);
+    if let Err(error) = run.fail_promotion(message.clone(), interrupted) {
+        message.push_str(" Promotion failure persistence also failed: ");
+        message.push_str(&error.to_string());
+    }
+    emit_run_failure(run, json, TemperError::new(message))
+}
+
+fn release_promotion_reserve(run: &run::Run, message: &mut String) {
+    if let Err(error) = run.release_promotion_failure_space() {
+        message.push_str(" Promotion failure-space release also failed: ");
+        message.push_str(&error.to_string());
+    }
+}
+
+fn release_emergency_promotion_failure(run: &mut run::Run, message: &mut String) {
+    if let Err(error) = run.release_emergency_promotion_failure() {
+        message.push_str(" Emergency promotion manifest release also failed: ");
+        message.push_str(&error.to_string());
+    }
+}
+
+fn interrupted_run(run: &mut run::Run, json: bool, phase: &'static str) -> Option<TemperError> {
+    if !workload::interrupted() {
+        return None;
+    }
+    let mut message =
+        format!("Run interrupted by SIGINT during {phase}; no artifact was promoted.");
+    if let Err(error) = run.fail_interrupted(phase, message.clone()) {
+        message.push_str(" Interrupted state persistence also failed: ");
+        message.push_str(&error.to_string());
+    }
+    Some(emit_run_failure(run, json, TemperError::new(message)))
 }
 
 fn emit_run_failure(run: &run::Run, json: bool, error: TemperError) -> TemperError {

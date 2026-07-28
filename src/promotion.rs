@@ -163,6 +163,28 @@ pub(crate) fn promote_artifact(
     strategy: Strategy,
     is_interrupted: &dyn Fn() -> bool,
 ) -> Result<PromotionRecord, PromotionError> {
+    promote_artifact_with_sync(
+        run_directory_path,
+        run_directory,
+        source,
+        strategy,
+        is_interrupted,
+        &|directory| {
+            directory
+                .sync()
+                .map_err(|error| filesystem_error(error.message))
+        },
+    )
+}
+
+fn promote_artifact_with_sync(
+    run_directory_path: &Path,
+    run_directory: &AnchoredDirectory,
+    source: &AnchoredArtifact,
+    strategy: Strategy,
+    is_interrupted: &dyn Fn() -> bool,
+    sync_directory: &dyn Fn(&AnchoredDirectory) -> Result<(), PromotionError>,
+) -> Result<PromotionRecord, PromotionError> {
     if is_interrupted() {
         return Err(interrupted_error());
     }
@@ -204,12 +226,22 @@ pub(crate) fn promote_artifact(
         let _synced = best_directory.sync();
         return Err(interrupted_error());
     }
-    best_directory
-        .sync()
-        .map_err(|error| filesystem_error(error.message))?;
-    run_directory
-        .sync()
-        .map_err(|error| filesystem_error(error.message))?;
+    if let Err(error) = sync_directory(&best_directory) {
+        return Err(rollback_published_artifact(
+            &best_directory,
+            run_directory,
+            error,
+            sync_directory,
+        ));
+    }
+    if let Err(error) = sync_directory(run_directory) {
+        return Err(rollback_published_artifact(
+            &best_directory,
+            run_directory,
+            error,
+            sync_directory,
+        ));
+    }
 
     Ok(PromotionRecord {
         source_strategy: strategy,
@@ -220,6 +252,46 @@ pub(crate) fn promote_artifact(
         size_bytes: source.size_bytes,
         permissions_mode: source.permissions_mode,
     })
+}
+
+fn rollback_published_artifact(
+    best_directory: &AnchoredDirectory,
+    run_directory: &AnchoredDirectory,
+    error: PromotionError,
+    sync_directory: &dyn Fn(&AnchoredDirectory) -> Result<(), PromotionError>,
+) -> PromotionError {
+    let mut message = error.message;
+    if let Err(cleanup_error) = best_directory.unlink("artifact") {
+        message.push_str(" Artifact removal also failed: ");
+        message.push_str(&cleanup_error.message);
+        return filesystem_error(message);
+    }
+    message.push_str(" The published artifact was removed before reporting the failure.");
+    for directory in [best_directory, run_directory] {
+        if let Err(cleanup_error) = sync_directory(directory) {
+            message.push_str(" Artifact removal sync also failed: ");
+            message.push_str(&cleanup_error.message);
+            break;
+        }
+    }
+    filesystem_error(message)
+}
+
+pub(crate) fn discard_promoted_artifact(
+    run_directory: &AnchoredDirectory,
+) -> Result<(), PromotionError> {
+    let best_directory = run_directory
+        .create_child("best", 0o700)
+        .map_err(|error| filesystem_error(error.message))?;
+    best_directory
+        .unlink("artifact")
+        .map_err(|error| filesystem_error(error.message))?;
+    best_directory
+        .sync()
+        .map_err(|error| filesystem_error(error.message))?;
+    run_directory
+        .sync()
+        .map_err(|error| filesystem_error(error.message))
 }
 
 fn copy_and_sync(
@@ -306,7 +378,10 @@ fn filesystem_error(message: impl Into<String>) -> PromotionError {
 
 #[cfg(test)]
 mod tests {
-    use super::{AnchoredArtifact, PromotionErrorKind, promote_artifact};
+    use super::{
+        AnchoredArtifact, PromotionErrorKind, copy_and_sync, discard_promoted_artifact,
+        filesystem_error, promote_artifact, promote_artifact_with_sync,
+    };
     use crate::anchored::AnchoredDirectory;
     use crate::hash::sha256_file;
     use crate::strategy::Strategy;
@@ -370,5 +445,135 @@ mod tests {
             PromotionErrorKind::Interrupted
         );
         assert!(!run.path().join("best/artifact").exists());
+    }
+
+    #[test]
+    fn discards_a_committed_artifact_before_latest_publication() {
+        let (run, directory, artifact) = confirmation_artifact();
+        promote_artifact(
+            run.path(),
+            &directory,
+            &artifact,
+            Strategy::ThinLto,
+            &|| false,
+        )
+        .expect("promotion");
+        assert!(run.path().join("best/artifact").exists());
+
+        discard_promoted_artifact(&directory).expect("discard promotion");
+
+        assert!(!run.path().join("best/artifact").exists());
+    }
+
+    #[test]
+    fn source_checksum_change_rejects_before_copy() {
+        let (run, directory, artifact) = confirmation_artifact();
+        fs::write(artifact.path(), b"changed confirmed artifact").expect("change candidate");
+
+        let error = promote_artifact(
+            run.path(),
+            &directory,
+            &artifact,
+            Strategy::ThinLto,
+            &|| false,
+        )
+        .expect_err("checksum change must reject");
+
+        assert_eq!(error.kind, PromotionErrorKind::ChecksumMismatch);
+        assert!(!run.path().join("best/artifact").exists());
+    }
+
+    #[test]
+    fn rename_failure_preserves_the_existing_destination() {
+        let (run, directory, artifact) = confirmation_artifact();
+        let best = run.path().join("best");
+        fs::create_dir(&best).expect("create best directory");
+        fs::write(best.join("artifact"), b"existing artifact").expect("seed artifact");
+
+        let error = promote_artifact(
+            run.path(),
+            &directory,
+            &artifact,
+            Strategy::ThinLto,
+            &|| false,
+        )
+        .expect_err("rename must not overwrite");
+
+        assert_eq!(error.kind, PromotionErrorKind::Filesystem);
+        assert_eq!(
+            fs::read(best.join("artifact")).expect("read existing artifact"),
+            b"existing artifact"
+        );
+        assert!(
+            fs::read_dir(best)
+                .expect("read best directory")
+                .all(|entry| !entry
+                    .expect("best entry")
+                    .file_name()
+                    .to_string_lossy()
+                    .starts_with(".artifact.tmp-"))
+        );
+    }
+
+    #[test]
+    fn full_destination_reports_a_filesystem_copy_failure() {
+        let (_run, _directory, artifact) = confirmation_artifact();
+        let mut full = fs::OpenOptions::new()
+            .write(true)
+            .open("/dev/full")
+            .expect("open /dev/full");
+
+        let error = copy_and_sync(&artifact, &mut full, &|| false)
+            .expect_err("/dev/full must reject writes");
+
+        assert_eq!(error.kind, PromotionErrorKind::Filesystem);
+        assert!(error.message.contains("Artifact copy failed"));
+    }
+
+    #[test]
+    fn best_directory_sync_failure_removes_the_renamed_artifact() {
+        assert_sync_failure_rolls_back(0);
+    }
+
+    #[test]
+    fn run_directory_sync_failure_removes_the_renamed_artifact() {
+        assert_sync_failure_rolls_back(1);
+    }
+
+    fn assert_sync_failure_rolls_back(failing_call: u8) {
+        let (run, directory, artifact) = confirmation_artifact();
+        let sync_calls = Cell::new(0_u8);
+
+        let error = promote_artifact_with_sync(
+            run.path(),
+            &directory,
+            &artifact,
+            Strategy::ThinLto,
+            &|| false,
+            &|anchored| {
+                let call = sync_calls.get();
+                sync_calls.set(call + 1);
+                if call == failing_call {
+                    Err(filesystem_error("injected directory sync failure"))
+                } else {
+                    anchored
+                        .sync()
+                        .map_err(|error| filesystem_error(error.message))
+                }
+            },
+        )
+        .expect_err("directory sync failure must reject promotion");
+
+        assert_eq!(error.kind, PromotionErrorKind::Filesystem);
+        assert!(!run.path().join("best/artifact").exists());
+        assert!(
+            fs::read_dir(run.path().join("best"))
+                .expect("best directory")
+                .all(|entry| !entry
+                    .expect("best entry")
+                    .file_name()
+                    .to_string_lossy()
+                    .starts_with(".artifact.tmp-"))
+        );
     }
 }

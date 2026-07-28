@@ -1,0 +1,2 @@
+Temper CLI 0.0.1 and report schema 2 are experimental; 0.x provides no backward-compatibility promise.
+Bounded search complete: baseline median 432866917 ns; selected candidate pgo.

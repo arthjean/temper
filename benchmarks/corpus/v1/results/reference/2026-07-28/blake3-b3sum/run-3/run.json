@@ -1,0 +1,1673 @@
+{
+  "schema_version": 2,
+  "experimental": true,
+  "compatibility": "No backward-compatibility promise during 0.x.",
+  "cli_version": "0.0.1",
+  "run_id": "1785232545-319888240-3359609",
+  "status": "no_improvement",
+  "completed_phases": [
+    "preflight",
+    "baseline_build",
+    "static_builds",
+    "screening",
+    "pgo_training",
+    "pgo_build",
+    "candidate_selection",
+    "confirmation"
+  ],
+  "final_decision": "no_improvement",
+  "source_reproducibility": "clean",
+  "request": {
+    "minimum_improvement_percent": 2.0,
+    "timeout_seconds": 10,
+    "workload": {
+      "executable": "/tmp/.tmpSOaIEM/blake3-b3sum/workload.sh",
+      "arguments": []
+    }
+  },
+  "preflight": {
+    "host_triple": "x86_64-unknown-linux-gnu",
+    "kernel": "Linux 7.1.5-200.fc44.x86_64",
+    "cpu_model": "AMD Ryzen 7 7800X3D 8-Core Processor",
+    "logical_core_count": 16,
+    "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+    "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+    "manifest_path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/Cargo.toml",
+    "lockfile_path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/Cargo.lock",
+    "lockfile_sha256": "e6fbe1f2b2a6fc726bf8f3da5774ba9fb05f94115883c531ba1a02a891e072a3"
+  },
+  "target": {
+    "package_id": "path+file:///tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum#1.8.5",
+    "package_name": "b3sum",
+    "binary_name": "b3sum",
+    "workspace_root": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum"
+  },
+  "baseline": {
+    "strategy": "baseline",
+    "stage": "baseline",
+    "target_directory": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/baseline",
+    "cargo_arguments": [
+      "build",
+      "--release",
+      "--locked",
+      "--target",
+      "x86_64-unknown-linux-gnu",
+      "--message-format=json",
+      "--package",
+      "b3sum",
+      "--bin",
+      "b3sum",
+      "--target-dir",
+      "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/baseline"
+    ],
+    "cargo_config_overrides": [],
+    "environment_overrides": [],
+    "outcome": "built",
+    "executable_path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/baseline/x86_64-unknown-linux-gnu/release/b3sum",
+    "sha256": "af8a57fe29effeec9225a4905489e6ba458425ce3d527cd22af480577f7b288c",
+    "size_bytes": 1497736,
+    "build_duration_ms": 2882,
+    "bounded_diagnostics": "build-script-executed: registry+https://github.com/rust-lang/crates.io-index#rayon-core@1.13.0\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#quote@1.0.45\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#crossbeam-utils@0.8.21\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#libc@0.2.186\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#proc-macro2@1.0.106\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#anyhow@1.0.102\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#rustix@1.1.4\nbuild-script-executed: path+file:///tmp/.tmpSOaIEM/blake3-b3sum/source#blake3@1.8.5\nbuild-finished: success=true\n   Compiling proc-macro2 v1.0.106\n\n   Compiling crossbeam-utils v0.8.21\n   Compiling unicode-ident v1.0.24\n\n   Compiling rustix v1.1.4\n\n   Compiling quote v1.0.45\n\n   Compiling rayon-core v1.13.0\n\n   Compiling bitflags v2.11.1\n\n   Compiling libc v0.2.186\n\n   Compiling linux-raw-sys v0.12.1\n\n   Compiling utf8parse v0.2.2\n\n   Compiling find-msvc-tools v0.1.9\n   Compiling shlex v1.3.0\n\n   Compiling colorchoice v1.0.5\n\n   Compiling anstyle-query v1.1.5\n\n   Compiling is_terminal_polyfill v1.70.2\n\n   Compiling anstyle v1.0.14\n\n   Compiling anstyle-parse v1.0.0\n   Compiling anyhow v1.0.102\n\n   Compiling\n strsim v0.11.1\n\n   Compiling\n heck v0.5.0\n\n   Compiling clap_lex v1.1.0\n\n   Compiling\n constant_time_eq v0.4.2\n\n   Compiling cc v1.2.61\n\n   Compiling cpufeatures v0.3.0\n\n   Compiling\n arrayref v0.3.9\n\n   Compiling anstream v1.0.0\n\n   Compiling cfg-if v1.0.4\n\n   Compiling\n arrayvec v0.7.6\n\n   Compiling hex v0.4.3\n\n   Compiling wild v2.2.1\n\n   Compiling crossbeam-epoch v0.9.18\n\n   Compiling syn v2.0.117\n\n   Compiling crossbeam-deque v0.8.6\n\n   Compiling terminal_size v0.4.4\n\n   Compiling clap_builder v4.6.0\n\n   Compiling blake3 v1.8.5 (/tmp/.tmpSOaIEM/blake3-b3sum/source)\n\n   Compiling memmap2 v0.9.10\n\n   Compiling clap_derive v4.6.1\n\n   Compiling clap v4.6.1\n\n   Compiling b3sum v1.8.5 (/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum)\n\n    Finished `release` profile [optimized] target(s) in 2.84s\n",
+    "compiler_diagnostics": [],
+    "diagnostics_truncated": false
+  },
+  "baseline_measurement": {
+    "sample_durations_ns": [
+      283426131,
+      283401911,
+      290646316,
+      283378201,
+      283403001,
+      283434691,
+      294341484
+    ],
+    "median_duration_ns": 283426131,
+    "relative_mad": 0.00008545436482707376,
+    "outcome": "stable"
+  },
+  "strategies": [
+    {
+      "identity": "thin-lto",
+      "build": {
+        "strategy": "thin-lto",
+        "stage": "static_candidate",
+        "target_directory": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/thin-lto",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "b3sum",
+          "--bin",
+          "b3sum",
+          "--target-dir",
+          "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/thin-lto",
+          "--config",
+          "profile.release.lto=\"thin\""
+        ],
+        "cargo_config_overrides": [
+          "profile.release.lto=\"thin\""
+        ],
+        "environment_overrides": [],
+        "outcome": "built",
+        "executable_path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/thin-lto/x86_64-unknown-linux-gnu/release/b3sum",
+        "sha256": "a5bca0498f0884f9eccbadb7cc5f5042dd82ffcc97af3bbb1e5a6f765b026218",
+        "size_bytes": 1475984,
+        "build_duration_ms": 4153,
+        "bounded_diagnostics": "build-script-executed: registry+https://github.com/rust-lang/crates.io-index#rayon-core@1.13.0\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#crossbeam-utils@0.8.21\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#quote@1.0.45\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#libc@0.2.186\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#rustix@1.1.4\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#proc-macro2@1.0.106\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#anyhow@1.0.102\nbuild-script-executed: path+file:///tmp/.tmpSOaIEM/blake3-b3sum/source#blake3@1.8.5\nbuild-finished: success=true\n   Compiling proc-macro2 v1.0.106\n\n   Compiling crossbeam-utils v0.8.21\n\n   Compiling quote v1.0.45\n\n   Compiling rustix v1.1.4\n\n   Compiling unicode-ident v1.0.24\n\n   Compiling bitflags v2.11.1\n\n   Compiling utf8parse v0.2.2\n\n   Compiling rayon-core v1.13.0\n\n   Compiling find-msvc-tools v0.1.9\n\n   Compiling linux-raw-sys v0.12.1\n\n   Compiling libc v0.2.186\n\n   Compiling shlex v1.3.0\n\n   Compiling anstyle v1.0.14\n\n   Compiling colorchoice v1.0.5\n   Compiling anstyle-query v1.1.5\n\n   Compiling\n is_terminal_polyfill v1.70.2\n\n   Compiling anstyle-parse v1.0.0\n\n   Compiling strsim v0.11.1\n   Compiling anyhow v1.0.102\n\n   Compiling clap_lex v1.1.0\n\n   Compiling heck v0.5.0\n\n   Compiling\n constant_time_eq v0.4.2\n\n   Compiling\n cc v1.2.61\n\n   Compiling cpufeatures v0.3.0\n\n   Compiling\n arrayvec v0.7.6\n\n   Compiling anstream v1.0.0\n\n   Compiling\n arrayref v0.3.9\n\n   Compiling cfg-if v1.0.4\n\n   Compiling wild v2.2.1\n\n   Compiling hex v0.4.3\n\n   Compiling crossbeam-epoch v0.9.18\n\n   Compiling crossbeam-deque v0.8.6\n\n   Compiling syn v2.0.117\n\n   Compiling terminal_size v0.4.4\n\n   Compiling clap_builder v4.6.0\n\n   Compiling blake3 v1.8.5 (/tmp/.tmpSOaIEM/blake3-b3sum/source)\n\n   Compiling memmap2 v0.9.10\n\n   Compiling clap_derive v4.6.1\n\n   Compiling clap v4.6.1\n\n   Compiling b3sum v1.8.5 (/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum)\n\n    Finished `release` profile [optimized] target(s) in 4.11s\n",
+        "compiler_diagnostics": [],
+        "diagnostics_truncated": false
+      },
+      "build_failure": null,
+      "screening": {
+        "sample_durations_ns": [
+          288487398,
+          298591790,
+          288352488,
+          283457171,
+          283369061,
+          294120064,
+          283423231
+        ],
+        "median_duration_ns": 288352488,
+        "relative_mad": 0.017094553385646527,
+        "outcome": "stable"
+      },
+      "workload_failure": null,
+      "rejection_reason": null
+    },
+    {
+      "identity": "fat-lto-cgu1",
+      "build": {
+        "strategy": "fat-lto-cgu1",
+        "stage": "static_candidate",
+        "target_directory": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/fat-lto-cgu1",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "b3sum",
+          "--bin",
+          "b3sum",
+          "--target-dir",
+          "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/fat-lto-cgu1",
+          "--config",
+          "profile.release.lto=\"fat\"",
+          "--config",
+          "profile.release.codegen-units=1"
+        ],
+        "cargo_config_overrides": [
+          "profile.release.lto=\"fat\"",
+          "profile.release.codegen-units=1"
+        ],
+        "environment_overrides": [],
+        "outcome": "built",
+        "executable_path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/fat-lto-cgu1/x86_64-unknown-linux-gnu/release/b3sum",
+        "sha256": "440b4e3b278e2e7b9539c750854db3c1f6bebeab257408973ad4dba80ea113ed",
+        "size_bytes": 1137864,
+        "build_duration_ms": 7903,
+        "bounded_diagnostics": "build-script-executed: registry+https://github.com/rust-lang/crates.io-index#rayon-core@1.13.0\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#crossbeam-utils@0.8.21\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#quote@1.0.45\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#libc@0.2.186\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#proc-macro2@1.0.106\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#rustix@1.1.4\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#anyhow@1.0.102\nbuild-script-executed: path+file:///tmp/.tmpSOaIEM/blake3-b3sum/source#blake3@1.8.5\nbuild-finished: success=true\n   Compiling crossbeam-utils v0.8.21\n\n   Compiling proc-macro2 v1.0.106\n\n   Compiling quote v1.0.45\n\n   Compiling rustix v1.1.4\n\n   Compiling unicode-ident v1.0.24\n\n   Compiling utf8parse v0.2.2\n\n   Compiling libc v0.2.186\n\n   Compiling linux-raw-sys v0.12.1\n\n   Compiling shlex v1.3.0\n\n   Compiling find-msvc-tools v0.1.9\n\n   Compiling rayon-core v1.13.0\n\n   Compiling bitflags v2.11.1\n\n   Compiling anstyle-query v1.1.5\n\n   Compiling is_terminal_polyfill v1.70.2\n\n   Compiling anstyle v1.0.14\n\n   Compiling colorchoice v1.0.5\n\n   Compiling anstyle-parse v1.0.0\n\n   Compiling clap_lex v1.1.0\n\n   Compiling strsim v0.11.1\n\n   Compiling\n heck v0.5.0\n\n   Compiling anyhow v1.0.102\n\n   Compiling cpufeatures v0.3.0\n\n   Compiling cc v1.2.61\n\n   Compiling constant_time_eq v0.4.2\n\n   Compiling anstream v1.0.0\n\n   Compiling arrayvec v0.7.6\n\n   Compiling cfg-if v1.0.4\n\n   Compiling\n arrayref v0.3.9\n\n   Compiling\n hex v0.4.3\n\n   Compiling\n wild v2.2.1\n\n   Compiling crossbeam-epoch v0.9.18\n\n   Compiling crossbeam-deque v0.8.6\n\n   Compiling syn v2.0.117\n\n   Compiling terminal_size v0.4.4\n\n   Compiling blake3 v1.8.5 (/tmp/.tmpSOaIEM/blake3-b3sum/source)\n\n   Compiling clap_builder v4.6.0\n\n   Compiling memmap2 v0.9.10\n\n   Compiling clap_derive v4.6.1\n\n   Compiling clap v4.6.1\n\n   Compiling b3sum v1.8.5 (/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum)\n\n    Finished `release` profile [optimized] target(s) in 7.86s\n",
+        "compiler_diagnostics": [],
+        "diagnostics_truncated": false
+      },
+      "build_failure": null,
+      "screening": {
+        "sample_durations_ns": [
+          283329481,
+          290890226,
+          283401151,
+          283435131,
+          283397511,
+          294253274,
+          283426231
+        ],
+        "median_duration_ns": 283426231,
+        "relative_mad": 0.00010133148191213113,
+        "outcome": "stable"
+      },
+      "workload_failure": null,
+      "rejection_reason": null
+    },
+    {
+      "identity": "pgo",
+      "build": {
+        "strategy": "pgo",
+        "stage": "pgo_optimized",
+        "target_directory": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/pgo",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "b3sum",
+          "--bin",
+          "b3sum",
+          "--target-dir",
+          "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/pgo"
+        ],
+        "cargo_config_overrides": [],
+        "environment_overrides": [
+          {
+            "name": "CARGO_ENCODED_RUSTFLAGS",
+            "arguments": [
+              "-Cprofile-use=/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/merged.profdata",
+              "-Cllvm-args=-pgo-warn-missing-function"
+            ]
+          }
+        ],
+        "outcome": "built",
+        "executable_path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/pgo/x86_64-unknown-linux-gnu/release/b3sum",
+        "sha256": "c94e781063d032809109e915807770c4b20fb456679427507d95e4332c179a60",
+        "size_bytes": 1538672,
+        "build_duration_ms": 2654,
+        "bounded_diagnostics": "build-script-executed: registry+https://github.com/rust-lang/crates.io-index#rayon-core@1.13.0\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#crossbeam-utils@0.8.21\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#quote@1.0.45\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#libc@0.2.186\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#anyhow@1.0.102\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#proc-macro2@1.0.106\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#rustix@1.1.4\nbuild-script-executed: path+file:///tmp/.tmpSOaIEM/blake3-b3sum/source#blake3@1.8.5\nbuild-finished: success=true\n   Compiling crossbeam-utils v0.8.21\n\n   Compiling proc-macro2 v1.0.106\n\n   Compiling unicode-ident v1.0.24\n\n   Compiling quote v1.0.45\n\n   Compiling rustix v1.1.4\n\n   Compiling linux-raw-sys v0.12.1\n\n   Compiling rayon-core v1.13.0\n\n   Compiling find-msvc-tools v0.1.9\n\n   Compiling utf8parse v0.2.2\n\n   Compiling bitflags v2.11.1\n\n   Compiling shlex v1.3.0\n\n   Compiling libc v0.2.186\n\n   Compiling anstyle-query v1.1.5\n\n   Compiling is_terminal_polyfill v1.70.2\n   Compiling colorchoice v1.0.5\n\n   Compiling anstyle v1.0.14\n\n   Compiling anstyle-parse v1.0.0\n\n   Compiling clap_lex v1.1.0\n   Compiling strsim v0.11.1\n   Compiling anyhow v1.0.102\n\n   Compiling heck v0.5.0\n\n   Compiling arrayref v0.3.9\n\n   Compiling cc v1.2.61\n\n   Compiling cfg-if v1.0.4\n\n   Compiling arrayvec v0.7.6\n\n   Compiling anstream v1.0.0\n\n   Compiling\n cpufeatures v0.3.0\n\n   Compiling constant_time_eq v0.4.2\n\n   Compiling\n hex v0.4.3\n\n   Compiling wild v2.2.1\n\n   Compiling crossbeam-epoch v0.9.18\n\n   Compiling syn v2.0.117\n\n   Compiling crossbeam-deque v0.8.6\n\n   Compiling terminal_size v0.4.4\n\n   Compiling clap_builder v4.6.0\n\n   Compiling blake3 v1.8.5 (/tmp/.tmpSOaIEM/blake3-b3sum/source)\n\n   Compiling memmap2 v0.9.10\n\n   Compiling clap_derive v4.6.1\n\n   Compiling clap v4.6.1\n\n   Compiling b3sum v1.8.5 (/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum)\n\n    Finished `release` profile [optimized] target(s) in 2.61s\n",
+        "compiler_diagnostics": [],
+        "diagnostics_truncated": false
+      },
+      "build_failure": null,
+      "screening": {
+        "sample_durations_ns": [
+          288443278,
+          283383801,
+          288384437,
+          278308715,
+          278350265,
+          288799267,
+          278353035
+        ],
+        "median_duration_ns": 283383801,
+        "relative_mad": 0.017762257342296004,
+        "outcome": "stable"
+      },
+      "workload_failure": null,
+      "rejection_reason": "confirmation_rejected"
+    }
+  ],
+  "pgo_base_strategy": "baseline",
+  "pgo_training": {
+    "outcome": "trained",
+    "base_strategy": "baseline",
+    "prerequisites": {
+      "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+      "target_libdir": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+      "preserved_target_rustflags": [],
+      "inspected_config_sources": [
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/.cargo/config.toml",
+          "sha256": "d2ee74a7f6fb14e176d103139f5b327cfe0ba80a0c7e232e106d4f5e34ffaa8c"
+        }
+      ],
+      "tool_identity": {
+        "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+        "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+        "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+        "llvm_profdata_sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+        "llvm_profdata_version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+      }
+    },
+    "instrumentation_build": {
+      "strategy": "pgo",
+      "stage": "pgo_instrumentation",
+      "target_directory": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/pgo-instrumented",
+      "cargo_arguments": [
+        "build",
+        "--release",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--message-format=json",
+        "--package",
+        "b3sum",
+        "--bin",
+        "b3sum",
+        "--target-dir",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/pgo-instrumented"
+      ],
+      "cargo_config_overrides": [],
+      "environment_overrides": [
+        {
+          "name": "CARGO_ENCODED_RUSTFLAGS",
+          "arguments": [
+            "-Cprofile-generate=/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw"
+          ]
+        }
+      ],
+      "outcome": "built",
+      "executable_path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/pgo-instrumented/x86_64-unknown-linux-gnu/release/b3sum",
+      "sha256": "65a46d0733f9e93f98e0faa55b1aecbb15e3cea36271ca101f3a2d674e6f55ff",
+      "size_bytes": 3436544,
+      "build_duration_ms": 2789,
+      "bounded_diagnostics": "build-script-executed: registry+https://github.com/rust-lang/crates.io-index#rayon-core@1.13.0\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#crossbeam-utils@0.8.21\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#quote@1.0.45\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#libc@0.2.186\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#rustix@1.1.4\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#anyhow@1.0.102\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#proc-macro2@1.0.106\nbuild-script-executed: path+file:///tmp/.tmpSOaIEM/blake3-b3sum/source#blake3@1.8.5\nbuild-finished: success=true\n   Compiling crossbeam-utils v0.8.21\n\n   Compiling proc-macro2 v1.0.106\n\n   Compiling rustix v1.1.4\n\n   Compiling quote v1.0.45\n\n   Compiling unicode-ident v1.0.24\n\n   Compiling find-msvc-tools v0.1.9\n\n   Compiling utf8parse v0.2.2\n\n   Compiling libc v0.2.186\n\n   Compiling bitflags v2.11.1\n\n   Compiling rayon-core v1.13.0\n\n   Compiling shlex v1.3.0\n\n   Compiling linux-raw-sys v0.12.1\n\n   Compiling anstyle-query v1.1.5\n\n   Compiling anstyle v1.0.14\n\n   Compiling colorchoice v1.0.5\n\n   Compiling is_terminal_polyfill v1.70.2\n\n   Compiling anstyle-parse v1.0.0\n\n   Compiling heck v0.5.0\n\n   Compiling anyhow v1.0.102\n   Compiling strsim v0.11.1\n\n   Compiling\n clap_lex v1.1.0\n\n   Compiling\n arrayref v0.3.9\n\n   Compiling\n cc v1.2.61\n\n   Compiling cfg-if v1.0.4\n\n   Compiling anstream v1.0.0\n\n   Compiling\n cpufeatures v0.3.0\n\n   Compiling constant_time_eq v0.4.2\n\n   Compiling\n arrayvec v0.7.6\n\n   Compiling wild v2.2.1\n\n   Compiling hex v0.4.3\n\n   Compiling crossbeam-epoch v0.9.18\n\n   Compiling syn v2.0.117\n\n   Compiling crossbeam-deque v0.8.6\n\n   Compiling terminal_size v0.4.4\n\n   Compiling blake3 v1.8.5 (/tmp/.tmpSOaIEM/blake3-b3sum/source)\n\n   Compiling clap_builder v4.6.0\n\n   Compiling memmap2 v0.9.10\n\n   Compiling clap_derive v4.6.1\n\n   Compiling clap v4.6.1\n\n   Compiling b3sum v1.8.5 (/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum)\n\n    Finished `release` profile [optimized] target(s) in 2.70s\n",
+      "compiler_diagnostics": [],
+      "diagnostics_truncated": false
+    },
+    "instrumentation_failure": null,
+    "training_duration_ns": 333922076,
+    "raw_profile_files": [
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416207.profraw",
+        "size_bytes": 384696,
+        "sha256": "7eb979bde17e38fc335b7722a9c7561e827d655f5331cb4cdf9198b3897058fc"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416225.profraw",
+        "size_bytes": 384696,
+        "sha256": "5d3363c28c6cc8f935ca5edae4e9378f255470d7578b8e24ebb8d2c88f4cc4f9"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416243.profraw",
+        "size_bytes": 384696,
+        "sha256": "aee2c5adc21e291190ef8ddba662cb9c885264882f296c0a94573b9ad0a17985"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416261.profraw",
+        "size_bytes": 384696,
+        "sha256": "887dc068ab816a6196f5ee84dc187c17cfd2527cdf481e8d33240a316cb3a2f1"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416279.profraw",
+        "size_bytes": 384696,
+        "sha256": "e01910e4bf26ed7f549a39641e04e14f80faa98143bd225a3927bbd2a2c22c9a"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416297.profraw",
+        "size_bytes": 384696,
+        "sha256": "f98eb9f413509d386725c8978c359775a5f3b44866d381725293a10bf1dad18c"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416315.profraw",
+        "size_bytes": 384696,
+        "sha256": "7d48ddc1faac3d8d173f7b5ac5c5d5c4c576a97a4cc7c7e4346ea89a107673d4"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416333.profraw",
+        "size_bytes": 384696,
+        "sha256": "aea1b04bbc9a371e745636ce25bb762533ddc3e1b2ed6050be4931f6036f209e"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416351.profraw",
+        "size_bytes": 384696,
+        "sha256": "6c9fa44212cef5c3b81b62d0ff35155c41bbf4356459f82e89beb0a272f8fcde"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416369.profraw",
+        "size_bytes": 384696,
+        "sha256": "f56414252b6bdd186bc0ee4ed2d54a198435a53efa11feba12e8069504ff3ba3"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416387.profraw",
+        "size_bytes": 384696,
+        "sha256": "9df06e08e5cee07be0229d9eb8c3ad9ba553cc0039a52de6378911246fcd2417"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416405.profraw",
+        "size_bytes": 384696,
+        "sha256": "8be615d0bf4130057c239293bafae1bc0cb09a755279e2ca9a1a04db74dec0c2"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416423.profraw",
+        "size_bytes": 384696,
+        "sha256": "d9d289713aa7550521b38942533c138f70e8e3c951555930947b450d84b850f2"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416441.profraw",
+        "size_bytes": 384696,
+        "sha256": "a62ba8b1260d943a1f8e1f3cab68e9567dc8de00b9a8306f619f284b11a79701"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416459.profraw",
+        "size_bytes": 384696,
+        "sha256": "fbf48ef8ed540421558633ba6f8a09232a016728e949d0c64feeae249589d018"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416477.profraw",
+        "size_bytes": 384696,
+        "sha256": "eb8b7f286f9af285741915032f687409738ccc14eac68cc0346d69e4cf9450e4"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416495.profraw",
+        "size_bytes": 384696,
+        "sha256": "eaaa52378948532b1f79fbbb14ab0d75bb30f054ac9765392871c84d3ea132c5"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416513.profraw",
+        "size_bytes": 384696,
+        "sha256": "57aa71f38886c61e7638931e6caf4c4d18e01e03180bc8c3a70ef8fde078a5aa"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416531.profraw",
+        "size_bytes": 384696,
+        "sha256": "eba5cd43250474dd7644706b28b4e2f31f277d5aff6a10217b0cea2f2a8c3f2a"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416549.profraw",
+        "size_bytes": 384696,
+        "sha256": "514d7d045f9e5b9cefeb4764e6319b16b98f3a18cd8569626af5cb67b5ceb629"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416567.profraw",
+        "size_bytes": 384696,
+        "sha256": "c51712b1ffc6c846904ca4b231543360d20d1d2a8a580bb4cd7b159d2378f7c6"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416585.profraw",
+        "size_bytes": 384696,
+        "sha256": "1e91a3406975173c2b4948faeecec9c901957b1331a7e97fc4a336c76ba1f353"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416603.profraw",
+        "size_bytes": 384696,
+        "sha256": "d1652d4600d7830466bded1db1a1b3b0dcf3439c1ec4de96cbbf45c322c4b6e6"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416621.profraw",
+        "size_bytes": 384696,
+        "sha256": "fbc91e10a0d9a7a6b5d377a7eb6d69ead459f786d8430860f06d75228ef23908"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416639.profraw",
+        "size_bytes": 384696,
+        "sha256": "4cda51b8b6d40660df01cee0d4d2f7e71082cb2d1e2293c548d987b991f1f0fe"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416657.profraw",
+        "size_bytes": 384696,
+        "sha256": "f2cc80b3bfe585c29f2dd38efd9616a6cd2d36414aa867510593fc46365e8407"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416675.profraw",
+        "size_bytes": 384696,
+        "sha256": "6088137d0cf7156fe9f0c06d98125fa8965cc0136933f61ecc457c5a18418537"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416693.profraw",
+        "size_bytes": 384696,
+        "sha256": "23704bccf48a28e6410dffe774ec0bbe5409778063e9e4d238b2ac9a6fa1e775"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416711.profraw",
+        "size_bytes": 384696,
+        "sha256": "6386f6f07e149960cfe7183a00a2a6c1a765730acacc1086828f323fb1914c0a"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416729.profraw",
+        "size_bytes": 384696,
+        "sha256": "56fc7ebb421280e399ec35cb5dbc06d2adfbea2950bea8820b8da2bae3ce72ce"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416747.profraw",
+        "size_bytes": 384696,
+        "sha256": "06be426a9ea2b55144e68e059a566d13dbca05ac80368fac93e6b18faec59237"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416765.profraw",
+        "size_bytes": 384696,
+        "sha256": "b299eb2d6d6ee437c9a2c11921f5750d6e6d466c719deb4017dd2bfee64260b6"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416783.profraw",
+        "size_bytes": 384696,
+        "sha256": "1065a064c1860c22628bf31e110c57b3f1afc59755528e146879cc2ec4d44980"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416801.profraw",
+        "size_bytes": 384696,
+        "sha256": "8ad56e75a7c6ed6111bdc366010375eef5840384cb5352a4ca6e045819fe3ebe"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416820.profraw",
+        "size_bytes": 384696,
+        "sha256": "bcfdf240438119a7156d0540a6494237555db15cb313168c9d99ef0ddc0a2fb1"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416838.profraw",
+        "size_bytes": 384696,
+        "sha256": "bdf90c65c21b84138becd6e8b51fe9ca93b6d0533e1092a63bcca83981609750"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416856.profraw",
+        "size_bytes": 384696,
+        "sha256": "25c754802a963b312583d6e9444257653b6eed282d8937042a49c044f299d3c0"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416874.profraw",
+        "size_bytes": 384696,
+        "sha256": "a2f900d0fbfe63e502af2f1ddc14e1cd1584a8aef01e173ce9b57ec169906fd6"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416892.profraw",
+        "size_bytes": 384696,
+        "sha256": "11885d08384c8916f4a023f7b2da2c45857929ee3b700474d62c9099e708dde8"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416910.profraw",
+        "size_bytes": 384696,
+        "sha256": "e19335e24441d173c315952e170127bcce0b08e0665b55caa39dc6c30db35ec4"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416928.profraw",
+        "size_bytes": 384696,
+        "sha256": "8dfee2e762b2fcdd22d6ac4506966c736fb8a1636fc22235358aba49c50dae60"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416946.profraw",
+        "size_bytes": 384696,
+        "sha256": "c3d0a12ea4fd5060ddb1cad8c4aafc15f0346579764535bd9e45860ee5e5e88d"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416964.profraw",
+        "size_bytes": 384696,
+        "sha256": "e52cff6fb792eea2dd9eedabcee41e029419cbaafd68d4e1e7d2fe3ece00e671"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416982.profraw",
+        "size_bytes": 384696,
+        "sha256": "32d313677abb2b668d4c5bb85f3b9269a42279e03ce010043cd699ff22ad6927"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417003.profraw",
+        "size_bytes": 384696,
+        "sha256": "1202743578f8f954a36f06e167ef38747c02308c1575e231078735cce9eefc49"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417021.profraw",
+        "size_bytes": 384696,
+        "sha256": "eaf004afb7e7be3d3f352a6d2e9e579f14ac02c9c34cd5d0daad6fd3ceac61d2"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417039.profraw",
+        "size_bytes": 384696,
+        "sha256": "b9ea5caae494dbe9e61d4f01965a85dedda10582a4fc50bace630dc9d67d0b90"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417060.profraw",
+        "size_bytes": 384696,
+        "sha256": "d1dd57254afdc34d7eeb52f392851186599cffa287750657963df106c7b09015"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417078.profraw",
+        "size_bytes": 384696,
+        "sha256": "2862afdaf412d891fe0b244fbde0c6668516fb7698ef3aeb3ee677149770239d"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417096.profraw",
+        "size_bytes": 384696,
+        "sha256": "b085e19e6fecb202ad4a485a62d557bdb5095dc67dd085d0142e96c3d5574992"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417114.profraw",
+        "size_bytes": 384696,
+        "sha256": "b7d5e71f6dd1c8b587f8a4f07c5ba858bc19e0147ea7a7aaed57fca21ec9ab16"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417135.profraw",
+        "size_bytes": 384696,
+        "sha256": "c0c4d1d6e23f147a428da17134b0b76dddf063811fe824dcd96ee4959aab80ec"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417153.profraw",
+        "size_bytes": 384696,
+        "sha256": "b12658e14787c6a6df6a69fc885385f5c3a7ae7d79e2db729ec7d025a7812d1d"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417171.profraw",
+        "size_bytes": 384696,
+        "sha256": "9c78b4c5e01086ec9a6f0f1c2582e7044ad6034b53200cae24d62d0d137fb4c5"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417192.profraw",
+        "size_bytes": 384696,
+        "sha256": "4c36f8556c2bea40592bb03ffdc9a2e86160d52454fcb71ca1330197471f1b82"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417210.profraw",
+        "size_bytes": 384696,
+        "sha256": "31371b11f0cc727213e47ee2f9b847b7a43ec188b500fb9807fe6f9ef5f248ee"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417228.profraw",
+        "size_bytes": 384696,
+        "sha256": "1cecc7ba8a6eb72c31edc9cce6dadf9a30487ccbeec411789a8828c418a1a74a"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417263.profraw",
+        "size_bytes": 384696,
+        "sha256": "b06376f5aefc2c052c7e16611bc15294a2cd4e0e757d4fdc0f57c78b2752b788"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417282.profraw",
+        "size_bytes": 384696,
+        "sha256": "046443978d40b4456c641177dd0697f5f82582ae90addf5bd6ea543a8b5bfeaa"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417300.profraw",
+        "size_bytes": 384696,
+        "sha256": "50406384ada57f72604474d43c0ec790962e981addfef7ea71cd5fabccff81fc"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417321.profraw",
+        "size_bytes": 384696,
+        "sha256": "9130d1e2dc511fa0b82bf9d8a1bdaa432ed702762ef4f1c2d20c8def734f95ad"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417339.profraw",
+        "size_bytes": 384696,
+        "sha256": "b9b1edf01cec1f9fbcf0dd8421cacceebb3af1d5871830fc5ba89cf4a4c3555d"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417357.profraw",
+        "size_bytes": 384696,
+        "sha256": "c3999fbe706e82e31d5060d770aa75cc5c9cbc650fd0891b121979a7ac1b9e3f"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417375.profraw",
+        "size_bytes": 384696,
+        "sha256": "6938348d7fb868dd451809287f828599915e8f8587203bb3548dd506e416b3d5"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417393.profraw",
+        "size_bytes": 384696,
+        "sha256": "9eb2d30e62734cb891fa05655f2bf5bead6b7953b08a8b3f612bc9cc97dada0e"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417411.profraw",
+        "size_bytes": 384696,
+        "sha256": "cc376be53f5ba96569663de38e4a03565f16ec827371272ff7483aaba7008011"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417432.profraw",
+        "size_bytes": 384696,
+        "sha256": "bd125e207dc9f02cdbc4f9389cb84aed4710caf8f4657ffdf9870aba113b1d68"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417450.profraw",
+        "size_bytes": 384696,
+        "sha256": "d6f2c605986e702bc8056507f26741b59da035c585293893dfabbcb878a137b4"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417468.profraw",
+        "size_bytes": 384696,
+        "sha256": "a7929bad35557a8d3239ae5d54f06d2f3cfdbe111086d8f40c8526f802588319"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417489.profraw",
+        "size_bytes": 384696,
+        "sha256": "ebfff1970f454e83b5078796e9e7d582ed31c27f58b6606b5b5edf37309bd6df"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417507.profraw",
+        "size_bytes": 384696,
+        "sha256": "3f8e1d2e024cc4981882cb579c583f26e0084f9787863844d712e30abd894250"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417525.profraw",
+        "size_bytes": 384696,
+        "sha256": "58ca72c88ee4feec5433faaf33af02dc6d2a638fec0575d572d742dd8a25e118"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417543.profraw",
+        "size_bytes": 384696,
+        "sha256": "229e86d229e4997ecb1dc3a1b3848c24900703538dfe5cfa025fbeaf2294b6bc"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417564.profraw",
+        "size_bytes": 384696,
+        "sha256": "5e334fe8e5f55f7922ff8b3f57e8dab671094b291d0144afdb4725716bdfa401"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417582.profraw",
+        "size_bytes": 384696,
+        "sha256": "d8b3c4f715d911cf9730cdd6113bcbb154ba6d5efbcbd8702a53f7ec0dbf1250"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417600.profraw",
+        "size_bytes": 384696,
+        "sha256": "2ac589f35dc7a30f11c707545cf17fdf88be08c3e04e76341f69257e03affb36"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417621.profraw",
+        "size_bytes": 384696,
+        "sha256": "69f3d80ac723f2665ac89962d997cb0815df8f2880bb0d1f9be091803482df2a"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417639.profraw",
+        "size_bytes": 384696,
+        "sha256": "b591edb81534eac751a049cbe43df19beaac45e950bf74ef8551ca188f4bc93e"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417657.profraw",
+        "size_bytes": 384696,
+        "sha256": "9cce94acaa94c46924e32d27d6af3f1cbd3ca78ea63b85f9a895268147a3505f"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417678.profraw",
+        "size_bytes": 384696,
+        "sha256": "b9adee8f50fee9625a927a34d293318e4c98b0b5c09b42c310032c8fca17b80b"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417696.profraw",
+        "size_bytes": 384696,
+        "sha256": "11ac33471afaa54e3054c8922461ed0dcd7332915733db8b626d81c8048da9b7"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417714.profraw",
+        "size_bytes": 384696,
+        "sha256": "6faaa8551ec12cff6e7cd126dcc89e32f1f8846de15f74bfe7e77022c1bfa238"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417735.profraw",
+        "size_bytes": 384696,
+        "sha256": "d7f9178c721e7b2333017dc94c968378d96799e9bdd21492c808a4d21251ea7f"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417753.profraw",
+        "size_bytes": 384696,
+        "sha256": "d11d576f1c7017ae5f2c139b0d4f7c7feec1dc05afb48587c18744940d5d10e7"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417773.profraw",
+        "size_bytes": 384696,
+        "sha256": "23d01b1da7cdf932454f65d15e7f74ddbf6a2ac7b710b4287dccc90fc0dbabfa"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417799.profraw",
+        "size_bytes": 384696,
+        "sha256": "90c071991a4b699a3fcbc2bbc8d9ed84257759dbfd3644a296dba11a86f3da7f"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417821.profraw",
+        "size_bytes": 384696,
+        "sha256": "72bc709e0034715232229b4f881de6a29b5de5150dc47766ca969d90259e73d1"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417844.profraw",
+        "size_bytes": 384696,
+        "sha256": "77220025a6aa408fc22ad9a7dcda131cd08a899edaeb0848897781bbfaf28ef2"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417864.profraw",
+        "size_bytes": 384696,
+        "sha256": "9b2ad28874d9f4326b98fb75a82fea5158531decb35f42dbb8b03f258092b629"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417885.profraw",
+        "size_bytes": 384696,
+        "sha256": "75aec06b534786958d97fe8cb506b89c1acf63c62b6469bb7e2554e328f68713"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417903.profraw",
+        "size_bytes": 384696,
+        "sha256": "997aab9add127db39aa5f7e7fb6ff6117245c7214717b57e6cd4594328401948"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417921.profraw",
+        "size_bytes": 384696,
+        "sha256": "de1aaee24a3385a55786bc2988f36a0ffbabed306710dbca600cefe93e42e5cb"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417942.profraw",
+        "size_bytes": 384696,
+        "sha256": "79d7d40d3750f8e1d6c50e962ed4532e93222ad2af527a1889323b8a4cef54f0"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417960.profraw",
+        "size_bytes": 384696,
+        "sha256": "82ce932b7a5e1bfebcd1461e1db1acdec7f187116b9d3cbc6effcb55a4a805c3"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417978.profraw",
+        "size_bytes": 384696,
+        "sha256": "090ab3eceb0172b1f775b42ce39d348d9bc28a3946fb949ac8e9e4727a4dc0ae"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417999.profraw",
+        "size_bytes": 384696,
+        "sha256": "038d3e75b837948bc85059490cdd941fbbb005170d62581a7b17aad44b790e74"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3418017.profraw",
+        "size_bytes": 384696,
+        "sha256": "f234523add2bae76fb7c090a8ac69d69386ba08c3f186d8ea6d71c611fae651a"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3418035.profraw",
+        "size_bytes": 384696,
+        "sha256": "ad4a4f8298b0d25fad503e8c9c1bb3d422f005401b247edc94e5c27a51289385"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3418056.profraw",
+        "size_bytes": 384696,
+        "sha256": "c3e808f36bd8ce03d71df5178fe66db906a5700a00b28a1699959c7981c8e893"
+      },
+      {
+        "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3418074.profraw",
+        "size_bytes": 384696,
+        "sha256": "d18640e38b3df06fe9f823f0da92fb47781af4c85fa47545014e80b38f1e1add"
+      }
+    ],
+    "merge": {
+      "outcome": "merged",
+      "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+      "arguments": [
+        "merge",
+        "--failure-mode=any",
+        "-o",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/merged.profdata",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416207.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416225.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416243.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416261.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416279.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416297.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416315.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416333.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416351.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416369.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416387.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416405.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416423.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416441.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416459.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416477.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416495.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416513.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416531.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416549.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416567.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416585.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416603.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416621.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416639.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416657.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416675.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416693.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416711.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416729.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416747.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416765.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416783.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416801.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416820.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416838.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416856.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416874.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416892.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416910.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416928.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416946.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416964.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416982.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417003.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417021.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417039.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417060.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417078.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417096.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417114.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417135.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417153.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417171.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417192.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417210.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417228.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417263.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417282.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417300.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417321.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417339.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417357.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417375.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417393.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417411.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417432.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417450.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417468.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417489.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417507.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417525.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417543.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417564.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417582.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417600.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417621.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417639.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417657.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417678.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417696.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417714.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417735.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417753.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417773.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417799.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417821.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417844.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417864.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417885.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417903.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417921.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417942.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417960.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417978.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417999.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3418017.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3418035.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3418056.profraw",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3418074.profraw"
+      ],
+      "profraw_files": [
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416207.profraw",
+          "size_bytes": 384696,
+          "sha256": "7eb979bde17e38fc335b7722a9c7561e827d655f5331cb4cdf9198b3897058fc"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416225.profraw",
+          "size_bytes": 384696,
+          "sha256": "5d3363c28c6cc8f935ca5edae4e9378f255470d7578b8e24ebb8d2c88f4cc4f9"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416243.profraw",
+          "size_bytes": 384696,
+          "sha256": "aee2c5adc21e291190ef8ddba662cb9c885264882f296c0a94573b9ad0a17985"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416261.profraw",
+          "size_bytes": 384696,
+          "sha256": "887dc068ab816a6196f5ee84dc187c17cfd2527cdf481e8d33240a316cb3a2f1"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416279.profraw",
+          "size_bytes": 384696,
+          "sha256": "e01910e4bf26ed7f549a39641e04e14f80faa98143bd225a3927bbd2a2c22c9a"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416297.profraw",
+          "size_bytes": 384696,
+          "sha256": "f98eb9f413509d386725c8978c359775a5f3b44866d381725293a10bf1dad18c"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416315.profraw",
+          "size_bytes": 384696,
+          "sha256": "7d48ddc1faac3d8d173f7b5ac5c5d5c4c576a97a4cc7c7e4346ea89a107673d4"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416333.profraw",
+          "size_bytes": 384696,
+          "sha256": "aea1b04bbc9a371e745636ce25bb762533ddc3e1b2ed6050be4931f6036f209e"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416351.profraw",
+          "size_bytes": 384696,
+          "sha256": "6c9fa44212cef5c3b81b62d0ff35155c41bbf4356459f82e89beb0a272f8fcde"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416369.profraw",
+          "size_bytes": 384696,
+          "sha256": "f56414252b6bdd186bc0ee4ed2d54a198435a53efa11feba12e8069504ff3ba3"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416387.profraw",
+          "size_bytes": 384696,
+          "sha256": "9df06e08e5cee07be0229d9eb8c3ad9ba553cc0039a52de6378911246fcd2417"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416405.profraw",
+          "size_bytes": 384696,
+          "sha256": "8be615d0bf4130057c239293bafae1bc0cb09a755279e2ca9a1a04db74dec0c2"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416423.profraw",
+          "size_bytes": 384696,
+          "sha256": "d9d289713aa7550521b38942533c138f70e8e3c951555930947b450d84b850f2"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416441.profraw",
+          "size_bytes": 384696,
+          "sha256": "a62ba8b1260d943a1f8e1f3cab68e9567dc8de00b9a8306f619f284b11a79701"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416459.profraw",
+          "size_bytes": 384696,
+          "sha256": "fbf48ef8ed540421558633ba6f8a09232a016728e949d0c64feeae249589d018"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416477.profraw",
+          "size_bytes": 384696,
+          "sha256": "eb8b7f286f9af285741915032f687409738ccc14eac68cc0346d69e4cf9450e4"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416495.profraw",
+          "size_bytes": 384696,
+          "sha256": "eaaa52378948532b1f79fbbb14ab0d75bb30f054ac9765392871c84d3ea132c5"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416513.profraw",
+          "size_bytes": 384696,
+          "sha256": "57aa71f38886c61e7638931e6caf4c4d18e01e03180bc8c3a70ef8fde078a5aa"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416531.profraw",
+          "size_bytes": 384696,
+          "sha256": "eba5cd43250474dd7644706b28b4e2f31f277d5aff6a10217b0cea2f2a8c3f2a"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416549.profraw",
+          "size_bytes": 384696,
+          "sha256": "514d7d045f9e5b9cefeb4764e6319b16b98f3a18cd8569626af5cb67b5ceb629"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416567.profraw",
+          "size_bytes": 384696,
+          "sha256": "c51712b1ffc6c846904ca4b231543360d20d1d2a8a580bb4cd7b159d2378f7c6"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416585.profraw",
+          "size_bytes": 384696,
+          "sha256": "1e91a3406975173c2b4948faeecec9c901957b1331a7e97fc4a336c76ba1f353"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416603.profraw",
+          "size_bytes": 384696,
+          "sha256": "d1652d4600d7830466bded1db1a1b3b0dcf3439c1ec4de96cbbf45c322c4b6e6"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416621.profraw",
+          "size_bytes": 384696,
+          "sha256": "fbc91e10a0d9a7a6b5d377a7eb6d69ead459f786d8430860f06d75228ef23908"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416639.profraw",
+          "size_bytes": 384696,
+          "sha256": "4cda51b8b6d40660df01cee0d4d2f7e71082cb2d1e2293c548d987b991f1f0fe"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416657.profraw",
+          "size_bytes": 384696,
+          "sha256": "f2cc80b3bfe585c29f2dd38efd9616a6cd2d36414aa867510593fc46365e8407"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416675.profraw",
+          "size_bytes": 384696,
+          "sha256": "6088137d0cf7156fe9f0c06d98125fa8965cc0136933f61ecc457c5a18418537"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416693.profraw",
+          "size_bytes": 384696,
+          "sha256": "23704bccf48a28e6410dffe774ec0bbe5409778063e9e4d238b2ac9a6fa1e775"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416711.profraw",
+          "size_bytes": 384696,
+          "sha256": "6386f6f07e149960cfe7183a00a2a6c1a765730acacc1086828f323fb1914c0a"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416729.profraw",
+          "size_bytes": 384696,
+          "sha256": "56fc7ebb421280e399ec35cb5dbc06d2adfbea2950bea8820b8da2bae3ce72ce"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416747.profraw",
+          "size_bytes": 384696,
+          "sha256": "06be426a9ea2b55144e68e059a566d13dbca05ac80368fac93e6b18faec59237"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416765.profraw",
+          "size_bytes": 384696,
+          "sha256": "b299eb2d6d6ee437c9a2c11921f5750d6e6d466c719deb4017dd2bfee64260b6"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416783.profraw",
+          "size_bytes": 384696,
+          "sha256": "1065a064c1860c22628bf31e110c57b3f1afc59755528e146879cc2ec4d44980"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416801.profraw",
+          "size_bytes": 384696,
+          "sha256": "8ad56e75a7c6ed6111bdc366010375eef5840384cb5352a4ca6e045819fe3ebe"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416820.profraw",
+          "size_bytes": 384696,
+          "sha256": "bcfdf240438119a7156d0540a6494237555db15cb313168c9d99ef0ddc0a2fb1"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416838.profraw",
+          "size_bytes": 384696,
+          "sha256": "bdf90c65c21b84138becd6e8b51fe9ca93b6d0533e1092a63bcca83981609750"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416856.profraw",
+          "size_bytes": 384696,
+          "sha256": "25c754802a963b312583d6e9444257653b6eed282d8937042a49c044f299d3c0"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416874.profraw",
+          "size_bytes": 384696,
+          "sha256": "a2f900d0fbfe63e502af2f1ddc14e1cd1584a8aef01e173ce9b57ec169906fd6"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416892.profraw",
+          "size_bytes": 384696,
+          "sha256": "11885d08384c8916f4a023f7b2da2c45857929ee3b700474d62c9099e708dde8"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416910.profraw",
+          "size_bytes": 384696,
+          "sha256": "e19335e24441d173c315952e170127bcce0b08e0665b55caa39dc6c30db35ec4"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416928.profraw",
+          "size_bytes": 384696,
+          "sha256": "8dfee2e762b2fcdd22d6ac4506966c736fb8a1636fc22235358aba49c50dae60"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416946.profraw",
+          "size_bytes": 384696,
+          "sha256": "c3d0a12ea4fd5060ddb1cad8c4aafc15f0346579764535bd9e45860ee5e5e88d"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416964.profraw",
+          "size_bytes": 384696,
+          "sha256": "e52cff6fb792eea2dd9eedabcee41e029419cbaafd68d4e1e7d2fe3ece00e671"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3416982.profraw",
+          "size_bytes": 384696,
+          "sha256": "32d313677abb2b668d4c5bb85f3b9269a42279e03ce010043cd699ff22ad6927"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417003.profraw",
+          "size_bytes": 384696,
+          "sha256": "1202743578f8f954a36f06e167ef38747c02308c1575e231078735cce9eefc49"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417021.profraw",
+          "size_bytes": 384696,
+          "sha256": "eaf004afb7e7be3d3f352a6d2e9e579f14ac02c9c34cd5d0daad6fd3ceac61d2"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417039.profraw",
+          "size_bytes": 384696,
+          "sha256": "b9ea5caae494dbe9e61d4f01965a85dedda10582a4fc50bace630dc9d67d0b90"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417060.profraw",
+          "size_bytes": 384696,
+          "sha256": "d1dd57254afdc34d7eeb52f392851186599cffa287750657963df106c7b09015"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417078.profraw",
+          "size_bytes": 384696,
+          "sha256": "2862afdaf412d891fe0b244fbde0c6668516fb7698ef3aeb3ee677149770239d"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417096.profraw",
+          "size_bytes": 384696,
+          "sha256": "b085e19e6fecb202ad4a485a62d557bdb5095dc67dd085d0142e96c3d5574992"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417114.profraw",
+          "size_bytes": 384696,
+          "sha256": "b7d5e71f6dd1c8b587f8a4f07c5ba858bc19e0147ea7a7aaed57fca21ec9ab16"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417135.profraw",
+          "size_bytes": 384696,
+          "sha256": "c0c4d1d6e23f147a428da17134b0b76dddf063811fe824dcd96ee4959aab80ec"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417153.profraw",
+          "size_bytes": 384696,
+          "sha256": "b12658e14787c6a6df6a69fc885385f5c3a7ae7d79e2db729ec7d025a7812d1d"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417171.profraw",
+          "size_bytes": 384696,
+          "sha256": "9c78b4c5e01086ec9a6f0f1c2582e7044ad6034b53200cae24d62d0d137fb4c5"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417192.profraw",
+          "size_bytes": 384696,
+          "sha256": "4c36f8556c2bea40592bb03ffdc9a2e86160d52454fcb71ca1330197471f1b82"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417210.profraw",
+          "size_bytes": 384696,
+          "sha256": "31371b11f0cc727213e47ee2f9b847b7a43ec188b500fb9807fe6f9ef5f248ee"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417228.profraw",
+          "size_bytes": 384696,
+          "sha256": "1cecc7ba8a6eb72c31edc9cce6dadf9a30487ccbeec411789a8828c418a1a74a"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417263.profraw",
+          "size_bytes": 384696,
+          "sha256": "b06376f5aefc2c052c7e16611bc15294a2cd4e0e757d4fdc0f57c78b2752b788"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417282.profraw",
+          "size_bytes": 384696,
+          "sha256": "046443978d40b4456c641177dd0697f5f82582ae90addf5bd6ea543a8b5bfeaa"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417300.profraw",
+          "size_bytes": 384696,
+          "sha256": "50406384ada57f72604474d43c0ec790962e981addfef7ea71cd5fabccff81fc"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417321.profraw",
+          "size_bytes": 384696,
+          "sha256": "9130d1e2dc511fa0b82bf9d8a1bdaa432ed702762ef4f1c2d20c8def734f95ad"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417339.profraw",
+          "size_bytes": 384696,
+          "sha256": "b9b1edf01cec1f9fbcf0dd8421cacceebb3af1d5871830fc5ba89cf4a4c3555d"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417357.profraw",
+          "size_bytes": 384696,
+          "sha256": "c3999fbe706e82e31d5060d770aa75cc5c9cbc650fd0891b121979a7ac1b9e3f"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417375.profraw",
+          "size_bytes": 384696,
+          "sha256": "6938348d7fb868dd451809287f828599915e8f8587203bb3548dd506e416b3d5"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417393.profraw",
+          "size_bytes": 384696,
+          "sha256": "9eb2d30e62734cb891fa05655f2bf5bead6b7953b08a8b3f612bc9cc97dada0e"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417411.profraw",
+          "size_bytes": 384696,
+          "sha256": "cc376be53f5ba96569663de38e4a03565f16ec827371272ff7483aaba7008011"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417432.profraw",
+          "size_bytes": 384696,
+          "sha256": "bd125e207dc9f02cdbc4f9389cb84aed4710caf8f4657ffdf9870aba113b1d68"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417450.profraw",
+          "size_bytes": 384696,
+          "sha256": "d6f2c605986e702bc8056507f26741b59da035c585293893dfabbcb878a137b4"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417468.profraw",
+          "size_bytes": 384696,
+          "sha256": "a7929bad35557a8d3239ae5d54f06d2f3cfdbe111086d8f40c8526f802588319"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417489.profraw",
+          "size_bytes": 384696,
+          "sha256": "ebfff1970f454e83b5078796e9e7d582ed31c27f58b6606b5b5edf37309bd6df"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417507.profraw",
+          "size_bytes": 384696,
+          "sha256": "3f8e1d2e024cc4981882cb579c583f26e0084f9787863844d712e30abd894250"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417525.profraw",
+          "size_bytes": 384696,
+          "sha256": "58ca72c88ee4feec5433faaf33af02dc6d2a638fec0575d572d742dd8a25e118"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417543.profraw",
+          "size_bytes": 384696,
+          "sha256": "229e86d229e4997ecb1dc3a1b3848c24900703538dfe5cfa025fbeaf2294b6bc"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417564.profraw",
+          "size_bytes": 384696,
+          "sha256": "5e334fe8e5f55f7922ff8b3f57e8dab671094b291d0144afdb4725716bdfa401"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417582.profraw",
+          "size_bytes": 384696,
+          "sha256": "d8b3c4f715d911cf9730cdd6113bcbb154ba6d5efbcbd8702a53f7ec0dbf1250"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417600.profraw",
+          "size_bytes": 384696,
+          "sha256": "2ac589f35dc7a30f11c707545cf17fdf88be08c3e04e76341f69257e03affb36"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417621.profraw",
+          "size_bytes": 384696,
+          "sha256": "69f3d80ac723f2665ac89962d997cb0815df8f2880bb0d1f9be091803482df2a"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417639.profraw",
+          "size_bytes": 384696,
+          "sha256": "b591edb81534eac751a049cbe43df19beaac45e950bf74ef8551ca188f4bc93e"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417657.profraw",
+          "size_bytes": 384696,
+          "sha256": "9cce94acaa94c46924e32d27d6af3f1cbd3ca78ea63b85f9a895268147a3505f"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417678.profraw",
+          "size_bytes": 384696,
+          "sha256": "b9adee8f50fee9625a927a34d293318e4c98b0b5c09b42c310032c8fca17b80b"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417696.profraw",
+          "size_bytes": 384696,
+          "sha256": "11ac33471afaa54e3054c8922461ed0dcd7332915733db8b626d81c8048da9b7"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417714.profraw",
+          "size_bytes": 384696,
+          "sha256": "6faaa8551ec12cff6e7cd126dcc89e32f1f8846de15f74bfe7e77022c1bfa238"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417735.profraw",
+          "size_bytes": 384696,
+          "sha256": "d7f9178c721e7b2333017dc94c968378d96799e9bdd21492c808a4d21251ea7f"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417753.profraw",
+          "size_bytes": 384696,
+          "sha256": "d11d576f1c7017ae5f2c139b0d4f7c7feec1dc05afb48587c18744940d5d10e7"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417773.profraw",
+          "size_bytes": 384696,
+          "sha256": "23d01b1da7cdf932454f65d15e7f74ddbf6a2ac7b710b4287dccc90fc0dbabfa"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417799.profraw",
+          "size_bytes": 384696,
+          "sha256": "90c071991a4b699a3fcbc2bbc8d9ed84257759dbfd3644a296dba11a86f3da7f"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417821.profraw",
+          "size_bytes": 384696,
+          "sha256": "72bc709e0034715232229b4f881de6a29b5de5150dc47766ca969d90259e73d1"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417844.profraw",
+          "size_bytes": 384696,
+          "sha256": "77220025a6aa408fc22ad9a7dcda131cd08a899edaeb0848897781bbfaf28ef2"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417864.profraw",
+          "size_bytes": 384696,
+          "sha256": "9b2ad28874d9f4326b98fb75a82fea5158531decb35f42dbb8b03f258092b629"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417885.profraw",
+          "size_bytes": 384696,
+          "sha256": "75aec06b534786958d97fe8cb506b89c1acf63c62b6469bb7e2554e328f68713"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417903.profraw",
+          "size_bytes": 384696,
+          "sha256": "997aab9add127db39aa5f7e7fb6ff6117245c7214717b57e6cd4594328401948"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417921.profraw",
+          "size_bytes": 384696,
+          "sha256": "de1aaee24a3385a55786bc2988f36a0ffbabed306710dbca600cefe93e42e5cb"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417942.profraw",
+          "size_bytes": 384696,
+          "sha256": "79d7d40d3750f8e1d6c50e962ed4532e93222ad2af527a1889323b8a4cef54f0"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417960.profraw",
+          "size_bytes": 384696,
+          "sha256": "82ce932b7a5e1bfebcd1461e1db1acdec7f187116b9d3cbc6effcb55a4a805c3"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417978.profraw",
+          "size_bytes": 384696,
+          "sha256": "090ab3eceb0172b1f775b42ce39d348d9bc28a3946fb949ac8e9e4727a4dc0ae"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3417999.profraw",
+          "size_bytes": 384696,
+          "sha256": "038d3e75b837948bc85059490cdd941fbbb005170d62581a7b17aad44b790e74"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3418017.profraw",
+          "size_bytes": 384696,
+          "sha256": "f234523add2bae76fb7c090a8ac69d69386ba08c3f186d8ea6d71c611fae651a"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3418035.profraw",
+          "size_bytes": 384696,
+          "sha256": "ad4a4f8298b0d25fad503e8c9c1bb3d422f005401b247edc94e5c27a51289385"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3418056.profraw",
+          "size_bytes": 384696,
+          "sha256": "c3e808f36bd8ce03d71df5178fe66db906a5700a00b28a1699959c7981c8e893"
+        },
+        {
+          "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw/temper-6908767310928612409_0-3418074.profraw",
+          "size_bytes": 384696,
+          "sha256": "d18640e38b3df06fe9f823f0da92fb47781af4c85fa47545014e80b38f1e1add"
+        }
+      ],
+      "profdata_path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/merged.profdata",
+      "profdata_size_bytes": 739952,
+      "profdata_sha256": "2bc1dc1e149a687199d8cb05e6349d5b5892e287c3bbc38a5ccf660c65fcb62b",
+      "bounded_diagnostics": "",
+      "diagnostics_truncated": false,
+      "message": null
+    },
+    "phase_parity": {
+      "permitted_differences": [
+        "target_directory",
+        "profile_generate_vs_use",
+        "pgo_warn_missing_function_in_use"
+      ],
+      "instrumentation": {
+        "package_id": "path+file:///tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum#1.8.5",
+        "binary_target": "b3sum",
+        "target_triple": "x86_64-unknown-linux-gnu",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "b3sum",
+          "--bin",
+          "b3sum",
+          "--target-dir",
+          "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/pgo-instrumented"
+        ],
+        "base_profile_overrides": [],
+        "project_rustflags": [],
+        "config_sources": [
+          {
+            "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/.cargo/config.toml",
+            "sha256": "d2ee74a7f6fb14e176d103139f5b327cfe0ba80a0c7e232e106d4f5e34ffaa8c"
+          }
+        ],
+        "cargo_identity": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+        "rustc_identity": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+        "llvm_profdata_identity": {
+          "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+          "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+          "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "llvm_profdata_sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+          "llvm_profdata_version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+        },
+        "target_directory": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/pgo-instrumented",
+        "environment_overrides": [
+          {
+            "name": "CARGO_ENCODED_RUSTFLAGS",
+            "arguments": [
+              "-Cprofile-generate=/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/raw"
+            ]
+          }
+        ]
+      },
+      "optimization": {
+        "package_id": "path+file:///tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum#1.8.5",
+        "binary_target": "b3sum",
+        "target_triple": "x86_64-unknown-linux-gnu",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "b3sum",
+          "--bin",
+          "b3sum",
+          "--target-dir",
+          "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/pgo"
+        ],
+        "base_profile_overrides": [],
+        "project_rustflags": [],
+        "config_sources": [
+          {
+            "path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/.cargo/config.toml",
+            "sha256": "d2ee74a7f6fb14e176d103139f5b327cfe0ba80a0c7e232e106d4f5e34ffaa8c"
+          }
+        ],
+        "cargo_identity": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+        "rustc_identity": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+        "llvm_profdata_identity": {
+          "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+          "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+          "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "llvm_profdata_sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+          "llvm_profdata_version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+        },
+        "target_directory": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/pgo",
+        "environment_overrides": [
+          {
+            "name": "CARGO_ENCODED_RUSTFLAGS",
+            "arguments": [
+              "-Cprofile-use=/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/merged.profdata",
+              "-Cllvm-args=-pgo-warn-missing-function"
+            ]
+          }
+        ]
+      },
+      "matched": true,
+      "unexpected_differences": []
+    },
+    "failure_stage": null,
+    "rejection_reason": null,
+    "message": null,
+    "remediation": null
+  },
+  "selected_candidate": "pgo",
+  "confirmation": {
+    "strategy": "pgo",
+    "outcome": "rejected",
+    "baseline_build": {
+      "strategy": "baseline",
+      "stage": "confirmation",
+      "target_directory": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/confirmation/baseline",
+      "cargo_arguments": [
+        "build",
+        "--release",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--message-format=json",
+        "--package",
+        "b3sum",
+        "--bin",
+        "b3sum",
+        "--target-dir",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/confirmation/baseline"
+      ],
+      "cargo_config_overrides": [],
+      "environment_overrides": [],
+      "outcome": "built",
+      "executable_path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/confirmation/baseline/x86_64-unknown-linux-gnu/release/b3sum",
+      "sha256": "af8a57fe29effeec9225a4905489e6ba458425ce3d527cd22af480577f7b288c",
+      "size_bytes": 1497736,
+      "build_duration_ms": 2950,
+      "bounded_diagnostics": "build-script-executed: registry+https://github.com/rust-lang/crates.io-index#rayon-core@1.13.0\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#quote@1.0.45\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#crossbeam-utils@0.8.21\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#libc@0.2.186\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#anyhow@1.0.102\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#proc-macro2@1.0.106\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#rustix@1.1.4\nbuild-script-executed: path+file:///tmp/.tmpSOaIEM/blake3-b3sum/source#blake3@1.8.5\nbuild-finished: success=true\n   Compiling crossbeam-utils v0.8.21\n\n   Compiling proc-macro2 v1.0.106\n\n   Compiling unicode-ident v1.0.24\n\n   Compiling quote v1.0.45\n\n   Compiling rustix v1.1.4\n\n   Compiling shlex v1.3.0\n\n   Compiling utf8parse v0.2.2\n\n   Compiling libc v0.2.186\n\n   Compiling rayon-core v1.13.0\n\n   Compiling bitflags v2.11.1\n\n   Compiling find-msvc-tools v0.1.9\n\n   Compiling linux-raw-sys v0.12.1\n\n   Compiling colorchoice v1.0.5\n\n   Compiling is_terminal_polyfill v1.70.2\n\n   Compiling\n anstyle-query v1.1.5\n\n   Compiling\n anstyle v1.0.14\n\n   Compiling anstyle-parse v1.0.0\n\n   Compiling heck v0.5.0\n\n   Compiling anyhow v1.0.102\n\n   Compiling\n clap_lex v1.1.0\n\n   Compiling strsim v0.11.1\n\n   Compiling cc v1.2.61\n\n   Compiling constant_time_eq v0.4.2\n\n   Compiling\n arrayvec v0.7.6\n\n   Compiling\n anstream v1.0.0\n\n   Compiling\n cfg-if v1.0.4\n\n   Compiling\n cpufeatures v0.3.0\n\n   Compiling\n arrayref v0.3.9\n\n   Compiling\n wild v2.2.1\n\n   Compiling\n hex v0.4.3\n\n   Compiling crossbeam-epoch v0.9.18\n\n   Compiling syn v2.0.117\n\n   Compiling crossbeam-deque v0.8.6\n\n   Compiling blake3 v1.8.5 (/tmp/.tmpSOaIEM/blake3-b3sum/source)\n\n   Compiling terminal_size v0.4.4\n\n   Compiling clap_builder v4.6.0\n\n   Compiling memmap2 v0.9.10\n\n   Compiling clap_derive v4.6.1\n\n   Compiling clap v4.6.1\n\n   Compiling b3sum v1.8.5 (/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum)\n\n    Finished `release` profile [optimized] target(s) in 2.90s\n",
+      "compiler_diagnostics": [],
+      "diagnostics_truncated": false
+    },
+    "baseline_build_failure": null,
+    "candidate_build": {
+      "strategy": "pgo",
+      "stage": "confirmation",
+      "target_directory": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/confirmation/pgo",
+      "cargo_arguments": [
+        "build",
+        "--release",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--message-format=json",
+        "--package",
+        "b3sum",
+        "--bin",
+        "b3sum",
+        "--target-dir",
+        "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/confirmation/pgo"
+      ],
+      "cargo_config_overrides": [],
+      "environment_overrides": [
+        {
+          "name": "CARGO_ENCODED_RUSTFLAGS",
+          "arguments": [
+            "-Cprofile-use=/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/pgo/merged.profdata",
+            "-Cllvm-args=-pgo-warn-missing-function"
+          ]
+        }
+      ],
+      "outcome": "built",
+      "executable_path": "/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum/.temper/runs/1785232545-319888240-3359609/target/confirmation/pgo/x86_64-unknown-linux-gnu/release/b3sum",
+      "sha256": "c94e781063d032809109e915807770c4b20fb456679427507d95e4332c179a60",
+      "size_bytes": 1538672,
+      "build_duration_ms": 2691,
+      "bounded_diagnostics": "build-script-executed: registry+https://github.com/rust-lang/crates.io-index#rayon-core@1.13.0\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#crossbeam-utils@0.8.21\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#quote@1.0.45\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#libc@0.2.186\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#rustix@1.1.4\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#proc-macro2@1.0.106\nbuild-script-executed: registry+https://github.com/rust-lang/crates.io-index#anyhow@1.0.102\nbuild-script-executed: path+file:///tmp/.tmpSOaIEM/blake3-b3sum/source#blake3@1.8.5\nbuild-finished: success=true\n   Compiling crossbeam-utils v0.8.21\n\n   Compiling proc-macro2 v1.0.106\n\n   Compiling quote v1.0.45\n\n   Compiling unicode-ident v1.0.24\n\n   Compiling rustix v1.1.4\n\n   Compiling rayon-core v1.13.0\n\n   Compiling utf8parse v0.2.2\n\n   Compiling bitflags v2.11.1\n\n   Compiling find-msvc-tools v0.1.9\n\n   Compiling linux-raw-sys v0.12.1\n\n   Compiling shlex v1.3.0\n\n   Compiling libc v0.2.186\n\n   Compiling anstyle-query v1.1.5\n\n   Compiling colorchoice v1.0.5\n\n   Compiling anstyle v1.0.14\n\n   Compiling is_terminal_polyfill v1.70.2\n\n   Compiling anstyle-parse v1.0.0\n\n   Compiling\n clap_lex v1.1.0\n\n   Compiling strsim v0.11.1\n\n   Compiling anyhow v1.0.102\n\n   Compiling heck v0.5.0\n\n   Compiling arrayvec v0.7.6\n\n   Compiling cc v1.2.61\n\n   Compiling\n anstream v1.0.0\n\n   Compiling cfg-if v1.0.4\n\n   Compiling\n arrayref v0.3.9\n\n   Compiling\n cpufeatures v0.3.0\n\n   Compiling\n constant_time_eq v0.4.2\n\n   Compiling hex v0.4.3\n\n   Compiling wild v2.2.1\n\n   Compiling crossbeam-epoch v0.9.18\n\n   Compiling crossbeam-deque v0.8.6\n\n   Compiling syn v2.0.117\n\n   Compiling terminal_size v0.4.4\n\n   Compiling clap_builder v4.6.0\n\n   Compiling\n blake3 v1.8.5 (/tmp/.tmpSOaIEM/blake3-b3sum/source)\n\n   Compiling memmap2 v0.9.10\n\n   Compiling clap_derive v4.6.1\n\n   Compiling clap v4.6.1\n\n   Compiling b3sum v1.8.5 (/tmp/.tmpSOaIEM/blake3-b3sum/source/b3sum)\n\n    Finished `release` profile [optimized] target(s) in 2.64s\n",
+      "compiler_diagnostics": [],
+      "diagnostics_truncated": false
+    },
+    "candidate_build_failure": null,
+    "measurement": {
+      "baseline_durations_ns": [
+        289418616,
+        288430748,
+        285888949,
+        288351078,
+        290492186,
+        288454958,
+        288431187,
+        288391737,
+        288317548,
+        288649157,
+        283518071,
+        283457791,
+        288474338,
+        283443672,
+        283454571,
+        288436617,
+        288429908,
+        288415948,
+        283434911,
+        288416757
+      ],
+      "candidate_durations_ns": [
+        283529621,
+        283465921,
+        288422348,
+        283353291,
+        283431861,
+        283429801,
+        288733668,
+        283377851,
+        289333087,
+        288401798,
+        288453108,
+        283397141,
+        289666546,
+        283406961,
+        289541236,
+        283412392,
+        295254503,
+        288408108,
+        286109909,
+        288513158
+      ],
+      "median_ratio": 0.9999216496200236,
+      "baseline_relative_mad": 0.00028444642417500653,
+      "candidate_relative_mad": 0.010681982518211735,
+      "confidence_interval_95": {
+        "lower": 0.9827272318687856,
+        "upper": 1.0038275488830208
+      },
+      "threshold_ratio": 0.98,
+      "outcome": "insufficient_improvement"
+    },
+    "workload_failure": null,
+    "rejection_reason": "insufficient_improvement"
+  },
+  "promotion": null,
+  "failure": null
+}

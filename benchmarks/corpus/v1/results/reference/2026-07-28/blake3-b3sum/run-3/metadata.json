@@ -1,0 +1,40 @@
+{
+  "baseline_screening_median_ns": null,
+  "case_id": "blake3-b3sum",
+  "confidence_interval_95": {
+    "lower": 0.9827272318687856,
+    "upper": 1.0038275488830208
+  },
+  "confirmation_median_ratio": 0.9999216496200236,
+  "corpus_version": "1.0.0",
+  "decision": "insufficient_improvement",
+  "input_sha256": [
+    {
+      "path": "cases/blake3-b3sum/source/test_vectors/test_vectors.json",
+      "sha256": "dcb91ea8accc77e6d6e632af7cdc1a99a9f3ae78cf648da595c7d064db32f624"
+    }
+  ],
+  "raw_run_identifier": "1785232545-319888240-3359609",
+  "reference_date": "2026-07-28",
+  "run_number": 3,
+  "schema_version": 2,
+  "selected_candidate": "pgo",
+  "source_revision": "8aa5145039b972ba30e98e788752d37d14568824",
+  "source_sha256": "0288247ad9370185132790def61b11094ee83fdee18f17051447961b4bde9339",
+  "status": "no_improvement",
+  "temper": {
+    "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+    "cpu": "AMD Ryzen 7 7800X3D 8-Core Processor",
+    "kernel": "Linux 7.1.5-200.fc44.x86_64 x86_64 GNU/Linux",
+    "llvm": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build.",
+    "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+    "logical_cores": 16,
+    "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+    "temper_commit": "024b3899fd64a25084eaeff33301acf76b5f4d94",
+    "temper_implementation_sha256": "980625bea61ce6cdfbfa6499946678b0ac1d3e7255153c84106932ed51479cbd",
+    "temper_worktree_dirty": true
+  },
+  "workload_argv": [
+    "cases/blake3-b3sum/workload.sh"
+  ]
+}

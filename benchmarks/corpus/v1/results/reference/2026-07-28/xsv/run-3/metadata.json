@@ -1,0 +1,40 @@
+{
+  "baseline_screening_median_ns": null,
+  "case_id": "xsv",
+  "confidence_interval_95": {
+    "lower": 0.9418444955916978,
+    "upper": 0.9542203175135509
+  },
+  "confirmation_median_ratio": 0.9524858299090708,
+  "corpus_version": "1.0.0",
+  "decision": "accepted",
+  "input_sha256": [
+    {
+      "path": "cases/xsv/inputs/records.csv",
+      "sha256": "b5d1d4947fd29d8bd520077f209b6846c90b72793d7e7d1e9b76fa85b226d316"
+    }
+  ],
+  "raw_run_identifier": "1785232894-637346542-3744340",
+  "reference_date": "2026-07-28",
+  "run_number": 3,
+  "schema_version": 2,
+  "selected_candidate": "pgo",
+  "source_revision": "f4304660231d7907798e831411871d2679d335c3",
+  "source_sha256": "1a8f3c34fabae2968806ca72045610377dc8cc04550b1fcddfcabd942b6fb61a",
+  "status": "confirmed",
+  "temper": {
+    "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+    "cpu": "AMD Ryzen 7 7800X3D 8-Core Processor",
+    "kernel": "Linux 7.1.5-200.fc44.x86_64 x86_64 GNU/Linux",
+    "llvm": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build.",
+    "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+    "logical_cores": 16,
+    "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+    "temper_commit": "024b3899fd64a25084eaeff33301acf76b5f4d94",
+    "temper_implementation_sha256": "980625bea61ce6cdfbfa6499946678b0ac1d3e7255153c84106932ed51479cbd",
+    "temper_worktree_dirty": true
+  },
+  "workload_argv": [
+    "cases/xsv/workload.sh"
+  ]
+}

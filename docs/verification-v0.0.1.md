@@ -394,3 +394,55 @@ On the available evidence, no known code-level v0.0.1 contract blocker remains
 in the current successor implementation. This is a strict implementation
 conformance conclusion, not a claim that historical v0.0.1 evidence is
 reproducible or that either version is release-ready.
+
+## 2026-07-28 v0.0.3 EP-001 compiler-interposition experiments
+
+This append-only section records the executed EP-001 evidence for
+[`../tasks/prd-temper-v0.0.3.md`](../tasks/prd-temper-v0.0.3.md). It is
+correctness and cost evidence for a compiler-interposition design. It contains
+no optimization-gain claim and no corpus result.
+
+| Field | Value |
+|---|---|
+| Tested commit | `f1619f9201c2abe75043952fb278c0d0c2295034` |
+| Tested worktree | `src`, `tests`, `Cargo.toml` and `Cargo.lock` unmodified; the only tracked change is this ledger entry, alongside untracked v0.0.3 planning and evidence files |
+| Toolchain | rustc 1.97.1 (LLVM 22.1.6), cargo 1.97.1; cargo 1.93.1 for the feature-version boundary |
+| Host | Linux 7.1.5-200.fc44.x86_64, AMD Ryzen 7 7800X3D, 16 logical cores |
+| Raw evidence | [`evidence/interposition/2026-07-28`](evidence/interposition/2026-07-28) |
+| Workload class | **Synthetic**. Two purpose-built fixtures exist only to expose compiler inputs |
+| Executed assertions | 125, all passing (US-001 39, US-002 57, US-003 29) |
+
+Workload definition: `fixtures/include-loss` and `fixtures/include-strict` are
+single-binary crates whose `main` runs a fixed 40,000,000-iteration integer
+mixing loop, and `fixtures/units` is a three-member workspace adding a build
+script, a proc macro and a target dependency around the same loop. Each Temper
+run used the workload `exec "$TEMPER_BINARY"`. These fixtures are not
+production-representative and carry no runtime interpretation.
+
+The experiments reproduced two v0.0.2 correctness defects on executed builds
+rather than by source analysis:
+
+- a target rustflag reaching Cargo only through a stable `include` file is
+  preserved by the baseline and both static candidates and lost by both PGO
+  phases, while schema 2 still reports `phase_parity.matched = true`. A
+  `compile_error!` variant converts the same loss into a `cargo_build_failed`
+  PGO instrumentation failure;
+- `build.rustc-wrapper`, `build.rustc-workspace-wrapper` and `build.rustc`
+  declared only through an `include` file are not detected. PGO trained
+  normally with a wrapper active for all 53 compiler invocations of those runs,
+  and with a configured compiler Temper never identified performing 7 target
+  compilations. The same three declarations are correctly rejected as
+  `unproven_compiler_override` when they appear in a directly discovered file.
+
+The measured cost and identity results were: identical direct and pass-through
+executable SHA-256 on the deterministic fixture, and 2.24% median pass-through
+overhead across 12 paired cold builds (152.1 ms direct, 154.6 ms pass-through,
+per-pair ratios 0.996 to 1.050). Raw monotonic per-pair timings are retained in
+`results/us-003/overhead.json`.
+
+Evidence limits: both fixtures are synthetic and tiny, so neither the overhead
+figure nor the observed invocation counts transfer to a large workspace; the
+caching wrapper is a documented emulation of a build-directory-independent
+cache and not `sccache`; the Cargo feature-version boundary was executed on
+`cargo 1.93.1` only; and nothing in this section measures the runtime of any
+optimized binary.

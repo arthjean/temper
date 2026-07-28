@@ -85,33 +85,38 @@ fn builds_screens_and_records_the_fixed_strategy_order() {
 }
 
 #[test]
-fn ambient_rustflags_reject_only_pgo() {
+fn ambient_rustflags_stay_with_cargo_and_no_longer_reject_pgo() {
     let fixture = Fixture::single("flag-boundary", true, true);
+    let workload = fixture.root.join("run-candidate");
+    fs::write(&workload, "#!/bin/sh\nexec \"$TEMPER_BINARY\"\n").expect("write workload");
+    make_executable(&workload);
     let output = Command::new(env!("CARGO_BIN_EXE_cargo-temper"))
         .current_dir(&fixture.root)
         .env("RUSTFLAGS", "-Ctarget-cpu=x86-64")
-        .args(["temper", "optimize", "--manifest-path"])
+        .args(["temper", "optimize", "--allow-dirty", "--manifest-path"])
         .arg(fixture.root.join("Cargo.toml"))
-        .args(["--", "/bin/true"])
+        .arg("--")
+        .arg(&workload)
         .output()
         .expect("run flag boundary");
     assert!(output.status.success(), "{}", stderr(&output));
 
+    // v0.0.3 interposes rustc instead of rebuilding the rustflags channel, so
+    // an ambient RUSTFLAGS value reaches every phase through Cargo itself.
     let manifest = fixture.manifest();
-    assert_eq!(manifest["pgo_training"]["outcome"], "rejected");
-    assert_eq!(
-        manifest["pgo_training"]["rejection_reason"],
-        "ambient_rustflags"
-    );
-    assert!(
-        manifest["pgo_training"]["message"]
-            .as_str()
-            .is_some_and(|message| message.contains("RUSTFLAGS"))
-    );
-    let strategies = manifest["strategies"].as_array().expect("strategy records");
-    assert_eq!(strategies[0]["build"]["outcome"], "built");
-    assert_eq!(strategies[1]["build"]["outcome"], "built");
-    assert_eq!(strategies[2]["rejection_reason"], "pgo_training_rejected");
+    assert_eq!(manifest["pgo_training"]["outcome"], "trained");
+    assert!(manifest["pgo_training"]["prerequisites"]["preserved_target_rustflags"].is_null());
+    for stage in [
+        &manifest["pgo_training"]["reference_build"],
+        &manifest["pgo_training"]["instrumentation_build"],
+    ] {
+        assert!(stage["environment_overrides"].is_null());
+        assert!(
+            stage["compiler_evidence"]["target_compilations"]
+                .as_u64()
+                .is_some_and(|count| count > 0)
+        );
+    }
 }
 
 #[test]
@@ -140,7 +145,7 @@ fn a_static_build_failure_does_not_stop_remaining_strategies() {
     fs::write(
         &wrapper,
         format!(
-            "#!/bin/sh\nfor argument in \"$@\"; do\n  case \"$argument\" in\n    'profile.release.lto=\"thin\"') exit 97 ;;\n  esac\ndone\ncase \"${{CARGO_ENCODED_RUSTFLAGS:-}}\" in\n  *-Cprofile-generate=*) exit 98 ;;\nesac\nexec '{real_cargo}' \"$@\"\n"
+            "#!/bin/sh\nfor argument in \"$@\"; do\n  case \"$argument\" in\n    'profile.release.lto=\"thin\"') exit 97 ;;\n    */target/pgo_generate) exit 98 ;;\n  esac\ndone\nexec '{real_cargo}' \"$@\"\n"
         ),
     )
     .expect("write Cargo wrapper");
@@ -275,11 +280,9 @@ fn trains_merges_rebuilds_and_screens_pgo() {
         manifest["pgo_training"]["instrumentation_build"]["outcome"],
         "built"
     );
-    assert!(
-        manifest["pgo_training"]["prerequisites"]["preserved_target_rustflags"]
-            .as_array()
-            .is_some_and(|flags| flags.iter().any(|value| value == "-Cdebuginfo=0"))
-    );
+    // The configured target rustflag is Cargo's to resolve; Temper neither
+    // copies it nor turns it into a config override of its own.
+    assert!(manifest["pgo_training"]["prerequisites"]["preserved_target_rustflags"].is_null());
     assert!(
         manifest["pgo_training"]["instrumentation_build"]["cargo_config_overrides"]
             .as_array()
@@ -288,6 +291,14 @@ fn trains_merges_rebuilds_and_screens_pgo() {
                     .as_str()
                     .is_none_or(|value| !value.contains("-Cdebuginfo=0"))
             }))
+    );
+    assert_eq!(
+        manifest["pgo_training"]["reference_build"]["interposition"]["stage"],
+        "pgo_reference"
+    );
+    assert_eq!(
+        manifest["pgo_training"]["reference_build"]["interposition"]["injected_flags"],
+        serde_json::json!([])
     );
     assert!(
         manifest["pgo_training"]["training_duration_ns"]
@@ -313,7 +324,9 @@ fn trains_merges_rebuilds_and_screens_pgo() {
     assert_eq!(
         manifest["pgo_training"]["phase_parity"]["permitted_differences"],
         serde_json::json!([
+            "interposition_stage",
             "target_directory",
+            "capture_directory",
             "profile_generate_vs_use",
             "pgo_warn_missing_function_in_use"
         ])
@@ -344,21 +357,28 @@ fn trains_merges_rebuilds_and_screens_pgo() {
                     .is_none_or(|value| !value.contains("rustflags"))
             }))
     );
-    let environment = &pgo["build"]["environment_overrides"][0];
-    assert_eq!(environment["name"], "CARGO_ENCODED_RUSTFLAGS");
-    assert_eq!(environment["arguments"][0], "-Cdebuginfo=0");
-    assert!(
-        environment["arguments"]
-            .as_array()
-            .is_some_and(|arguments| {
-                arguments.iter().any(|argument| {
-                    argument
-                        .as_str()
-                        .is_some_and(|argument| argument.starts_with("-Cprofile-use="))
-                }) && arguments.last()
-                    == Some(&serde_json::json!("-Cllvm-args=-pgo-warn-missing-function"))
-            })
+    assert!(pgo["build"]["environment_overrides"].is_null());
+    assert_eq!(pgo["build"]["interposition"]["stage"], "pgo_use");
+    assert_eq!(
+        pgo["build"]["interposition"]["injected_flags"],
+        serde_json::json!(["profile-use", "pgo-warn-missing-function"])
     );
+    assert!(
+        pgo["build"]["interposition"]["profile_path"]
+            .as_str()
+            .is_some_and(|path| path.ends_with("/pgo/merged.profdata"))
+    );
+    assert_eq!(
+        pgo["build"]["compiler_evidence"]["injected_flags"],
+        serde_json::json!(["profile-use", "pgo-warn-missing-function"])
+    );
+    assert_eq!(pgo["build"]["compiler_evidence"]["host_compilations"], 0);
+}
+
+fn make_executable(path: &std::path::Path) {
+    let mut permissions = fs::metadata(path).expect("file metadata").permissions();
+    permissions.set_mode(0o755);
+    fs::set_permissions(path, permissions).expect("make file executable");
 }
 
 #[test]

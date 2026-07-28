@@ -7,7 +7,7 @@ use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 
-use serde_json::Value;
+use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use support::{Fixture, stderr};
 
@@ -71,7 +71,9 @@ fn pgo_json_looking_stream_rejects_only_pgo() {
 
 #[test]
 fn pgo_zero_executable_stream_rejects_only_pgo() {
-    assert_pgo_stream_rejection(PgoStreamMode::Zero, "cargo_executable_missing");
+    // A Cargo that emits no artifact also compiled nothing, so the missing
+    // compiler evidence is what rejects PGO before any screening.
+    assert_pgo_stream_rejection(PgoStreamMode::Zero, "compiler_capture_missing");
 }
 
 #[test]
@@ -150,6 +152,13 @@ fn assert_supported_pgo(manifest: &Value, expected_base: &str) {
         manifest["pgo_training"]["merge"]["arguments"][1],
         "--failure-mode=any"
     );
+    let training = &manifest["pgo_training"];
+    assert_stage(&training["reference_build"], "pgo_reference", &[]);
+    assert_stage(
+        &training["instrumentation_build"],
+        "pgo_generate",
+        &["profile-generate"],
+    );
     let pgo = manifest["strategies"]
         .as_array()
         .and_then(|strategies| strategies.iter().find(|record| record["identity"] == "pgo"))
@@ -161,14 +170,52 @@ fn assert_supported_pgo(manifest: &Value, expected_base: &str) {
             .map(Vec::len),
         Some(7)
     );
+    assert_stage(
+        &pgo["build"],
+        "pgo_use",
+        &["profile-use", "pgo-warn-missing-function"],
+    );
+    // Cargo alone owns the compiler inputs: Temper synthesizes no rustflags.
+    assert!(pgo["build"]["environment_overrides"].is_null());
+}
+
+/// Asserts one interposed stage recorded the expected private protocol and a
+/// complete capture aggregate that injected the phase controls on target
+/// compilations only.
+fn assert_stage(build: &Value, stage: &str, injected: &[&str]) {
+    assert_eq!(build["outcome"], "built", "{stage} must have been built");
+    let interposition = &build["interposition"];
+    assert_eq!(interposition["protocol"], "temper-rustc-shim-1");
+    assert_eq!(interposition["stage"], stage);
+    assert_eq!(interposition["injected_flags"], json!(injected));
+    let evidence = &build["compiler_evidence"];
+    assert_eq!(evidence["stage"], stage);
+    assert_eq!(evidence["injected_flags"], json!(injected));
+    let target_compilations = evidence["target_compilations"]
+        .as_u64()
+        .expect("target compilation count");
     assert!(
-        pgo["build"]["environment_overrides"][0]["arguments"]
-            .as_array()
-            .is_some_and(|arguments| {
-                arguments
-                    .iter()
-                    .any(|argument| argument == "-Cllvm-args=-pgo-warn-missing-function")
-            })
+        target_compilations > 0,
+        "{stage} observed no target compilation"
+    );
+    let expected_injections = if injected.is_empty() {
+        0
+    } else {
+        target_compilations
+    };
+    assert_eq!(
+        evidence["injected_invocations"].as_u64(),
+        Some(expected_injections)
+    );
+    assert!(
+        evidence["capture_digest"]
+            .as_str()
+            .is_some_and(|digest| digest.len() == 64)
+    );
+    assert!(
+        evidence["record_count"]
+            .as_u64()
+            .is_some_and(|count| count >= target_compilations)
     );
 }
 
@@ -215,7 +262,27 @@ fn assert_pgo_stream_rejection(mode: PgoStreamMode, expected_reason: &str) {
         .find(|strategy| strategy["identity"] == "pgo")
         .expect("PGO strategy");
     assert_eq!(pgo["build_failure"]["reason"], expected_reason);
-    assert_eq!(pgo["rejection_reason"], "pgo_build_failed");
+    if expected_reason == "unrecognized_cargo_json" {
+        // Cargo compiled before its stream failed, so the failed build record
+        // still carries its complete compiler evidence.
+        assert_eq!(
+            pgo["build_failure"]["compiler_evidence"]["stage"],
+            "pgo_use"
+        );
+        assert!(
+            pgo["build_failure"]["compiler_evidence"]["target_compilations"]
+                .as_u64()
+                .is_some_and(|count| count > 0)
+        );
+    }
+    assert_eq!(
+        pgo["rejection_reason"],
+        if expected_reason.starts_with("compiler_") {
+            expected_reason
+        } else {
+            "pgo_build_failed"
+        }
+    );
     assert!(pgo["screening"].is_null());
     assert_ne!(manifest["selected_candidate"], "pgo");
 }
@@ -238,7 +305,7 @@ fn pgo_stream_wrapper(root: &Path, mode: PgoStreamMode) -> PathBuf {
     fs::write(
         &wrapper,
         format!(
-            "#!/bin/sh\ncase \"${{CARGO_ENCODED_RUSTFLAGS:-}}\" in\n  *-Cprofile-use=*)\n    {injection}\n    ;;\n  *) exec '{real_cargo}' \"$@\" ;;\nesac\n"
+            "#!/bin/sh\noptimized=\nfor argument in \"$@\"; do\n  case \"$argument\" in\n    */target/pgo_use) optimized=1 ;;\n  esac\ndone\ncase \"$optimized\" in\n  1)\n    {injection}\n    ;;\n  *) exec '{real_cargo}' \"$@\" ;;\nesac\n"
         ),
     )
     .expect("write PGO Cargo-stream wrapper");

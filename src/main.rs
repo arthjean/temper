@@ -5,6 +5,7 @@ mod cargo;
 mod cli;
 mod error;
 mod hash;
+mod interposition;
 mod measurement;
 mod preflight;
 mod promotion;
@@ -20,6 +21,9 @@ use crate::strategy::{BuildPlan, PgoTrainingOutcome, Strategy};
 use crate::workload::{ConfirmationStep, WorkloadFailureKind};
 
 fn main() {
+    // The private compiler shim is dispatched before any public CLI parsing so
+    // an interposed rustc invocation never reaches Clap.
+    interposition::dispatch();
     let exit_code = match cli::parse() {
         ParseOutcome::Optimize(arguments) => match optimize(arguments) {
             Ok(()) => 0,

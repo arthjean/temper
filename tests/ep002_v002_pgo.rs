@@ -93,7 +93,7 @@ fn optimized_missing_profile_diagnostic_rejects_only_pgo() {
     fs::write(
         &wrapper,
         format!(
-            "#!/bin/sh\ncase \"${{CARGO_ENCODED_RUSTFLAGS:-}}\" in\n  *-Cprofile-use=*)\n    '{real_cargo}' \"$@\"\n    status=$?\n    if [ \"$status\" -eq 0 ]; then\n      printf '%s\\n' '{diagnostic}'\n    fi\n    exit \"$status\"\n    ;;\n  *) exec '{real_cargo}' \"$@\" ;;\nesac\n"
+            "#!/bin/sh\noptimized=\nfor argument in \"$@\"; do\n  case \"$argument\" in\n    */target/pgo_use) optimized=1 ;;\n  esac\ndone\ncase \"$optimized\" in\n  1)\n    '{real_cargo}' \"$@\"\n    status=$?\n    if [ \"$status\" -eq 0 ]; then\n      printf '%s\\n' '{diagnostic}'\n    fi\n    exit \"$status\"\n    ;;\n  *) exec '{real_cargo}' \"$@\" ;;\nesac\n"
         ),
     )
     .expect("write Cargo wrapper");
@@ -132,14 +132,9 @@ fn optimized_missing_profile_diagnostic_rejects_only_pgo() {
                 })
             })
     );
-    assert!(
-        pgo["build_failure"]["environment_overrides"][0]["arguments"]
-            .as_array()
-            .is_some_and(|arguments| {
-                arguments
-                    .iter()
-                    .any(|argument| argument == "-Cllvm-args=-pgo-warn-missing-function")
-            })
+    assert_eq!(
+        pgo["build_failure"]["interposition"]["injected_flags"],
+        serde_json::json!(["profile-use", "pgo-warn-missing-function"])
     );
     assert_ne!(manifest["selected_candidate"], "pgo");
 }
@@ -163,7 +158,7 @@ fn confirmation_missing_profile_diagnostic_cannot_reach_promotion() {
     fs::write(
         &wrapper,
         format!(
-            "#!/bin/sh\nconfirmation=\nfor argument in \"$@\"; do\n  case \"$argument\" in\n    */confirmation/pgo) confirmation=1 ;;\n  esac\ndone\ncase \"${{CARGO_ENCODED_RUSTFLAGS:-}}:$confirmation\" in\n  *-Cprofile-use=*:1)\n    '{real_cargo}' \"$@\"\n    status=$?\n    if [ \"$status\" -eq 0 ]; then\n      printf '%s\\n' '{diagnostic}'\n    fi\n    exit \"$status\"\n    ;;\n  *) exec '{real_cargo}' \"$@\" ;;\nesac\n"
+            "#!/bin/sh\nconfirmation=\nfor argument in \"$@\"; do\n  case \"$argument\" in\n    */target/confirmation/pgo) confirmation=1 ;;\n  esac\ndone\ncase \"$confirmation\" in\n  1)\n    '{real_cargo}' \"$@\"\n    status=$?\n    if [ \"$status\" -eq 0 ]; then\n      printf '%s\\n' '{diagnostic}'\n    fi\n    exit \"$status\"\n    ;;\n  *) exec '{real_cargo}' \"$@\" ;;\nesac\n"
         ),
     )
     .expect("write confirmation Cargo wrapper");
@@ -186,6 +181,15 @@ fn confirmation_missing_profile_diagnostic_cannot_reach_promotion() {
     assert_eq!(
         manifest["confirmation"]["candidate_build_failure"]["reason"],
         "pgo_missing_profile_data"
+    );
+    // The confirmation stage rebuilds through its own fresh interposed stage.
+    assert_eq!(
+        manifest["confirmation"]["candidate_build_failure"]["interposition"]["stage"],
+        "pgo_confirmation"
+    );
+    assert_eq!(
+        manifest["confirmation"]["candidate_build_failure"]["interposition"]["injected_flags"],
+        serde_json::json!(["profile-use", "pgo-warn-missing-function"])
     );
     assert!(
         manifest["confirmation"]["candidate_build_failure"]["compiler_diagnostics"]

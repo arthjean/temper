@@ -12,12 +12,12 @@ use serde::Serialize;
 use crate::cli::OptimizeArgs;
 use crate::error::{Result, TemperError};
 use crate::hash::sha256_file;
+use crate::interposition::{self, CaptureAggregate, CaptureFailure, InterpositionRecord};
 use crate::preflight::{Preflight, SUPPORTED_HOST, cargo_program};
 use crate::strategy::{BuildPlan, BuildStage, Strategy};
 
 const DIAGNOSTIC_LIMIT: usize = 64 * 1024;
 const DIAGNOSTIC_FIELD_LIMIT: usize = 8 * 1024;
-const ENCODED_RUSTFLAGS_SEPARATOR: char = '\u{1f}';
 const MISSING_PROFILE_MESSAGE_PREFIX: &str = "no profile data available for function ";
 
 #[derive(Clone, Debug, Serialize)]
@@ -36,34 +36,13 @@ pub(crate) enum BuildOutcome {
 }
 
 #[derive(Clone, Debug, Serialize)]
-pub(crate) struct BuildEnvironmentOverride {
-    pub(crate) name: String,
-    pub(crate) arguments: Vec<String>,
-}
-
-impl BuildEnvironmentOverride {
-    pub(crate) fn cargo_encoded_rustflags(arguments: Vec<String>) -> Self {
-        Self {
-            name: "CARGO_ENCODED_RUSTFLAGS".to_owned(),
-            arguments,
-        }
-    }
-
-    fn process_value(&self) -> OsString {
-        self.arguments
-            .join(&ENCODED_RUSTFLAGS_SEPARATOR.to_string())
-            .into()
-    }
-}
-
-#[derive(Clone, Debug, Serialize)]
 pub(crate) struct BuildInvocation {
     pub(crate) strategy: Strategy,
     pub(crate) stage: BuildStage,
     pub(crate) target_directory: PathBuf,
     pub(crate) cargo_arguments: Vec<String>,
     pub(crate) cargo_config_overrides: Vec<String>,
-    pub(crate) environment_overrides: Vec<BuildEnvironmentOverride>,
+    pub(crate) interposition: Option<InterpositionRecord>,
 }
 
 #[derive(Debug, Serialize)]
@@ -74,10 +53,11 @@ pub(crate) struct BuildRecord {
     pub(crate) executable_path: PathBuf,
     pub(crate) sha256: String,
     pub(crate) size_bytes: u64,
-    pub(crate) build_duration_ms: u128,
+    pub(crate) build_duration_ms: u64,
     pub(crate) bounded_diagnostics: String,
     pub(crate) compiler_diagnostics: Vec<CompilerDiagnosticRecord>,
     pub(crate) diagnostics_truncated: bool,
+    pub(crate) compiler_evidence: Option<Box<CaptureAggregate>>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -129,11 +109,12 @@ pub(crate) struct BuildFailure {
     pub(crate) invocation: Box<BuildInvocation>,
     pub(crate) outcome: BuildOutcome,
     pub(crate) reason: &'static str,
-    pub(crate) build_duration_ms: u128,
+    pub(crate) build_duration_ms: u64,
     pub(crate) message: String,
     pub(crate) bounded_diagnostics: String,
     pub(crate) compiler_diagnostics: Box<[CompilerDiagnosticRecord]>,
     pub(crate) diagnostics_truncated: bool,
+    pub(crate) compiler_evidence: Option<Box<CaptureAggregate>>,
 }
 
 pub(crate) fn resolve_target(
@@ -271,8 +252,8 @@ pub(crate) fn build(
     command
         .args(&arguments)
         .current_dir(&selection.workspace_root);
-    for environment in &plan.environment_overrides {
-        command.env(&environment.name, environment.process_value());
+    if let Some(interposition) = &plan.interposition {
+        interposition.apply(&mut command);
     }
     let mut child = command
         .stdout(Stdio::piped())
@@ -370,6 +351,7 @@ pub(crate) fn build(
     diagnostics.push(&stderr.text);
     diagnostics.truncated |= stderr.truncated;
 
+    let capture = CaptureOutcome::collect(plan);
     if let Some((reason, error)) = stream_error {
         return Err(BuildFailure::with_diagnostics(
             &invocation,
@@ -377,6 +359,7 @@ pub(crate) fn build(
             reason,
             format!("Cargo JSON message stream failed: {error}"),
             diagnostics,
+            capture.evidence(),
         ));
     }
     if plan.strategy == Strategy::Pgo && diagnostics.missing_profile_data {
@@ -386,6 +369,7 @@ pub(crate) fn build(
             "pgo_missing_profile_data",
             "PGO rejected: LLVM reported missing profile data.",
             diagnostics,
+            capture.evidence(),
         ));
     }
     if !status.success() {
@@ -398,8 +382,23 @@ pub(crate) fn build(
                 plan.strategy.canonical_identity()
             ),
             diagnostics,
+            capture.evidence(),
         ));
     }
+    let compiler_evidence = match capture {
+        CaptureOutcome::NotInterposed => None,
+        CaptureOutcome::Complete(aggregate) => Some(Box::new(aggregate)),
+        CaptureOutcome::Failed(failure) => {
+            return Err(BuildFailure::with_diagnostics(
+                &invocation,
+                started,
+                failure.reason,
+                failure.message,
+                diagnostics,
+                None,
+            ));
+        }
+    };
     let executable = match executables.as_slice() {
         [executable] => executable,
         [] => {
@@ -412,6 +411,7 @@ pub(crate) fn build(
                     selection.package_name, selection.binary_name
                 ),
                 diagnostics,
+                compiler_evidence,
             ));
         }
         _ => {
@@ -424,6 +424,7 @@ pub(crate) fn build(
                     selection.package_name, selection.binary_name
                 ),
                 diagnostics,
+                compiler_evidence,
             ));
         }
     };
@@ -434,6 +435,7 @@ pub(crate) fn build(
             "cargo_executable_unavailable",
             format!("Cargo executable could not be canonicalized: {error}"),
             diagnostics.clone(),
+            compiler_evidence.clone(),
         )
     })?;
     let canonical_target = std::fs::canonicalize(&plan.target_directory).map_err(|error| {
@@ -443,6 +445,7 @@ pub(crate) fn build(
             "target_directory_unavailable",
             format!("Isolated target directory could not be canonicalized: {error}"),
             diagnostics.clone(),
+            compiler_evidence.clone(),
         )
     })?;
     if !executable.starts_with(&canonical_target) {
@@ -452,6 +455,7 @@ pub(crate) fn build(
             "cargo_executable_outside_target",
             "Cargo emitted an executable outside the isolated target directory.",
             diagnostics,
+            compiler_evidence,
         ));
     }
     let file_metadata = std::fs::metadata(&executable).map_err(|error| {
@@ -461,6 +465,7 @@ pub(crate) fn build(
             "cargo_executable_metadata_failed",
             format!("Cargo executable metadata could not be read: {error}"),
             diagnostics.clone(),
+            compiler_evidence.clone(),
         )
     })?;
     let sha256 = sha256_file(&executable).map_err(|error| {
@@ -470,6 +475,7 @@ pub(crate) fn build(
             "cargo_executable_hash_failed",
             error.to_string(),
             diagnostics.clone(),
+            compiler_evidence.clone(),
         )
     })?;
 
@@ -479,11 +485,38 @@ pub(crate) fn build(
         executable_path: executable,
         sha256,
         size_bytes: file_metadata.len(),
-        build_duration_ms: started.elapsed().as_millis(),
+        build_duration_ms: elapsed_milliseconds(started),
         bounded_diagnostics: diagnostics.text,
         compiler_diagnostics: diagnostics.compiler_diagnostics,
         diagnostics_truncated: diagnostics.truncated,
+        compiler_evidence,
     })
+}
+
+/// Capture evidence of one build, validated after Cargo exits.
+enum CaptureOutcome {
+    NotInterposed,
+    Complete(CaptureAggregate),
+    Failed(CaptureFailure),
+}
+
+impl CaptureOutcome {
+    fn collect(plan: &BuildPlan) -> Self {
+        match plan.interposition.as_ref() {
+            None => Self::NotInterposed,
+            Some(interposition) => match interposition::collect(interposition) {
+                Ok(aggregate) => Self::Complete(aggregate),
+                Err(failure) => Self::Failed(failure),
+            },
+        }
+    }
+
+    fn evidence(&self) -> Option<Box<CaptureAggregate>> {
+        match self {
+            Self::Complete(aggregate) => Some(Box::new(aggregate.clone())),
+            Self::NotInterposed | Self::Failed(_) => None,
+        }
+    }
 }
 
 pub(crate) fn planned_invocation(selection: &TargetSelection, plan: &BuildPlan) -> BuildInvocation {
@@ -527,7 +560,10 @@ fn build_invocation(
             target_directory: plan.target_directory.clone(),
             cargo_arguments,
             cargo_config_overrides: plan.cargo_config_overrides.clone(),
-            environment_overrides: plan.environment_overrides.clone(),
+            interposition: plan
+                .interposition
+                .as_ref()
+                .map(crate::interposition::InterpositionPlan::record),
         },
     )
 }
@@ -543,11 +579,12 @@ impl BuildFailure {
             invocation: Box::new(invocation.clone()),
             outcome: BuildOutcome::Failed,
             reason,
-            build_duration_ms: started.elapsed().as_millis(),
+            build_duration_ms: elapsed_milliseconds(started),
             message: message.into(),
             bounded_diagnostics: String::new(),
             compiler_diagnostics: Vec::new().into_boxed_slice(),
             diagnostics_truncated: false,
+            compiler_evidence: None,
         }
     }
 
@@ -557,16 +594,18 @@ impl BuildFailure {
         reason: &'static str,
         message: impl Into<String>,
         diagnostics: BoundedDiagnostics,
+        compiler_evidence: Option<Box<CaptureAggregate>>,
     ) -> Self {
         Self {
             invocation: Box::new(invocation.clone()),
             outcome: BuildOutcome::Failed,
             reason,
-            build_duration_ms: started.elapsed().as_millis(),
+            build_duration_ms: elapsed_milliseconds(started),
             message: message.into(),
             bounded_diagnostics: diagnostics.text,
             compiler_diagnostics: diagnostics.compiler_diagnostics.into_boxed_slice(),
             diagnostics_truncated: diagnostics.truncated,
+            compiler_evidence,
         }
     }
 }
@@ -653,6 +692,10 @@ fn drain_bounded(mut reader: impl Read) -> BoundedDiagnostics {
         }
     }
     diagnostics
+}
+
+fn elapsed_milliseconds(started: Instant) -> u64 {
+    u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX)
 }
 
 fn bounded_text(bytes: &[u8]) -> String {

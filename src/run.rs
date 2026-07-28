@@ -9,6 +9,7 @@ use crate::anchored::AnchoredDirectory;
 use crate::cargo::{BuildFailure, BuildRecord, TargetSelection};
 use crate::cli::OptimizeArgs;
 use crate::error::{Result, TemperError};
+use crate::interposition::{self, Injection, InterpositionPlan, ShimStage};
 use crate::measurement::{ConfirmationResult, MeasurementOutcome, ScreeningResult};
 use crate::preflight::{Preflight, SourceReproducibility};
 use crate::promotion::PromotionRecord;
@@ -482,8 +483,10 @@ impl Run {
     }
 
     pub(crate) fn reject_pgo_build(&mut self, failure: BuildFailure) -> Result<()> {
-        let rejection_reason = if failure.reason == "pgo_missing_profile_data" {
-            "pgo_missing_profile_data"
+        let rejection_reason = if failure.reason == "pgo_missing_profile_data"
+            || interposition::COMPILER_INPUT_REASONS.contains(&failure.reason)
+        {
+            failure.reason
         } else {
             "pgo_build_failed"
         };
@@ -542,26 +545,47 @@ impl Run {
             .as_ref()
             .map(|record| record.invocation.cargo_config_overrides.clone())
             .ok_or_else(|| TemperError::new("Baseline build record is unavailable."))?;
-        let baseline_environment = self
-            .manifest
-            .baseline
-            .as_ref()
-            .map(|record| record.invocation.environment_overrides.clone())
-            .ok_or_else(|| TemperError::new("Baseline build record is unavailable."))?;
+        let candidate_interposition = match candidate {
+            Strategy::Pgo => Some(self.pgo_confirmation_interposition(candidate_record)?),
+            _ => None,
+        };
         Ok(Some(ConfirmationPlans {
             baseline: BuildPlan::confirmation(
                 Strategy::Baseline,
                 &self.target_root,
                 baseline_overrides,
-                baseline_environment,
+                None,
             ),
             candidate: BuildPlan::confirmation(
                 candidate,
                 &self.target_root,
                 candidate_record.invocation.cargo_config_overrides.clone(),
-                candidate_record.invocation.environment_overrides.clone(),
+                candidate_interposition,
             ),
         }))
+    }
+
+    /// Rebuilds the accepted PGO input contract in a fresh interposed stage.
+    fn pgo_confirmation_interposition(&self, record: &BuildRecord) -> Result<InterpositionPlan> {
+        let interposition = record.invocation.interposition.as_ref().ok_or_else(|| {
+            TemperError::new("The accepted PGO build carries no compiler interposition record.")
+        })?;
+        let profile = interposition.profile_path.clone().ok_or_else(|| {
+            TemperError::new("The accepted PGO build recorded no merged profile path.")
+        })?;
+        let tools = interposition::validated_tools(
+            &interposition.shim_executable,
+            &interposition.real_rustc,
+        )
+        .map_err(TemperError::new)?;
+        interposition::plan_stage(
+            &tools,
+            &self.directory,
+            &self.target_root,
+            ShimStage::Confirmation,
+            Injection::Use(profile),
+        )
+        .map_err(TemperError::new)
     }
 
     pub(crate) fn complete_without_candidate(&mut self) -> Result<()> {

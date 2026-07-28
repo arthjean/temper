@@ -8,8 +8,12 @@ use std::thread;
 
 use serde::Serialize;
 
-use crate::cargo::{self, BuildEnvironmentOverride, BuildFailure, BuildRecord, TargetSelection};
+use crate::cargo::{self, BuildFailure, BuildRecord, TargetSelection};
 use crate::hash::sha256_file;
+use crate::interposition::{
+    self, Injection, InterpositionPlan, InterpositionRecord, MISSING_FUNCTION_FLAG,
+    PROFILE_GENERATE_FLAG, PROFILE_USE_FLAG, ShimStage, ShimTools,
+};
 use crate::preflight::{SUPPORTED_HOST, cargo_program, rustc_program};
 use crate::workload::{WorkloadFailure, WorkloadFailureKind, WorkloadSpec};
 
@@ -57,6 +61,7 @@ impl Strategy {
 pub(crate) enum BuildStage {
     Baseline,
     StaticCandidate,
+    PgoReference,
     PgoInstrumentation,
     PgoOptimized,
     Confirmation,
@@ -68,7 +73,7 @@ pub(crate) struct BuildPlan {
     pub(crate) stage: BuildStage,
     pub(crate) target_directory: PathBuf,
     pub(crate) cargo_config_overrides: Vec<String>,
-    pub(crate) environment_overrides: Vec<BuildEnvironmentOverride>,
+    pub(crate) interposition: Option<InterpositionPlan>,
 }
 
 impl BuildPlan {
@@ -87,7 +92,7 @@ impl BuildPlan {
             stage,
             target_directory: target_root.join(strategy.canonical_identity()),
             cargo_config_overrides: strategy.profile_overrides(),
-            environment_overrides: Vec::new(),
+            interposition: None,
         }
     }
 
@@ -95,66 +100,32 @@ impl BuildPlan {
         strategy: Strategy,
         target_root: &Path,
         cargo_config_overrides: Vec<String>,
-        environment_overrides: Vec<BuildEnvironmentOverride>,
+        interposition: Option<InterpositionPlan>,
     ) -> Self {
+        let target_directory = match &interposition {
+            Some(plan) => plan.target_directory.clone(),
+            None => target_root
+                .join("confirmation")
+                .join(strategy.canonical_identity()),
+        };
         Self {
             strategy,
             stage: BuildStage::Confirmation,
-            target_directory: target_root
-                .join("confirmation")
-                .join(strategy.canonical_identity()),
+            target_directory,
             cargo_config_overrides,
-            environment_overrides,
+            interposition,
         }
     }
 
-    fn pgo_instrumentation(
-        base_strategy: Strategy,
-        target_root: &Path,
-        project_rustflags: &[String],
-        phase_rustflags: &[String],
-    ) -> Self {
-        Self::pgo(
-            base_strategy,
-            BuildStage::PgoInstrumentation,
-            target_root.join("pgo-instrumented"),
-            project_rustflags,
-            phase_rustflags,
-        )
-    }
-
-    fn pgo_optimized(
-        base_strategy: Strategy,
-        target_root: &Path,
-        project_rustflags: &[String],
-        phase_rustflags: &[String],
-    ) -> Self {
-        Self::pgo(
-            base_strategy,
-            BuildStage::PgoOptimized,
-            target_root.join(Strategy::Pgo.canonical_identity()),
-            project_rustflags,
-            phase_rustflags,
-        )
-    }
-
-    fn pgo(
-        base_strategy: Strategy,
-        stage: BuildStage,
-        target_directory: PathBuf,
-        project_rustflags: &[String],
-        phase_rustflags: &[String],
-    ) -> Self {
-        let mut rustflags = project_rustflags.to_vec();
-        rustflags.extend_from_slice(phase_rustflags);
+    /// Interposed PGO stage. Cargo keeps ownership of every compiler input;
+    /// the shim appends the phase controls after Cargo has resolved them.
+    fn pgo(base_strategy: Strategy, stage: BuildStage, interposition: InterpositionPlan) -> Self {
         Self {
             strategy: Strategy::Pgo,
             stage,
-            target_directory,
+            target_directory: interposition.target_directory.clone(),
             cargo_config_overrides: base_strategy.profile_overrides(),
-            environment_overrides: vec![BuildEnvironmentOverride::cargo_encoded_rustflags(
-                rustflags,
-            )],
+            interposition: Some(interposition),
         }
     }
 }
@@ -178,9 +149,20 @@ struct ToolIdentity {
 pub(crate) struct PgoPrerequisites {
     llvm_profdata_path: PathBuf,
     target_libdir: PathBuf,
-    preserved_target_rustflags: Vec<String>,
+    real_rustc: PathBuf,
+    shim_executable: PathBuf,
+    shim_protocol: &'static str,
     inspected_config_sources: Vec<ConfigSourceRecord>,
     tool_identity: ToolIdentity,
+}
+
+impl PgoPrerequisites {
+    fn tools(&self) -> ShimTools {
+        ShimTools {
+            shim_executable: self.shim_executable.clone(),
+            real_rustc: self.real_rustc.clone(),
+        }
+    }
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -188,20 +170,24 @@ struct PgoPhaseInputs {
     package_id: String,
     binary_target: String,
     target_triple: &'static str,
+    stage: ShimStage,
     cargo_arguments: Vec<String>,
     base_profile_overrides: Vec<String>,
-    project_rustflags: Vec<String>,
     config_sources: Vec<ConfigSourceRecord>,
     cargo_identity: String,
     rustc_identity: String,
     llvm_profdata_identity: ToolIdentity,
+    real_rustc: PathBuf,
+    shim_executable: PathBuf,
+    injected_flags: Vec<&'static str>,
     target_directory: PathBuf,
-    environment_overrides: Vec<BuildEnvironmentOverride>,
+    capture_directory: PathBuf,
 }
 
 #[derive(Clone, Debug, Serialize)]
 pub(crate) struct PgoParityRecord {
-    permitted_differences: [&'static str; 3],
+    permitted_differences: [&'static str; 5],
+    reference: Option<PgoPhaseInputs>,
     instrumentation: Option<PgoPhaseInputs>,
     optimization: Option<PgoPhaseInputs>,
     matched: bool,
@@ -219,6 +205,7 @@ pub(crate) enum PgoTrainingOutcomeKind {
 #[serde(rename_all = "snake_case")]
 pub(crate) enum PgoFailureStage {
     Prerequisites,
+    Reference,
     Instrumentation,
     Training,
     ProfileDiscovery,
@@ -258,6 +245,8 @@ pub(crate) struct PgoTrainingRecord {
     pub(crate) outcome: PgoTrainingOutcomeKind,
     pub(crate) base_strategy: Strategy,
     prerequisites: Option<PgoPrerequisites>,
+    reference_build: Option<BuildRecord>,
+    reference_failure: Option<BuildFailure>,
     instrumentation_build: Option<BuildRecord>,
     instrumentation_failure: Option<BuildFailure>,
     training_duration_ns: Option<u64>,
@@ -288,439 +277,461 @@ pub(crate) fn train_pgo(
     target_root: &Path,
     base_strategy: Strategy,
 ) -> PgoTrainingOutcome {
+    let mut state = TrainingState::new(base_strategy);
     let prerequisites = match prove_pgo_prerequisites(&selection.workspace_root) {
         Ok(prerequisites) => prerequisites,
         Err(failure) => {
-            return PgoTrainingOutcome::Rejected(PgoTrainingRecord::rejected(
-                base_strategy,
+            return PgoTrainingOutcome::Rejected(state.reject(
                 PgoFailureStage::Prerequisites,
                 failure.reason,
                 failure.message,
-                PgoParityRecord::unavailable("instrumentation_inputs_unavailable"),
                 failure.remediation,
             ));
         }
     };
-    let raw_profile_directory = run_directory.join("pgo").join("raw");
-    if let Err(error) = fs::create_dir_all(&raw_profile_directory) {
-        return PgoTrainingOutcome::Rejected(PgoTrainingRecord::rejected(
-            base_strategy,
-            PgoFailureStage::Instrumentation,
-            "pgo_profile_directory_failed",
-            format!(
-                "Could not create the run-scoped PGO profile directory {}: {error}",
-                raw_profile_directory.display()
-            ),
-            PgoParityRecord::unavailable("instrumentation_inputs_unavailable"),
-            None,
-        ));
+    let tools = prerequisites.tools();
+    let llvm_profdata_path = prerequisites.llvm_profdata_path.clone();
+    let reference_prerequisites = prerequisites.clone();
+    state.prerequisites = Some(prerequisites);
+
+    // A fresh pass-through reference stage observes the compiler inputs Cargo
+    // resolves with no PGO control at all. It is the boundary the instrumented
+    // and optimized stages are compared against.
+    let reference_plan = match interposition::plan_stage(
+        &tools,
+        run_directory,
+        target_root,
+        ShimStage::Reference,
+        Injection::None,
+    ) {
+        Ok(plan) => BuildPlan::pgo(base_strategy, BuildStage::PgoReference, plan),
+        Err(message) => {
+            return PgoTrainingOutcome::Rejected(state.reject(
+                PgoFailureStage::Reference,
+                "pgo_stage_isolation_failed",
+                message,
+                None,
+            ));
+        }
+    };
+    state.phase_parity.reference = Some(phase_inputs(
+        selection,
+        &reference_plan,
+        &reference_prerequisites,
+    ));
+    match cargo::build(selection, &reference_plan) {
+        Ok(build) => state.reference_build = Some(build),
+        Err(failure) => {
+            let message = failure.message.clone();
+            let reason = pgo_build_rejection(&failure, "pgo_reference_failed");
+            state.reference_failure = Some(failure);
+            return PgoTrainingOutcome::Rejected(state.reject(
+                PgoFailureStage::Reference,
+                reason,
+                message,
+                None,
+            ));
+        }
     }
-    let raw_profile_directory = match fs::canonicalize(&raw_profile_directory) {
+
+    let raw_profile_directory = match prepare_profile_directory(run_directory) {
         Ok(directory) => directory,
-        Err(error) => {
-            return PgoTrainingOutcome::Rejected(PgoTrainingRecord::rejected(
-                base_strategy,
+        Err(message) => {
+            return PgoTrainingOutcome::Rejected(state.reject(
                 PgoFailureStage::Instrumentation,
                 "pgo_profile_directory_failed",
-                format!("Could not canonicalize the PGO profile directory: {error}"),
-                PgoParityRecord::unavailable("instrumentation_inputs_unavailable"),
-                None,
-            ));
-        }
-    };
-    let generate_flag = match path_flag("-Cprofile-generate=", &raw_profile_directory) {
-        Ok(flag) => flag,
-        Err(message) => {
-            return PgoTrainingOutcome::Rejected(PgoTrainingRecord::rejected(
-                base_strategy,
-                PgoFailureStage::Instrumentation,
-                "pgo_profile_path_not_utf8",
                 message,
-                PgoParityRecord::unavailable("instrumentation_inputs_unavailable"),
                 None,
             ));
         }
     };
-    let generate_rustflags = [generate_flag];
-    let instrumentation_plan = BuildPlan::pgo_instrumentation(
-        base_strategy,
+    let instrumentation_plan = match interposition::plan_stage(
+        &tools,
+        run_directory,
         target_root,
-        &prerequisites.preserved_target_rustflags,
-        &generate_rustflags,
-    );
-    let instrumentation_inputs = phase_inputs(selection, &instrumentation_plan, &prerequisites);
-    let instrumentation_parity =
-        PgoParityRecord::instrumentation_only(instrumentation_inputs.clone());
+        ShimStage::Generate,
+        Injection::Generate(raw_profile_directory.clone()),
+    ) {
+        Ok(plan) => BuildPlan::pgo(base_strategy, BuildStage::PgoInstrumentation, plan),
+        Err(message) => {
+            return PgoTrainingOutcome::Rejected(state.reject(
+                PgoFailureStage::Instrumentation,
+                "pgo_stage_isolation_failed",
+                message,
+                None,
+            ));
+        }
+    };
+    state.phase_parity.instrumentation = Some(phase_inputs(
+        selection,
+        &instrumentation_plan,
+        &reference_prerequisites,
+    ));
     let instrumentation_build = match cargo::build(selection, &instrumentation_plan) {
         Ok(build) => build,
         Err(failure) => {
             let message = failure.message.clone();
-            return PgoTrainingOutcome::Rejected(PgoTrainingRecord {
-                outcome: PgoTrainingOutcomeKind::Rejected,
-                base_strategy,
-                prerequisites: Some(prerequisites),
-                instrumentation_build: None,
-                instrumentation_failure: Some(failure),
-                training_duration_ns: None,
-                raw_profile_files: Vec::new(),
-                merge: None,
-                phase_parity: instrumentation_parity,
-                failure_stage: Some(PgoFailureStage::Instrumentation),
-                rejection_reason: Some("pgo_instrumentation_failed".to_owned()),
-                message: Some(message),
-                remediation: None,
-            });
+            let reason = pgo_build_rejection(&failure, "pgo_instrumentation_failed");
+            state.instrumentation_failure = Some(failure);
+            return PgoTrainingOutcome::Rejected(state.reject(
+                PgoFailureStage::Instrumentation,
+                reason,
+                message,
+                None,
+            ));
         }
     };
+    let instrumented_executable = instrumentation_build.executable_path.clone();
+    state.instrumentation_build = Some(instrumentation_build);
 
     let profile_pattern = raw_profile_directory.join("temper-%m-%p.profraw");
     let training = match workload.invoke_with_environment(
-        &instrumentation_build.executable_path,
+        &instrumented_executable,
         &[("LLVM_PROFILE_FILE", profile_pattern.as_os_str())],
     ) {
         Ok(training) => training,
         Err(failure) if failure.kind == WorkloadFailureKind::Interrupted => {
-            let record = PgoTrainingRecord {
-                outcome: PgoTrainingOutcomeKind::Rejected,
-                base_strategy,
-                prerequisites: Some(prerequisites),
-                instrumentation_build: Some(instrumentation_build),
-                instrumentation_failure: None,
-                training_duration_ns: None,
-                raw_profile_files: Vec::new(),
-                merge: None,
-                phase_parity: instrumentation_parity,
-                failure_stage: Some(PgoFailureStage::Training),
-                rejection_reason: Some("pgo_training_interrupted".to_owned()),
-                message: Some(failure.message.clone()),
-                remediation: None,
-            };
+            let record = state.reject(
+                PgoFailureStage::Training,
+                "pgo_training_interrupted",
+                failure.message.clone(),
+                None,
+            );
             return PgoTrainingOutcome::Interrupted(record, failure);
         }
         Err(failure) => {
-            return PgoTrainingOutcome::Rejected(PgoTrainingRecord {
-                outcome: PgoTrainingOutcomeKind::Rejected,
-                base_strategy,
-                prerequisites: Some(prerequisites),
-                instrumentation_build: Some(instrumentation_build),
-                instrumentation_failure: None,
-                training_duration_ns: None,
-                raw_profile_files: Vec::new(),
-                merge: None,
-                phase_parity: instrumentation_parity,
-                failure_stage: Some(PgoFailureStage::Training),
-                rejection_reason: Some("pgo_training_failed".to_owned()),
-                message: Some(failure.message),
-                remediation: None,
-            });
+            return PgoTrainingOutcome::Rejected(state.reject(
+                PgoFailureStage::Training,
+                "pgo_training_failed",
+                failure.message,
+                None,
+            ));
         }
     };
-    let raw_profile_files = match collect_profile_files(&raw_profile_directory) {
-        Ok(files) if !files.is_empty() => files,
+    state.training_duration_ns = Some(training.duration_ns);
+
+    match collect_profile_files(&raw_profile_directory) {
+        Ok(files) if !files.is_empty() => state.raw_profile_files = files,
         Ok(_) => {
-            return PgoTrainingOutcome::Rejected(PgoTrainingRecord {
-                outcome: PgoTrainingOutcomeKind::Rejected,
-                base_strategy,
-                prerequisites: Some(prerequisites),
-                instrumentation_build: Some(instrumentation_build),
-                instrumentation_failure: None,
-                training_duration_ns: Some(training.duration_ns),
-                raw_profile_files: Vec::new(),
-                merge: None,
-                phase_parity: instrumentation_parity,
-                failure_stage: Some(PgoFailureStage::ProfileDiscovery),
-                rejection_reason: Some("pgo_training_produced_no_profraw_files".to_owned()),
-                message: Some("PGO training produced no raw profile files.".to_owned()),
-                remediation: None,
-            });
+            return PgoTrainingOutcome::Rejected(state.reject(
+                PgoFailureStage::ProfileDiscovery,
+                "pgo_training_produced_no_profraw_files",
+                "PGO training produced no raw profile files.",
+                None,
+            ));
         }
         Err(message) => {
-            return PgoTrainingOutcome::Rejected(PgoTrainingRecord {
-                outcome: PgoTrainingOutcomeKind::Rejected,
-                base_strategy,
-                prerequisites: Some(prerequisites),
-                instrumentation_build: Some(instrumentation_build),
-                instrumentation_failure: None,
-                training_duration_ns: Some(training.duration_ns),
-                raw_profile_files: Vec::new(),
-                merge: None,
-                phase_parity: instrumentation_parity,
-                failure_stage: Some(PgoFailureStage::ProfileDiscovery),
-                rejection_reason: Some("pgo_profile_discovery_failed".to_owned()),
-                message: Some(message),
-                remediation: None,
-            });
+            return PgoTrainingOutcome::Rejected(state.reject(
+                PgoFailureStage::ProfileDiscovery,
+                "pgo_profile_discovery_failed",
+                message,
+                None,
+            ));
         }
-    };
+    }
+
     let profdata_path = run_directory.join("pgo").join("merged.profdata");
     let merge = merge_profiles(
-        &prerequisites.llvm_profdata_path,
-        &raw_profile_files,
+        &llvm_profdata_path,
+        &state.raw_profile_files,
         &profdata_path,
         &run_directory.join("pgo"),
     );
-    if matches!(merge.outcome, ProfileMergeOutcome::Rejected) {
-        let reason = merge
-            .message
-            .clone()
-            .unwrap_or_else(|| "llvm-profdata merge rejected the profile data.".to_owned());
-        return PgoTrainingOutcome::Rejected(PgoTrainingRecord {
-            outcome: PgoTrainingOutcomeKind::Rejected,
-            base_strategy,
-            prerequisites: Some(prerequisites),
-            instrumentation_build: Some(instrumentation_build),
-            instrumentation_failure: None,
-            training_duration_ns: Some(training.duration_ns),
-            raw_profile_files,
-            merge: Some(merge),
-            phase_parity: instrumentation_parity,
-            failure_stage: Some(PgoFailureStage::ProfileMerge),
-            rejection_reason: Some("pgo_profile_merge_failed".to_owned()),
-            message: Some(reason),
-            remediation: None,
-        });
+    let merge_rejected = matches!(merge.outcome, ProfileMergeOutcome::Rejected);
+    let merge_message = merge.message.clone();
+    state.merge = Some(merge);
+    if merge_rejected {
+        return PgoTrainingOutcome::Rejected(
+            state.reject(
+                PgoFailureStage::ProfileMerge,
+                "pgo_profile_merge_failed",
+                merge_message
+                    .unwrap_or_else(|| "llvm-profdata merge rejected the profile data.".to_owned()),
+                None,
+            ),
+        );
     }
     let merged_profile = match fs::canonicalize(&profdata_path) {
         Ok(profile) => profile,
         Err(error) => {
-            return PgoTrainingOutcome::Rejected(PgoTrainingRecord {
-                outcome: PgoTrainingOutcomeKind::Rejected,
-                base_strategy,
-                prerequisites: Some(prerequisites),
-                instrumentation_build: Some(instrumentation_build),
-                instrumentation_failure: None,
-                training_duration_ns: Some(training.duration_ns),
-                raw_profile_files,
-                merge: Some(merge),
-                phase_parity: instrumentation_parity,
-                failure_stage: Some(PgoFailureStage::ProfileMerge),
-                rejection_reason: Some("pgo_merged_profile_unavailable".to_owned()),
-                message: Some(format!(
-                    "Merged PGO profile could not be canonicalized: {error}"
-                )),
-                remediation: None,
-            });
+            return PgoTrainingOutcome::Rejected(state.reject(
+                PgoFailureStage::ProfileMerge,
+                "pgo_merged_profile_unavailable",
+                format!("Merged PGO profile could not be canonicalized: {error}"),
+                None,
+            ));
         }
     };
-    let use_flag = match path_flag("-Cprofile-use=", &merged_profile) {
-        Ok(flag) => flag,
-        Err(message) => {
-            return PgoTrainingOutcome::Rejected(PgoTrainingRecord {
-                outcome: PgoTrainingOutcomeKind::Rejected,
-                base_strategy,
-                prerequisites: Some(prerequisites),
-                instrumentation_build: Some(instrumentation_build),
-                instrumentation_failure: None,
-                training_duration_ns: Some(training.duration_ns),
-                raw_profile_files,
-                merge: Some(merge),
-                phase_parity: instrumentation_parity,
-                failure_stage: Some(PgoFailureStage::ProfileMerge),
-                rejection_reason: Some("pgo_profile_path_not_utf8".to_owned()),
-                message: Some(message),
-                remediation: None,
-            });
-        }
-    };
-    let use_rustflags = [
-        use_flag,
-        "-Cllvm-args=-pgo-warn-missing-function".to_owned(),
-    ];
+
+    // The optimized stage re-proves its own prerequisites so a compiler,
+    // wrapper or config source that changed during training is observed.
     let optimization_prerequisites = match prove_pgo_prerequisites(&selection.workspace_root) {
         Ok(prerequisites) => prerequisites,
         Err(failure) => {
-            return PgoTrainingOutcome::Rejected(PgoTrainingRecord {
-                outcome: PgoTrainingOutcomeKind::Rejected,
-                base_strategy,
-                prerequisites: Some(prerequisites),
-                instrumentation_build: Some(instrumentation_build),
-                instrumentation_failure: None,
-                training_duration_ns: Some(training.duration_ns),
-                raw_profile_files,
-                merge: Some(merge),
-                phase_parity: instrumentation_parity,
-                failure_stage: Some(PgoFailureStage::Prerequisites),
-                rejection_reason: Some(failure.reason.to_owned()),
-                message: Some(failure.message),
-                remediation: failure.remediation,
-            });
+            return PgoTrainingOutcome::Rejected(state.reject(
+                PgoFailureStage::Prerequisites,
+                failure.reason,
+                failure.message,
+                failure.remediation,
+            ));
         }
     };
-    let optimized_plan = BuildPlan::pgo_optimized(
-        base_strategy,
+    let optimized_plan = match interposition::plan_stage(
+        &optimization_prerequisites.tools(),
+        run_directory,
         target_root,
-        &optimization_prerequisites.preserved_target_rustflags,
-        &use_rustflags,
-    );
-    let optimization_inputs = phase_inputs(selection, &optimized_plan, &optimization_prerequisites);
-    let phase_parity = PgoParityRecord::compare(instrumentation_inputs, optimization_inputs);
-    if !phase_parity.matched {
-        return PgoTrainingOutcome::Rejected(PgoTrainingRecord {
-            outcome: PgoTrainingOutcomeKind::Rejected,
-            base_strategy,
-            prerequisites: Some(prerequisites),
-            instrumentation_build: Some(instrumentation_build),
-            instrumentation_failure: None,
-            training_duration_ns: Some(training.duration_ns),
-            raw_profile_files,
-            merge: Some(merge),
-            phase_parity,
-            failure_stage: Some(PgoFailureStage::Prerequisites),
-            rejection_reason: Some("pgo_phase_parity_mismatch".to_owned()),
-            message: Some(
-                "PGO optimization inputs differed from the instrumentation inputs outside the explicit allowlist."
-                    .to_owned(),
-            ),
-            remediation: None,
-        });
-    }
-    let record = PgoTrainingRecord {
-        outcome: PgoTrainingOutcomeKind::Trained,
-        base_strategy,
-        prerequisites: Some(prerequisites),
-        instrumentation_build: Some(instrumentation_build),
-        instrumentation_failure: None,
-        training_duration_ns: Some(training.duration_ns),
-        raw_profile_files,
-        merge: Some(merge),
-        phase_parity,
-        failure_stage: None,
-        rejection_reason: None,
-        message: None,
-        remediation: None,
+        ShimStage::Use,
+        Injection::Use(merged_profile),
+    ) {
+        Ok(plan) => BuildPlan::pgo(base_strategy, BuildStage::PgoOptimized, plan),
+        Err(message) => {
+            return PgoTrainingOutcome::Rejected(state.reject(
+                PgoFailureStage::Prerequisites,
+                "pgo_stage_isolation_failed",
+                message,
+                None,
+            ));
+        }
     };
+    state.phase_parity.optimization = Some(phase_inputs(
+        selection,
+        &optimized_plan,
+        &optimization_prerequisites,
+    ));
+    state.phase_parity.decide();
+    if !state.phase_parity.matched {
+        return PgoTrainingOutcome::Rejected(state.reject(
+            PgoFailureStage::Prerequisites,
+            "pgo_phase_parity_mismatch",
+            "PGO optimization inputs differed from the instrumentation inputs outside the explicit allowlist.",
+            None,
+        ));
+    }
     PgoTrainingOutcome::Trained(PgoTrainingSuccess {
-        record,
+        record: state.trained(),
         optimized_plan,
     })
 }
 
-impl PgoTrainingRecord {
-    fn rejected(
-        base_strategy: Strategy,
-        stage: PgoFailureStage,
-        reason: &'static str,
-        message: String,
-        phase_parity: PgoParityRecord,
-        remediation: Option<&'static str>,
-    ) -> Self {
+/// Accumulates every durable PGO training fact so each rejection persists the
+/// evidence gathered so far instead of rebuilding a record at every exit.
+struct TrainingState {
+    base_strategy: Strategy,
+    prerequisites: Option<PgoPrerequisites>,
+    reference_build: Option<BuildRecord>,
+    reference_failure: Option<BuildFailure>,
+    instrumentation_build: Option<BuildRecord>,
+    instrumentation_failure: Option<BuildFailure>,
+    training_duration_ns: Option<u64>,
+    raw_profile_files: Vec<ProfileFileRecord>,
+    merge: Option<ProfileMergeRecord>,
+    phase_parity: PgoParityRecord,
+}
+
+impl TrainingState {
+    fn new(base_strategy: Strategy) -> Self {
         Self {
-            outcome: PgoTrainingOutcomeKind::Rejected,
             base_strategy,
             prerequisites: None,
+            reference_build: None,
+            reference_failure: None,
             instrumentation_build: None,
             instrumentation_failure: None,
             training_duration_ns: None,
             raw_profile_files: Vec::new(),
             merge: None,
-            phase_parity,
+            phase_parity: PgoParityRecord::pending(),
+        }
+    }
+
+    fn reject(
+        mut self,
+        stage: PgoFailureStage,
+        reason: impl Into<String>,
+        message: impl Into<String>,
+        remediation: Option<&'static str>,
+    ) -> PgoTrainingRecord {
+        self.phase_parity.decide();
+        PgoTrainingRecord {
+            outcome: PgoTrainingOutcomeKind::Rejected,
+            base_strategy: self.base_strategy,
+            prerequisites: self.prerequisites,
+            reference_build: self.reference_build,
+            reference_failure: self.reference_failure,
+            instrumentation_build: self.instrumentation_build,
+            instrumentation_failure: self.instrumentation_failure,
+            training_duration_ns: self.training_duration_ns,
+            raw_profile_files: self.raw_profile_files,
+            merge: self.merge,
+            phase_parity: self.phase_parity,
             failure_stage: Some(stage),
-            rejection_reason: Some(reason.to_owned()),
-            message: Some(message),
+            rejection_reason: Some(reason.into()),
+            message: Some(message.into()),
             remediation,
+        }
+    }
+
+    fn trained(mut self) -> PgoTrainingRecord {
+        self.phase_parity.decide();
+        PgoTrainingRecord {
+            outcome: PgoTrainingOutcomeKind::Trained,
+            base_strategy: self.base_strategy,
+            prerequisites: self.prerequisites,
+            reference_build: self.reference_build,
+            reference_failure: self.reference_failure,
+            instrumentation_build: self.instrumentation_build,
+            instrumentation_failure: self.instrumentation_failure,
+            training_duration_ns: self.training_duration_ns,
+            raw_profile_files: self.raw_profile_files,
+            merge: self.merge,
+            phase_parity: self.phase_parity,
+            failure_stage: None,
+            rejection_reason: None,
+            message: None,
+            remediation: None,
         }
     }
 }
 
+fn pgo_build_rejection(failure: &BuildFailure, fallback: &'static str) -> &'static str {
+    if interposition::COMPILER_INPUT_REASONS.contains(&failure.reason) {
+        failure.reason
+    } else {
+        fallback
+    }
+}
+
+fn prepare_profile_directory(run_directory: &Path) -> Result<PathBuf, String> {
+    let raw_profile_directory = run_directory.join("pgo").join("raw");
+    fs::create_dir_all(&raw_profile_directory).map_err(|error| {
+        format!(
+            "Could not create the run-scoped PGO profile directory {}: {error}",
+            raw_profile_directory.display()
+        )
+    })?;
+    fs::canonicalize(&raw_profile_directory)
+        .map_err(|error| format!("Could not canonicalize the PGO profile directory: {error}"))
+}
+
 impl PgoParityRecord {
-    const PERMITTED_DIFFERENCES: [&'static str; 3] = [
+    const PERMITTED_DIFFERENCES: [&'static str; 5] = [
+        "interposition_stage",
         "target_directory",
+        "capture_directory",
         "profile_generate_vs_use",
         "pgo_warn_missing_function_in_use",
     ];
 
-    fn unavailable(field: &str) -> Self {
+    fn pending() -> Self {
         Self {
             permitted_differences: Self::PERMITTED_DIFFERENCES,
+            reference: None,
             instrumentation: None,
             optimization: None,
             matched: false,
-            unexpected_differences: vec![field.to_owned()],
+            unexpected_differences: Vec::new(),
         }
     }
 
-    fn instrumentation_only(instrumentation: PgoPhaseInputs) -> Self {
-        Self {
-            permitted_differences: Self::PERMITTED_DIFFERENCES,
-            instrumentation: Some(instrumentation),
-            optimization: None,
-            matched: false,
-            unexpected_differences: vec!["optimization_inputs_unavailable".to_owned()],
+    /// Compares the projected Temper-side inputs of the two PGO phases.
+    /// Observed compiler evidence is compared separately once every stage has
+    /// executed.
+    fn decide(&mut self) {
+        self.unexpected_differences.clear();
+        match (&self.instrumentation, &self.optimization) {
+            (None, _) => self
+                .unexpected_differences
+                .push("instrumentation_inputs_unavailable".to_owned()),
+            (Some(_), None) => self
+                .unexpected_differences
+                .push("optimization_inputs_unavailable".to_owned()),
+            (Some(instrumentation), Some(optimization)) => {
+                compare_phase_inputs(
+                    instrumentation,
+                    optimization,
+                    &mut self.unexpected_differences,
+                );
+            }
         }
+        self.matched = self.unexpected_differences.is_empty();
     }
+}
 
-    fn compare(instrumentation: PgoPhaseInputs, optimization: PgoPhaseInputs) -> Self {
-        let mut unexpected = Vec::new();
-        compare_field(
-            "package_id",
-            &instrumentation.package_id,
-            &optimization.package_id,
-            &mut unexpected,
-        );
-        compare_field(
-            "binary_target",
-            &instrumentation.binary_target,
-            &optimization.binary_target,
-            &mut unexpected,
-        );
-        compare_field(
-            "target_triple",
-            &instrumentation.target_triple,
-            &optimization.target_triple,
-            &mut unexpected,
-        );
-        compare_field(
-            "cargo_arguments",
-            &normalized_cargo_arguments(&instrumentation.cargo_arguments),
-            &normalized_cargo_arguments(&optimization.cargo_arguments),
-            &mut unexpected,
-        );
-        compare_field(
-            "base_profile_overrides",
-            &instrumentation.base_profile_overrides,
-            &optimization.base_profile_overrides,
-            &mut unexpected,
-        );
-        compare_field(
-            "project_rustflags",
-            &instrumentation.project_rustflags,
-            &optimization.project_rustflags,
-            &mut unexpected,
-        );
-        compare_field(
-            "config_sources",
-            &instrumentation.config_sources,
-            &optimization.config_sources,
-            &mut unexpected,
-        );
-        compare_field(
-            "cargo_identity",
-            &instrumentation.cargo_identity,
-            &optimization.cargo_identity,
-            &mut unexpected,
-        );
-        compare_field(
-            "rustc_identity",
-            &instrumentation.rustc_identity,
-            &optimization.rustc_identity,
-            &mut unexpected,
-        );
-        compare_field(
-            "llvm_profdata_identity",
-            &instrumentation.llvm_profdata_identity,
-            &optimization.llvm_profdata_identity,
-            &mut unexpected,
-        );
-        if !owned_pgo_channels_are_valid(&instrumentation, &optimization) {
-            unexpected.push("pgo_environment_channel".to_owned());
-        }
-        Self {
-            permitted_differences: Self::PERMITTED_DIFFERENCES,
-            instrumentation: Some(instrumentation),
-            optimization: Some(optimization),
-            matched: unexpected.is_empty(),
-            unexpected_differences: unexpected,
-        }
+fn compare_phase_inputs(
+    instrumentation: &PgoPhaseInputs,
+    optimization: &PgoPhaseInputs,
+    differences: &mut Vec<String>,
+) {
+    compare_field(
+        "package_id",
+        &instrumentation.package_id,
+        &optimization.package_id,
+        differences,
+    );
+    compare_field(
+        "binary_target",
+        &instrumentation.binary_target,
+        &optimization.binary_target,
+        differences,
+    );
+    compare_field(
+        "target_triple",
+        &instrumentation.target_triple,
+        &optimization.target_triple,
+        differences,
+    );
+    compare_field(
+        "cargo_arguments",
+        &normalized_cargo_arguments(&instrumentation.cargo_arguments),
+        &normalized_cargo_arguments(&optimization.cargo_arguments),
+        differences,
+    );
+    compare_field(
+        "base_profile_overrides",
+        &instrumentation.base_profile_overrides,
+        &optimization.base_profile_overrides,
+        differences,
+    );
+    compare_field(
+        "config_sources",
+        &instrumentation.config_sources,
+        &optimization.config_sources,
+        differences,
+    );
+    compare_field(
+        "cargo_identity",
+        &instrumentation.cargo_identity,
+        &optimization.cargo_identity,
+        differences,
+    );
+    compare_field(
+        "rustc_identity",
+        &instrumentation.rustc_identity,
+        &optimization.rustc_identity,
+        differences,
+    );
+    compare_field(
+        "llvm_profdata_identity",
+        &instrumentation.llvm_profdata_identity,
+        &optimization.llvm_profdata_identity,
+        differences,
+    );
+    compare_field(
+        "real_rustc",
+        &instrumentation.real_rustc,
+        &optimization.real_rustc,
+        differences,
+    );
+    compare_field(
+        "shim_executable",
+        &instrumentation.shim_executable,
+        &optimization.shim_executable,
+        differences,
+    );
+    if instrumentation.injected_flags != [PROFILE_GENERATE_FLAG]
+        || optimization.injected_flags != [PROFILE_USE_FLAG, MISSING_FUNCTION_FLAG]
+    {
+        differences.push("pgo_injection_channel".to_owned());
     }
 }
 
@@ -730,57 +741,32 @@ fn phase_inputs(
     prerequisites: &PgoPrerequisites,
 ) -> PgoPhaseInputs {
     let invocation = cargo::planned_invocation(selection, plan);
+    let interposition: Option<InterpositionRecord> = invocation.interposition;
     PgoPhaseInputs {
         package_id: selection.package_id.clone(),
         binary_target: selection.binary_name.clone(),
         target_triple: SUPPORTED_HOST,
+        stage: interposition
+            .as_ref()
+            .map_or(ShimStage::Reference, |record| record.stage),
         cargo_arguments: invocation.cargo_arguments,
         base_profile_overrides: invocation.cargo_config_overrides,
-        project_rustflags: prerequisites.preserved_target_rustflags.clone(),
         config_sources: prerequisites.inspected_config_sources.clone(),
         cargo_identity: prerequisites.tool_identity.cargo_version.clone(),
         rustc_identity: prerequisites.tool_identity.rustc_version.clone(),
         llvm_profdata_identity: prerequisites.tool_identity.clone(),
+        real_rustc: prerequisites.real_rustc.clone(),
+        shim_executable: prerequisites.shim_executable.clone(),
+        injected_flags: interposition
+            .as_ref()
+            .map(|record| record.injected_flags.clone())
+            .unwrap_or_default(),
         target_directory: invocation.target_directory,
-        environment_overrides: invocation.environment_overrides,
+        capture_directory: interposition
+            .as_ref()
+            .map(|record| record.capture_directory.clone())
+            .unwrap_or_default(),
     }
-}
-
-fn owned_pgo_channels_are_valid(
-    instrumentation: &PgoPhaseInputs,
-    optimization: &PgoPhaseInputs,
-) -> bool {
-    let Some(instrumentation_flags) = owned_pgo_flags(instrumentation) else {
-        return false;
-    };
-    let Some(optimization_flags) = owned_pgo_flags(optimization) else {
-        return false;
-    };
-    let instrumentation_valid = matches!(
-        instrumentation_flags,
-        [generate] if generate.starts_with("-Cprofile-generate=")
-    );
-    let optimization_valid = match optimization_flags {
-        [profile_use] => profile_use.starts_with("-Cprofile-use="),
-        [profile_use, warning] => {
-            profile_use.starts_with("-Cprofile-use=")
-                && warning == "-Cllvm-args=-pgo-warn-missing-function"
-        }
-        _ => false,
-    };
-    instrumentation_valid && optimization_valid
-}
-
-fn owned_pgo_flags(inputs: &PgoPhaseInputs) -> Option<&[String]> {
-    let [environment] = inputs.environment_overrides.as_slice() else {
-        return None;
-    };
-    if environment.name != "CARGO_ENCODED_RUSTFLAGS"
-        || !environment.arguments.starts_with(&inputs.project_rustflags)
-    {
-        return None;
-    }
-    Some(&environment.arguments[inputs.project_rustflags.len()..])
 }
 
 fn normalized_cargo_arguments(arguments: &[String]) -> Vec<String> {
@@ -808,25 +794,16 @@ struct PgoPrerequisiteFailure {
     remediation: Option<&'static str>,
 }
 
+/// Proves the PGO boundary before any compiler interposition starts.
+///
+/// v0.0.3 no longer reconstructs project rustflags: Cargo resolves every
+/// compiler input and the shim appends the phase controls after it. What must
+/// still be proven is that no compiler wrapper or replacement compiler sits
+/// between Cargo and the real rustc, because an outer cache can key an artifact
+/// before the phase control exists.
 fn prove_pgo_prerequisites(
     workspace_root: &Path,
 ) -> Result<PgoPrerequisites, PgoPrerequisiteFailure> {
-    for variable in [
-        "CARGO_ENCODED_RUSTFLAGS",
-        "RUSTFLAGS",
-        "CARGO_BUILD_RUSTFLAGS",
-        "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS",
-    ] {
-        if std::env::var_os(variable).is_some() {
-            return Err(PgoPrerequisiteFailure {
-                reason: "ambient_rustflags",
-                message: format!(
-                    "PGO was rejected because {variable} is set and Temper cannot prove flag composition."
-                ),
-                remediation: None,
-            });
-        }
-    }
     for variable in [
         "CARGO_BUILD_RUSTC",
         "RUSTC_WRAPPER",
@@ -834,19 +811,18 @@ fn prove_pgo_prerequisites(
         "CARGO_BUILD_RUSTC_WRAPPER",
         "CARGO_BUILD_RUSTC_WORKSPACE_WRAPPER",
     ] {
-        if std::env::var_os(variable).is_some() {
+        if std::env::var_os(variable).is_some_and(|value| !value.is_empty()) {
             return Err(PgoPrerequisiteFailure {
                 reason: "ambient_compiler_override",
                 message: format!(
-                    "PGO was rejected because {variable} is set and Temper cannot prove the active rustc toolchain."
+                    "PGO was rejected because {variable} is set and Temper cannot prove that an outer compiler cache keys its PGO phase controls."
                 ),
                 remediation: None,
             });
         }
     }
 
-    let (preserved_target_rustflags, inspected_config_sources) =
-        effective_target_rustflags(workspace_root)?;
+    let inspected_config_sources = inspect_config_sources(workspace_root)?;
     let target_libdir =
         rustc_target_libdir(workspace_root).map_err(|message| PgoPrerequisiteFailure {
             reason: "rustc_target_libdir_failed",
@@ -915,11 +891,21 @@ fn prove_pgo_prerequisites(
             message: error.to_string(),
             remediation: Some(LLVM_TOOLS_HINT),
         })?;
+    // The real compiler is resolved and identified before any process-local
+    // `RUSTC` override, so the shim can never resolve itself.
+    let tools =
+        interposition::resolve_tools(&rustc_version).map_err(|message| PgoPrerequisiteFailure {
+            reason: "compiler_interposition_unavailable",
+            message,
+            remediation: None,
+        })?;
 
     Ok(PgoPrerequisites {
         llvm_profdata_path: llvm_profdata_path.clone(),
         target_libdir,
-        preserved_target_rustflags,
+        real_rustc: tools.real_rustc,
+        shim_executable: tools.shim_executable,
+        shim_protocol: interposition::PROTOCOL,
         inspected_config_sources,
         tool_identity: ToolIdentity {
             cargo_version,
@@ -965,16 +951,18 @@ fn rustc_target_libdir(workspace_root: &Path) -> Result<PathBuf, String> {
         .map_err(|error| format!("rustc target-libdir could not be canonicalized: {error}"))
 }
 
-fn effective_target_rustflags(
+/// Records the directly discovered Cargo config sources and rejects a compiler
+/// override declared in any of them. Temper never merges config values; Cargo
+/// keeps ownership of effective rustflags. Recursive `include` provenance
+/// arrives with the schema-3 source graph.
+fn inspect_config_sources(
     workspace_root: &Path,
-) -> Result<(Vec<String>, Vec<ConfigSourceRecord>), PgoPrerequisiteFailure> {
+) -> Result<Vec<ConfigSourceRecord>, PgoPrerequisiteFailure> {
     let paths = cargo_config_paths(workspace_root).map_err(|message| PgoPrerequisiteFailure {
         reason: "cargo_config_inspection_failed",
         message,
         remediation: None,
     })?;
-    let mut rustflags = Vec::new();
-    let mut target_sources = 0_usize;
     let mut inspected_sources = Vec::new();
     for path in &paths {
         let contents = fs::read_to_string(path).map_err(|error| PgoPrerequisiteFailure {
@@ -1000,54 +988,15 @@ fn effective_target_rustflags(
                 ),
                 remediation: None,
             })?;
-        if let Some(build) = config.get("build") {
-            if build.get("rustflags").is_some() {
-                return Err(PgoPrerequisiteFailure {
-                    reason: "unproven_build_rustflags",
-                    message: format!(
-                        "PGO was rejected because effective build.rustflags may come from {}.",
-                        path.display()
-                    ),
-                    remediation: None,
-                });
-            }
-            for key in ["rustc", "rustc-wrapper", "rustc-workspace-wrapper"] {
-                if build.get(key).is_some() {
-                    return Err(PgoPrerequisiteFailure {
-                        reason: "unproven_compiler_override",
-                        message: format!(
-                            "PGO was rejected because effective build.{key} may come from {}.",
-                            path.display()
-                        ),
-                        remediation: None,
-                    });
-                }
-            }
-        }
-        let Some(targets) = config.get("target").and_then(toml::Value::as_table) else {
+        let Some(build) = config.get("build") else {
             continue;
         };
-        for (target, settings) in targets {
-            let Some(value) = settings.get("rustflags") else {
-                continue;
-            };
-            if target == SUPPORTED_HOST {
-                target_sources += 1;
-                if target_sources > 1 {
-                    return Err(PgoPrerequisiteFailure {
-                        reason: "ambiguous_target_rustflags",
-                        message:
-                            "PGO was rejected because multiple target-specific rustflags sources make composition ambiguous."
-                                .to_owned(),
-                        remediation: None,
-                    });
-                }
-                rustflags = rustflags_value(value, path)?;
-            } else if target.trim_start().starts_with("cfg(") {
+        for key in ["rustc", "rustc-wrapper", "rustc-workspace-wrapper"] {
+            if build.get(key).is_some() {
                 return Err(PgoPrerequisiteFailure {
-                    reason: "unproven_cfg_rustflags",
+                    reason: "unproven_compiler_override",
                     message: format!(
-                        "PGO was rejected because cfg-selected target rustflags in {} cannot be proven composable.",
+                        "PGO was rejected because effective build.{key} may come from {}.",
                         path.display()
                     ),
                     remediation: None,
@@ -1055,71 +1004,7 @@ fn effective_target_rustflags(
             }
         }
     }
-    Ok((rustflags, inspected_sources))
-}
-
-fn rustflags_value(
-    value: &toml::Value,
-    path: &Path,
-) -> Result<Vec<String>, PgoPrerequisiteFailure> {
-    if let Some(flags) = value.as_str() {
-        if flags.contains('\u{1f}') {
-            return Err(PgoPrerequisiteFailure {
-                reason: "unsupported_target_rustflags_encoding",
-                message: format!(
-                    "Target rustflags in {} contain Cargo's encoded-rustflags separator.",
-                    path.display()
-                ),
-                remediation: None,
-            });
-        }
-        if flags
-            .chars()
-            .any(|character| matches!(character, '"' | '\'' | '\\'))
-        {
-            return Err(PgoPrerequisiteFailure {
-                reason: "unsupported_string_rustflags_boundaries",
-                message: format!(
-                    "Target rustflags in {} use quoting or escaping that Temper cannot preserve without reinterpreting Cargo's argument boundaries.",
-                    path.display()
-                ),
-                remediation: None,
-            });
-        }
-        return Ok(flags.split_ascii_whitespace().map(str::to_owned).collect());
-    }
-    let flags = value.as_array().ok_or_else(|| PgoPrerequisiteFailure {
-        reason: "invalid_target_rustflags",
-        message: format!(
-            "Target rustflags in {} must be a string or an array of strings.",
-            path.display()
-        ),
-        remediation: None,
-    })?;
-    flags
-        .iter()
-        .map(|flag| {
-            let flag = flag.as_str().ok_or_else(|| PgoPrerequisiteFailure {
-                reason: "invalid_target_rustflags",
-                message: format!(
-                    "Target rustflags in {} contain a non-string value.",
-                    path.display()
-                ),
-                remediation: None,
-            })?;
-            if flag.contains('\u{1f}') {
-                return Err(PgoPrerequisiteFailure {
-                    reason: "unsupported_target_rustflags_encoding",
-                    message: format!(
-                        "Target rustflags in {} contain Cargo's encoded-rustflags separator.",
-                        path.display()
-                    ),
-                    remediation: None,
-                });
-            }
-            Ok(flag.to_owned())
-        })
-        .collect()
+    Ok(inspected_sources)
 }
 
 fn cargo_config_paths(workspace_root: &Path) -> Result<Vec<PathBuf>, String> {
@@ -1163,17 +1048,6 @@ fn active_config_path(directory: &Path) -> Option<PathBuf> {
         let toml = directory.join("config.toml");
         toml.is_file().then_some(toml)
     }
-}
-
-fn path_flag(prefix: &str, path: &Path) -> Result<String, String> {
-    path.to_str()
-        .map(|path| format!("{prefix}{path}"))
-        .ok_or_else(|| {
-            format!(
-                "PGO requires a UTF-8 run path for target-scoped rustflags: {}.",
-                path.display()
-            )
-        })
 }
 
 fn collect_profile_files(root: &Path) -> Result<Vec<ProfileFileRecord>, String> {
@@ -1506,18 +1380,23 @@ pub(crate) fn selected_candidate(measurements: &[(Strategy, u64)]) -> Option<Str
 mod tests {
     use super::{
         BuildPlan, BuildStage, ConfigSourceRecord, PgoParityRecord, PgoPhaseInputs, Strategy,
-        ToolIdentity, effective_target_rustflags, lowest_median_strategy, selected_candidate,
+        ToolIdentity, inspect_config_sources, lowest_median_strategy, selected_candidate,
     };
-    use crate::cargo::BuildEnvironmentOverride;
+    use crate::interposition::{
+        Injection, InterpositionPlan, MISSING_FUNCTION_FLAG, PROFILE_GENERATE_FLAG,
+        PROFILE_USE_FLAG, ShimStage,
+    };
     use std::fs;
+    use std::path::{Path, PathBuf};
 
     #[test]
     fn fixed_strategies_have_canonical_overrides_and_directories() {
-        let root = std::path::Path::new("/run/target");
+        let root = Path::new("/run/target");
         let baseline = BuildPlan::baseline(root);
         assert_eq!(baseline.target_directory, root.join("baseline"));
         assert!(baseline.cargo_config_overrides.is_empty());
         assert!(matches!(baseline.stage, BuildStage::Baseline));
+        assert!(baseline.interposition.is_none());
 
         let thin = BuildPlan::candidate(Strategy::ThinLto, root);
         assert_eq!(thin.target_directory, root.join("thin-lto"));
@@ -1540,13 +1419,14 @@ mod tests {
             Strategy::FatLtoCgu1,
             root,
             fat.cargo_config_overrides.clone(),
-            Vec::new(),
+            None,
         );
         assert_eq!(
             confirmation.target_directory,
             root.join("confirmation/fat-lto-cgu1")
         );
         assert!(matches!(confirmation.stage, BuildStage::Confirmation));
+        assert!(confirmation.interposition.is_none());
         assert_eq!(
             confirmation.cargo_config_overrides,
             fat.cargo_config_overrides
@@ -1571,118 +1451,68 @@ mod tests {
     }
 
     #[test]
-    fn preserves_exact_target_flags_and_rejects_build_flags() {
+    fn config_inspection_records_sources_without_reconstructing_rustflags() {
         let fixture = tempfile::tempdir().expect("fixture");
         let cargo = fixture.path().join(".cargo");
         fs::create_dir(&cargo).expect("cargo directory");
+        // Every rustflags shape v0.0.2 rejected now stays with Cargo.
         fs::write(
             cargo.join("config.toml"),
-            "[target.x86_64-unknown-linux-gnu]\nrustflags = [\"-C\", \"target-cpu=native\"]\n",
+            "[build]\nrustflags = [\"--cfg\", \"build_flag\"]\n\n[target.x86_64-unknown-linux-gnu]\nrustflags = '--cfg \"quoted label\"'\n\n[target.'cfg(unix)']\nrustflags = [\"--cfg\", \"cfg_flag\"]\n",
         )
-        .expect("target config");
-        let (flags, sources) =
-            effective_target_rustflags(fixture.path()).expect("compatible target flags");
-        assert_eq!(flags, ["-C", "target-cpu=native"]);
+        .expect("rustflags config");
+        let sources = inspect_config_sources(fixture.path()).expect("rustflags stay with Cargo");
         assert_eq!(sources.len(), 1);
         assert_eq!(sources[0].path, cargo.join("config.toml"));
         assert_eq!(sources[0].sha256.len(), 64);
-
-        fs::write(
-            cargo.join("config.toml"),
-            "[build]\nrustflags = [\"-C\", \"target-cpu=native\"]\nrustc = \"/other/rustc\"\n",
-        )
-        .expect("build config");
-        let error = effective_target_rustflags(fixture.path())
-            .expect_err("build rustflags must fail closed");
-        assert_eq!(error.reason, "unproven_build_rustflags");
-        assert!(error.message.contains("effective build.rustflags"));
-
-        fs::write(
-            cargo.join("config.toml"),
-            "[build]\nrustc = \"/other/rustc\"\n",
-        )
-        .expect("compiler config");
-        let error = effective_target_rustflags(fixture.path())
-            .expect_err("compiler override must fail closed");
-        assert_eq!(error.reason, "unproven_compiler_override");
-        assert!(error.message.contains("effective build.rustc"));
     }
 
     #[test]
-    fn pgo_owns_one_ordered_environment_channel() {
-        let root = std::path::Path::new("/run/target");
-        let project = ["--cfg".to_owned(), "temper_project".to_owned()];
-        let phase = ["-Cprofile-generate=/run/profiles".to_owned()];
-        let plan = BuildPlan::pgo_instrumentation(Strategy::ThinLto, root, &project, &phase);
+    fn config_inspection_rejects_every_declared_compiler_override() {
+        let fixture = tempfile::tempdir().expect("fixture");
+        let cargo = fixture.path().join(".cargo");
+        fs::create_dir(&cargo).expect("cargo directory");
+        for key in ["rustc", "rustc-wrapper", "rustc-workspace-wrapper"] {
+            fs::write(
+                cargo.join("config.toml"),
+                format!("[build]\n{key} = \"/other/compiler\"\n"),
+            )
+            .expect("compiler override config");
+            let error =
+                inspect_config_sources(fixture.path()).expect_err("compiler override fails closed");
+            assert_eq!(error.reason, "unproven_compiler_override");
+            assert!(error.message.contains(&format!("build.{key}")));
+        }
+    }
+
+    #[test]
+    fn interposed_pgo_plans_own_no_rustflags_channel() {
+        let plan = BuildPlan::pgo(
+            Strategy::ThinLto,
+            BuildStage::PgoInstrumentation,
+            interposition_plan(
+                ShimStage::Generate,
+                Injection::Generate(PathBuf::from("/run/pgo/raw")),
+            ),
+        );
         assert_eq!(
             plan.cargo_config_overrides,
             ["profile.release.lto=\"thin\""]
         );
-        assert_eq!(plan.environment_overrides.len(), 1);
+        let interposition = plan.interposition.expect("interposed stage");
+        assert_eq!(plan.target_directory, interposition.target_directory);
         assert_eq!(
-            plan.environment_overrides[0].name,
-            "CARGO_ENCODED_RUSTFLAGS"
+            interposition.record().injected_flags,
+            [PROFILE_GENERATE_FLAG]
         );
-        assert_eq!(
-            plan.environment_overrides[0].arguments,
-            [
-                "--cfg",
-                "temper_project",
-                "-Cprofile-generate=/run/profiles"
-            ]
-        );
-    }
-
-    #[test]
-    fn string_rustflags_with_ambiguous_boundaries_are_rejected_stably() {
-        let fixture = tempfile::tempdir().expect("fixture");
-        let cargo = fixture.path().join(".cargo");
-        fs::create_dir(&cargo).expect("cargo directory");
-        fs::write(
-            cargo.join("config.toml"),
-            "[target.x86_64-unknown-linux-gnu]\nrustflags = '--cfg \"temper label\"'\n",
-        )
-        .expect("target config");
-        let error = effective_target_rustflags(fixture.path())
-            .expect_err("quoted string rustflags must fail closed");
-        assert_eq!(error.reason, "unsupported_string_rustflags_boundaries");
-    }
-
-    #[test]
-    fn cfg_and_multiple_target_sources_remain_fail_closed() {
-        let fixture = tempfile::tempdir().expect("fixture");
-        let workspace = fixture.path().join("workspace");
-        fs::create_dir_all(workspace.join(".cargo")).expect("workspace Cargo directory");
-        fs::write(
-            workspace.join(".cargo/config.toml"),
-            "[target.'cfg(unix)']\nrustflags = [\"--cfg\", \"temper_cfg\"]\n",
-        )
-        .expect("cfg target config");
-        let error = effective_target_rustflags(&workspace)
-            .expect_err("cfg-selected rustflags must fail closed");
-        assert_eq!(error.reason, "unproven_cfg_rustflags");
-
-        fs::create_dir_all(fixture.path().join(".cargo")).expect("parent Cargo directory");
-        fs::write(
-            fixture.path().join(".cargo/config.toml"),
-            "[target.x86_64-unknown-linux-gnu]\nrustflags = [\"--cfg\", \"parent\"]\n",
-        )
-        .expect("parent target config");
-        fs::write(
-            workspace.join(".cargo/config.toml"),
-            "[target.x86_64-unknown-linux-gnu]\nrustflags = [\"--cfg\", \"workspace\"]\n",
-        )
-        .expect("workspace target config");
-        let error = effective_target_rustflags(&workspace)
-            .expect_err("multiple target rustflags must fail closed");
-        assert_eq!(error.reason, "ambiguous_target_rustflags");
     }
 
     #[test]
     fn parity_allows_only_phase_differences_and_names_every_other_field() {
-        let instrumentation = parity_inputs("/run/instrumented", "-Cprofile-generate=/run/raw");
-        let optimization = parity_inputs("/run/optimized", "-Cprofile-use=/run/merged.profdata");
-        let parity = PgoParityRecord::compare(instrumentation.clone(), optimization.clone());
+        let instrumentation = parity_inputs(ShimStage::Generate);
+        let optimization = parity_inputs(ShimStage::Use);
+        let mut parity = parity_record(Some(instrumentation.clone()), Some(optimization.clone()));
+        parity.decide();
         assert!(parity.matched);
         assert!(parity.unexpected_differences.is_empty());
 
@@ -1694,15 +1524,15 @@ mod tests {
         changed
             .base_profile_overrides
             .push("profile.release.debug=1".to_owned());
-        changed
-            .project_rustflags
-            .push("--changed-project-flag".to_owned());
         changed.config_sources[0].sha256 = "changed-config-hash".to_owned();
         changed.cargo_identity = "changed-cargo".to_owned();
         changed.rustc_identity = "changed-rustc".to_owned();
         changed.llvm_profdata_identity.llvm_profdata_sha256 = "changed-profdata".to_owned();
-        changed.environment_overrides.clear();
-        let parity = PgoParityRecord::compare(instrumentation, changed);
+        changed.real_rustc = PathBuf::from("/other/rustc");
+        changed.shim_executable = PathBuf::from("/other/cargo-temper");
+        changed.injected_flags = vec![PROFILE_GENERATE_FLAG];
+        let mut parity = parity_record(Some(instrumentation), Some(changed));
+        parity.decide();
         assert_eq!(
             parity.unexpected_differences,
             [
@@ -1711,18 +1541,65 @@ mod tests {
                 "target_triple",
                 "cargo_arguments",
                 "base_profile_overrides",
-                "project_rustflags",
                 "config_sources",
                 "cargo_identity",
                 "rustc_identity",
                 "llvm_profdata_identity",
-                "pgo_environment_channel",
+                "real_rustc",
+                "shim_executable",
+                "pgo_injection_channel",
             ]
         );
     }
 
-    fn parity_inputs(target_directory: &str, phase_flag: &str) -> PgoPhaseInputs {
-        let project_rustflags = vec!["--cfg".to_owned(), "temper_project".to_owned()];
+    #[test]
+    fn parity_can_never_match_without_both_phases() {
+        let mut empty = parity_record(None, None);
+        empty.decide();
+        assert!(!empty.matched);
+        assert_eq!(
+            empty.unexpected_differences,
+            ["instrumentation_inputs_unavailable"]
+        );
+
+        let mut instrumentation_only =
+            parity_record(Some(parity_inputs(ShimStage::Generate)), None);
+        instrumentation_only.decide();
+        assert!(!instrumentation_only.matched);
+        assert_eq!(
+            instrumentation_only.unexpected_differences,
+            ["optimization_inputs_unavailable"]
+        );
+    }
+
+    fn parity_record(
+        instrumentation: Option<PgoPhaseInputs>,
+        optimization: Option<PgoPhaseInputs>,
+    ) -> PgoParityRecord {
+        let mut record = PgoParityRecord::pending();
+        record.instrumentation = instrumentation;
+        record.optimization = optimization;
+        record
+    }
+
+    fn interposition_plan(stage: ShimStage, injection: Injection) -> InterpositionPlan {
+        InterpositionPlan {
+            stage,
+            shim_executable: PathBuf::from("/toolchain/cargo-temper"),
+            real_rustc: PathBuf::from("/toolchain/rustc"),
+            run_root: PathBuf::from("/run"),
+            target_directory: PathBuf::from("/run/target").join(stage.label()),
+            capture_directory: PathBuf::from("/run/captures").join(stage.label()),
+            injection,
+        }
+    }
+
+    fn parity_inputs(stage: ShimStage) -> PgoPhaseInputs {
+        let injection = match stage {
+            ShimStage::Generate => Injection::Generate(PathBuf::from("/run/pgo/raw")),
+            _ => Injection::Use(PathBuf::from("/run/pgo/merged.profdata")),
+        };
+        let plan = interposition_plan(stage, injection);
         let tool_identity = ToolIdentity {
             cargo_version: "cargo identity".to_owned(),
             rustc_version: "rustc identity".to_owned(),
@@ -1734,13 +1611,13 @@ mod tests {
             package_id: "package 0.1.0 (path+file:///workspace)".to_owned(),
             binary_target: "binary".to_owned(),
             target_triple: "x86_64-unknown-linux-gnu",
+            stage,
             cargo_arguments: vec![
                 "build".to_owned(),
                 "--target-dir".to_owned(),
-                target_directory.to_owned(),
+                plan.target_directory.to_string_lossy().into_owned(),
             ],
             base_profile_overrides: vec!["profile.release.lto=\"thin\"".to_owned()],
-            project_rustflags: project_rustflags.clone(),
             config_sources: vec![ConfigSourceRecord {
                 path: "/workspace/.cargo/config.toml".into(),
                 sha256: "config hash".to_owned(),
@@ -1748,13 +1625,14 @@ mod tests {
             cargo_identity: tool_identity.cargo_version.clone(),
             rustc_identity: tool_identity.rustc_version.clone(),
             llvm_profdata_identity: tool_identity,
-            target_directory: target_directory.into(),
-            environment_overrides: vec![BuildEnvironmentOverride::cargo_encoded_rustflags(
-                project_rustflags
-                    .into_iter()
-                    .chain([phase_flag.to_owned()])
-                    .collect(),
-            )],
+            real_rustc: plan.real_rustc.clone(),
+            shim_executable: plan.shim_executable.clone(),
+            injected_flags: match stage {
+                ShimStage::Generate => vec![PROFILE_GENERATE_FLAG],
+                _ => vec![PROFILE_USE_FLAG, MISSING_FUNCTION_FLAG],
+            },
+            target_directory: plan.target_directory.clone(),
+            capture_directory: plan.capture_directory.clone(),
         }
     }
 }

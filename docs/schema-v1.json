@@ -1,0 +1,570 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://temper.invalid/schema/run-v1.json",
+  "title": "Temper completed run schema v1",
+  "type": "object",
+  "$defs": {
+    "buildRecord": {
+      "type": "object",
+      "required": [
+        "strategy",
+        "stage",
+        "target_directory",
+        "cargo_arguments",
+        "cargo_config_overrides",
+        "outcome",
+        "executable_path",
+        "sha256",
+        "size_bytes",
+        "build_duration_ms",
+        "bounded_diagnostics",
+        "diagnostics_truncated"
+      ],
+      "properties": {
+        "strategy": {
+          "enum": [
+            "baseline",
+            "thin-lto",
+            "fat-lto-cgu1",
+            "pgo"
+          ]
+        },
+        "stage": {
+          "enum": [
+            "baseline",
+            "static_candidate",
+            "pgo_instrumentation",
+            "pgo_optimized",
+            "confirmation"
+          ]
+        },
+        "target_directory": {
+          "type": "string"
+        },
+        "cargo_arguments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cargo_config_overrides": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "outcome": {
+          "const": "built"
+        },
+        "executable_path": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string"
+        },
+        "size_bytes": {
+          "type": "integer"
+        },
+        "build_duration_ms": {
+          "type": "integer"
+        },
+        "bounded_diagnostics": {
+          "type": "string"
+        },
+        "diagnostics_truncated": {
+          "type": "boolean"
+        }
+      }
+    },
+    "buildFailure": {
+      "type": "object",
+      "required": [
+        "strategy",
+        "stage",
+        "target_directory",
+        "cargo_arguments",
+        "cargo_config_overrides",
+        "outcome",
+        "build_duration_ms",
+        "message",
+        "bounded_diagnostics",
+        "diagnostics_truncated"
+      ],
+      "properties": {
+        "outcome": {
+          "const": "failed"
+        },
+        "message": {
+          "type": "string"
+        },
+        "bounded_diagnostics": {
+          "type": "string"
+        },
+        "diagnostics_truncated": {
+          "type": "boolean"
+        }
+      }
+    },
+    "screening": {
+      "type": "object",
+      "required": [
+        "sample_durations_ns",
+        "median_duration_ns",
+        "relative_mad",
+        "outcome"
+      ],
+      "properties": {
+        "sample_durations_ns": {
+          "type": "array",
+          "minItems": 7,
+          "maxItems": 7,
+          "items": {
+            "type": "integer"
+          }
+        },
+        "median_duration_ns": {
+          "type": "integer"
+        },
+        "relative_mad": {
+          "type": "number"
+        },
+        "outcome": {
+          "enum": [
+            "stable",
+            "unstable_measurement"
+          ]
+        }
+      }
+    },
+    "confirmationMeasurement": {
+      "type": "object",
+      "required": [
+        "baseline_durations_ns",
+        "candidate_durations_ns",
+        "median_ratio",
+        "baseline_relative_mad",
+        "candidate_relative_mad",
+        "confidence_interval_95",
+        "threshold_ratio",
+        "outcome"
+      ],
+      "properties": {
+        "baseline_durations_ns": {
+          "type": "array",
+          "minItems": 20,
+          "maxItems": 20,
+          "items": {
+            "type": "integer"
+          }
+        },
+        "candidate_durations_ns": {
+          "type": "array",
+          "minItems": 20,
+          "maxItems": 20,
+          "items": {
+            "type": "integer"
+          }
+        },
+        "median_ratio": {
+          "type": "number"
+        },
+        "baseline_relative_mad": {
+          "type": "number"
+        },
+        "candidate_relative_mad": {
+          "type": "number"
+        },
+        "confidence_interval_95": {
+          "type": "object",
+          "required": [
+            "lower",
+            "upper"
+          ],
+          "properties": {
+            "lower": {
+              "type": "number"
+            },
+            "upper": {
+              "type": "number"
+            }
+          }
+        },
+        "threshold_ratio": {
+          "type": "number"
+        },
+        "outcome": {
+          "enum": [
+            "accepted",
+            "insufficient_improvement",
+            "unstable_measurement"
+          ]
+        }
+      }
+    },
+    "strategyRecord": {
+      "type": "object",
+      "required": [
+        "identity",
+        "build",
+        "build_failure",
+        "screening",
+        "workload_failure",
+        "rejection_reason"
+      ],
+      "properties": {
+        "identity": {
+          "enum": [
+            "thin-lto",
+            "fat-lto-cgu1",
+            "pgo"
+          ]
+        },
+        "build": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/buildRecord"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "build_failure": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/buildFailure"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "screening": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/screening"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "pgoTraining": {
+      "type": "object",
+      "required": [
+        "outcome",
+        "base_strategy",
+        "prerequisites",
+        "instrumentation_build",
+        "instrumentation_failure",
+        "training_duration_ns",
+        "raw_profile_files",
+        "merge",
+        "failure_stage",
+        "rejection_reason",
+        "remediation"
+      ],
+      "properties": {
+        "outcome": {
+          "enum": [
+            "trained",
+            "rejected"
+          ]
+        },
+        "base_strategy": {
+          "enum": [
+            "baseline",
+            "thin-lto",
+            "fat-lto-cgu1"
+          ]
+        },
+        "raw_profile_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "confirmation": {
+      "type": "object",
+      "required": [
+        "strategy",
+        "outcome",
+        "baseline_build",
+        "baseline_build_failure",
+        "candidate_build",
+        "candidate_build_failure",
+        "measurement",
+        "workload_failure",
+        "rejection_reason"
+      ],
+      "properties": {
+        "outcome": {
+          "enum": [
+            "accepted",
+            "rejected"
+          ]
+        },
+        "baseline_build": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/buildRecord"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "candidate_build": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/buildRecord"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "measurement": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/confirmationMeasurement"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "promotion": {
+      "type": "object",
+      "required": [
+        "source_strategy",
+        "source_path",
+        "source_sha256",
+        "promoted_path",
+        "promoted_sha256",
+        "size_bytes",
+        "permissions_mode"
+      ]
+    },
+    "failure": {
+      "type": "object",
+      "required": [
+        "phase",
+        "outcome",
+        "message",
+        "bounded_diagnostics",
+        "diagnostics_truncated",
+        "build_failure"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "experimental",
+    "compatibility",
+    "cli_version",
+    "run_id",
+    "status",
+    "completed_phases",
+    "final_decision",
+    "source_reproducibility",
+    "request",
+    "preflight",
+    "target",
+    "baseline",
+    "baseline_measurement",
+    "strategies",
+    "pgo_base_strategy",
+    "pgo_training",
+    "selected_candidate",
+    "confirmation",
+    "promotion",
+    "failure"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "experimental": {
+      "type": "boolean"
+    },
+    "compatibility": {
+      "type": "string"
+    },
+    "cli_version": {
+      "const": "0.0.1"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "confirmed",
+        "no_improvement",
+        "interrupted",
+        "failed"
+      ]
+    },
+    "completed_phases": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "final_decision": {
+      "enum": [
+        "confirmed",
+        "no_improvement",
+        "interrupted",
+        "failed"
+      ]
+    },
+    "source_reproducibility": {
+      "enum": [
+        "clean",
+        "dirty"
+      ]
+    },
+    "request": {
+      "type": "object",
+      "required": [
+        "minimum_improvement_percent",
+        "timeout_seconds",
+        "workload"
+      ],
+      "properties": {
+        "minimum_improvement_percent": {
+          "type": "number"
+        },
+        "timeout_seconds": {
+          "type": "integer"
+        },
+        "workload": {
+          "type": "object",
+          "required": [
+            "executable",
+            "arguments"
+          ],
+          "properties": {
+            "executable": {
+              "type": "string"
+            },
+            "arguments": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "preflight": {
+      "type": "object",
+      "required": [
+        "host_triple",
+        "kernel",
+        "cpu_model",
+        "logical_core_count",
+        "cargo_version",
+        "rustc_version",
+        "manifest_path",
+        "lockfile_path",
+        "lockfile_sha256"
+      ]
+    },
+    "target": {
+      "type": "object",
+      "required": [
+        "package_id",
+        "package_name",
+        "binary_name",
+        "workspace_root"
+      ]
+    },
+    "baseline": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/buildRecord"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "baseline_measurement": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/screening"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "strategies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/strategyRecord"
+      }
+    },
+    "pgo_base_strategy": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "pgo_training": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/pgoTraining"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "selected_candidate": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "confirmation": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/confirmation"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "promotion": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/promotion"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "failure": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/failure"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  }
+}

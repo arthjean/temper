@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "experimental": true,
+  "compatibility": "No backward-compatibility promise during 0.x.",
+  "cli_version": "0.0.1",
+  "run_id": "schema-v1-fixture",
+  "status": "no_improvement",
+  "completed_phases": [
+    "preflight",
+    "baseline_build",
+    "static_builds",
+    "screening",
+    "pgo_training",
+    "pgo_build",
+    "candidate_selection",
+    "confirmation"
+  ],
+  "final_decision": "no_improvement",
+  "source_reproducibility": "clean",
+  "request": {
+    "minimum_improvement_percent": 2.0,
+    "timeout_seconds": 300,
+    "workload": {
+      "executable": "/fixture/workload",
+      "arguments": [
+        "literal argument"
+      ]
+    }
+  },
+  "preflight": {
+    "host_triple": "x86_64-unknown-linux-gnu",
+    "kernel": "Linux fixture",
+    "cpu_model": "fixture CPU",
+    "logical_core_count": 1,
+    "cargo_version": "cargo fixture",
+    "rustc_version": "rustc fixture",
+    "manifest_path": "/fixture/Cargo.toml",
+    "lockfile_path": "/fixture/Cargo.lock",
+    "lockfile_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "target": {
+    "package_id": "path+file:///fixture#schema-v1-fixture@0.1.0",
+    "package_name": "schema-v1-fixture",
+    "binary_name": "schema-v1-fixture",
+    "workspace_root": "/fixture"
+  },
+  "baseline": {
+    "strategy": "baseline",
+    "stage": "baseline",
+    "target_directory": "/fixture/.temper/runs/schema-v1-fixture/target/baseline",
+    "cargo_arguments": [],
+    "cargo_config_overrides": [],
+    "outcome": "built",
+    "executable_path": "/fixture/baseline",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "size_bytes": 1,
+    "build_duration_ms": 1,
+    "bounded_diagnostics": "",
+    "diagnostics_truncated": false
+  },
+  "baseline_measurement": {
+    "sample_durations_ns": [
+      1000000,
+      1000000,
+      1000000,
+      1000000,
+      1000000,
+      1000000,
+      1000000
+    ],
+    "median_duration_ns": 1000000,
+    "relative_mad": 0.0,
+    "outcome": "stable"
+  },
+  "strategies": [
+    {
+      "identity": "thin-lto",
+      "build": null,
+      "build_failure": {
+        "strategy": "thin-lto",
+        "stage": "static_candidate",
+        "target_directory": "/fixture/.temper/runs/schema-v1-fixture/target/thin-lto",
+        "cargo_arguments": [],
+        "cargo_config_overrides": [
+          "profile.release.lto=\"thin\""
+        ],
+        "outcome": "failed",
+        "build_duration_ms": 1,
+        "message": "synthetic fixture build failure",
+        "bounded_diagnostics": "",
+        "diagnostics_truncated": false
+      },
+      "screening": null,
+      "workload_failure": null,
+      "rejection_reason": "static_build_failed"
+    },
+    {
+      "identity": "fat-lto-cgu1",
+      "build": null,
+      "build_failure": {
+        "strategy": "fat-lto-cgu1",
+        "stage": "static_candidate",
+        "target_directory": "/fixture/.temper/runs/schema-v1-fixture/target/fat-lto-cgu1",
+        "cargo_arguments": [],
+        "cargo_config_overrides": [
+          "profile.release.lto=\"fat\"",
+          "profile.release.codegen-units=1"
+        ],
+        "outcome": "failed",
+        "build_duration_ms": 1,
+        "message": "synthetic fixture build failure",
+        "bounded_diagnostics": "",
+        "diagnostics_truncated": false
+      },
+      "screening": null,
+      "workload_failure": null,
+      "rejection_reason": "static_build_failed"
+    },
+    {
+      "identity": "pgo",
+      "build": null,
+      "build_failure": null,
+      "screening": null,
+      "workload_failure": null,
+      "rejection_reason": "pgo_training_rejected"
+    }
+  ],
+  "pgo_base_strategy": "baseline",
+  "pgo_training": {
+    "outcome": "rejected",
+    "base_strategy": "baseline",
+    "prerequisites": null,
+    "instrumentation_build": null,
+    "instrumentation_failure": null,
+    "training_duration_ns": null,
+    "raw_profile_files": [],
+    "merge": null,
+    "failure_stage": "prerequisites",
+    "rejection_reason": "llvm_profdata_missing",
+    "remediation": "Install llvm-tools-preview to evaluate PGO."
+  },
+  "selected_candidate": null,
+  "confirmation": {
+    "strategy": null,
+    "outcome": "rejected",
+    "baseline_build": null,
+    "baseline_build_failure": null,
+    "candidate_build": null,
+    "candidate_build_failure": null,
+    "measurement": null,
+    "workload_failure": null,
+    "rejection_reason": "no_valid_candidate"
+  },
+  "promotion": null,
+  "failure": null
+}

@@ -1,0 +1,320 @@
+{
+  "corpus_schema_version": 1,
+  "corpus_id": "temper-corpus-v1",
+  "changelog_version": "1.0.0",
+  "cases": [
+    {
+      "id": "blake3-b3sum",
+      "classification": "real",
+      "workload_class": "compute-heavy",
+      "source": {
+        "upstream_url": "https://github.com/BLAKE3-team/BLAKE3",
+        "revision": "8aa5145039b972ba30e98e788752d37d14568824",
+        "snapshot_path": "cases/blake3-b3sum/source",
+        "snapshot_sha256": "0288247ad9370185132790def61b11094ee83fdee18f17051447961b4bde9339",
+        "snapshot_bytes": 1854477
+      },
+      "cargo": {
+        "manifest_path": "cases/blake3-b3sum/source/b3sum/Cargo.toml",
+        "package": "b3sum",
+        "binary": "b3sum",
+        "lockfile_path": "cases/blake3-b3sum/source/b3sum/Cargo.lock",
+        "lockfile_sha256": "e6fbe1f2b2a6fc726bf8f3da5774ba9fb05f94115883c531ba1a02a891e072a3"
+      },
+      "license": {
+        "spdx_expression": "CC0-1.0 OR Apache-2.0 OR Apache-2.0 WITH LLVM-exception",
+        "notice_paths": [
+          "cases/blake3-b3sum/source/LICENSE_CC0",
+          "cases/blake3-b3sum/source/LICENSE_A2",
+          "cases/blake3-b3sum/source/LICENSE_A2LLVM"
+        ],
+        "redistribution_determination_path": "cases/blake3-b3sum/provenance.md",
+        "manual_review": {
+          "date": "2026-07-28",
+          "secrets_found": false,
+          "personal_data_found": false,
+          "automatic_network_operation_found": false
+        }
+      },
+      "inputs": [
+        {
+          "path": "cases/blake3-b3sum/source/test_vectors/test_vectors.json",
+          "sha256": "dcb91ea8accc77e6d6e632af7cdc1a99a9f3ae78cf648da595c7d064db32f624"
+        }
+      ],
+      "scenarios": [
+        {
+          "id": "hash-32",
+          "weight": 60,
+          "arguments": [
+            "--no-names",
+            "--length",
+            "32",
+            "source/test_vectors/test_vectors.json"
+          ],
+          "expected_output_sha256": "2165a523b134985df7b998889cb0cd90d1ffb06e873d4b5002147f60bf84c259",
+          "rationale": "Default-length hashing represents the primary b3sum use path."
+        },
+        {
+          "id": "hash-64",
+          "weight": 40,
+          "arguments": [
+            "--no-names",
+            "--length",
+            "64",
+            "source/test_vectors/test_vectors.json"
+          ],
+          "expected_output_sha256": "9d1642f4c0490e63017d881624df5e93e5c5fe96d732724ad4dab080a0fa8a20",
+          "rationale": "Extended-output hashing exercises the output-reader path."
+        }
+      ],
+      "oracle": {
+        "workload_path": "cases/blake3-b3sum/workload.sh",
+        "workload_sha256": "659423690575ad4054363f4984df2d4e59149c085f9d20244ea64aacd41a95f8",
+        "method": "exit-status-and-output-sha256"
+      },
+      "resource_bounds": {
+        "timeout_seconds": 10,
+        "output_limit_bytes": 1048576,
+        "maximum_source_bytes": 26214400,
+        "curation_baseline_median_ms": 280
+      },
+      "expected_evidence_paths": [
+        "results/reference/2026-07-28/blake3-b3sum/run-1/run.json",
+        "results/reference/2026-07-28/blake3-b3sum/run-2/run.json",
+        "results/reference/2026-07-28/blake3-b3sum/run-3/run.json"
+      ]
+    },
+    {
+      "id": "xsv",
+      "classification": "real",
+      "workload_class": "parsing-transformation",
+      "source": {
+        "upstream_url": "https://github.com/BurntSushi/xsv",
+        "revision": "f4304660231d7907798e831411871d2679d335c3",
+        "snapshot_path": "cases/xsv/source",
+        "snapshot_sha256": "1a8f3c34fabae2968806ca72045610377dc8cc04550b1fcddfcabd942b6fb61a",
+        "snapshot_bytes": 269161
+      },
+      "cargo": {
+        "manifest_path": "cases/xsv/source/Cargo.toml",
+        "package": "xsv",
+        "binary": "xsv",
+        "lockfile_path": "cases/xsv/source/Cargo.lock",
+        "lockfile_sha256": "17b4d59a6e6d65b59d8e837abf5481a2170553ee7ac31b7aa0822e51ec04564b"
+      },
+      "license": {
+        "spdx_expression": "MIT OR Unlicense",
+        "notice_paths": [
+          "cases/xsv/source/LICENSE-MIT",
+          "cases/xsv/source/COPYING"
+        ],
+        "redistribution_determination_path": "cases/xsv/provenance.md",
+        "manual_review": {
+          "date": "2026-07-28",
+          "secrets_found": false,
+          "personal_data_found": false,
+          "automatic_network_operation_found": false
+        }
+      },
+      "inputs": [
+        {
+          "path": "cases/xsv/inputs/records.csv",
+          "sha256": "b5d1d4947fd29d8bd520077f209b6846c90b72793d7e7d1e9b76fa85b226d316"
+        }
+      ],
+      "scenarios": [
+        {
+          "id": "statistics",
+          "weight": 55,
+          "arguments": [
+            "stats",
+            "--everything",
+            "inputs/records.csv"
+          ],
+          "expected_output_sha256": "ec9913fb6f5f3944b0230e7c8594cf3e6ed24f5726758574c7e5aac5015441fb",
+          "rationale": "Full-column statistics exercises parsing, inference and aggregation."
+        },
+        {
+          "id": "projection",
+          "weight": 45,
+          "arguments": [
+            "select",
+            "name,value",
+            "inputs/records.csv"
+          ],
+          "expected_output_sha256": "15f325a2d926419e506f18b2cd37109c33dcea5c7f5bdd20725b47542d8a7ad8",
+          "rationale": "Column projection represents streaming CSV transformation."
+        }
+      ],
+      "oracle": {
+        "workload_path": "cases/xsv/workload.sh",
+        "workload_sha256": "7501885f7d87a2e0592346142701aa7692ab81fd18018a4b1f0524efa76f9cf8",
+        "method": "exit-status-and-output-sha256"
+      },
+      "resource_bounds": {
+        "timeout_seconds": 10,
+        "output_limit_bytes": 1048576,
+        "maximum_source_bytes": 26214400,
+        "curation_baseline_median_ms": 420
+      },
+      "expected_evidence_paths": [
+        "results/reference/2026-07-28/xsv/run-1/run.json",
+        "results/reference/2026-07-28/xsv/run-2/run.json",
+        "results/reference/2026-07-28/xsv/run-3/run.json"
+      ]
+    },
+    {
+      "id": "hexyl",
+      "classification": "real",
+      "workload_class": "streaming",
+      "source": {
+        "upstream_url": "https://github.com/sharkdp/hexyl",
+        "revision": "6ecc29b9c8c84d08a7e860f7f69c22b113b480ea",
+        "snapshot_path": "cases/hexyl/source",
+        "snapshot_sha256": "ad5d404a679aa03696e6e38a99e37c369e8be7b95787f93ea90916d7e277bdcd",
+        "snapshot_bytes": 218112
+      },
+      "cargo": {
+        "manifest_path": "cases/hexyl/source/Cargo.toml",
+        "package": "hexyl",
+        "binary": "hexyl",
+        "lockfile_path": "cases/hexyl/source/Cargo.lock",
+        "lockfile_sha256": "8ea5d9783696026e5ca55d669dd91b38d8613e9fe4f5a5ad701281142adf291d"
+      },
+      "license": {
+        "spdx_expression": "MIT OR Apache-2.0",
+        "notice_paths": [
+          "cases/hexyl/source/LICENSE-MIT",
+          "cases/hexyl/source/LICENSE-APACHE"
+        ],
+        "redistribution_determination_path": "cases/hexyl/provenance.md",
+        "manual_review": {
+          "date": "2026-07-28",
+          "secrets_found": false,
+          "personal_data_found": false,
+          "automatic_network_operation_found": false
+        }
+      },
+      "inputs": [
+        {
+          "path": "cases/hexyl/source/tests/examples/hello_world_elf64",
+          "sha256": "c6f999f766c94ded605701e5a3ad3aced09796af3410c7d88c6605d0d73edb91"
+        }
+      ],
+      "scenarios": [
+        {
+          "id": "full-stream",
+          "weight": 60,
+          "arguments": [
+            "--plain",
+            "source/tests/examples/hello_world_elf64"
+          ],
+          "expected_output_sha256": "d2673e9c1cba4bf8331a4c768a7d9649fa2080aa08c28d6a91504237340b6509",
+          "rationale": "A complete local binary stream represents the primary viewer path."
+        },
+        {
+          "id": "bounded-slice",
+          "weight": 40,
+          "arguments": [
+            "--plain",
+            "--skip",
+            "1024",
+            "--length",
+            "4096",
+            "source/tests/examples/hello_world_elf64"
+          ],
+          "expected_output_sha256": "05548de4a225c006ed06af02dd478006b4095affb15799d79116be599b534622",
+          "rationale": "Offset and length handling exercises bounded seek-and-stream behavior."
+        }
+      ],
+      "oracle": {
+        "workload_path": "cases/hexyl/workload.sh",
+        "workload_sha256": "1d941acbb2ad294459716becba0a1ef55ab286b2fc52ee645eba8510c96d62c3",
+        "method": "exit-status-and-output-sha256"
+      },
+      "resource_bounds": {
+        "timeout_seconds": 10,
+        "output_limit_bytes": 1048576,
+        "maximum_source_bytes": 26214400,
+        "curation_baseline_median_ms": 230
+      },
+      "expected_evidence_paths": [
+        "results/reference/2026-07-28/hexyl/run-1/run.json",
+        "results/reference/2026-07-28/hexyl/run-2/run.json",
+        "results/reference/2026-07-28/hexyl/run-3/run.json"
+      ]
+    },
+    {
+      "id": "synthetic-control",
+      "classification": "synthetic",
+      "workload_class": "harness-control",
+      "source": {
+        "upstream_url": null,
+        "revision": "corpus-v1",
+        "snapshot_path": "cases/synthetic-control/source",
+        "snapshot_sha256": "d470b8120600839b86d2b36610a0ce5a1911d063de8b8926be065b8c4d267435",
+        "snapshot_bytes": 1989
+      },
+      "cargo": {
+        "manifest_path": "cases/synthetic-control/source/Cargo.toml",
+        "package": "temper-corpus-control",
+        "binary": "temper-corpus-control",
+        "lockfile_path": "cases/synthetic-control/source/Cargo.lock",
+        "lockfile_sha256": "6ea8caf7d7eb5f73dd295b6035de5359a3c48bc0abbec5178519013b115d4d79"
+      },
+      "license": {
+        "spdx_expression": "CC0-1.0",
+        "notice_paths": [
+          "cases/synthetic-control/source/LICENSE"
+        ],
+        "redistribution_determination_path": "cases/synthetic-control/provenance.md",
+        "manual_review": {
+          "date": "2026-07-28",
+          "secrets_found": false,
+          "personal_data_found": false,
+          "automatic_network_operation_found": false
+        }
+      },
+      "inputs": [],
+      "scenarios": [
+        {
+          "id": "mix",
+          "weight": 50,
+          "arguments": [
+            "mix",
+            "200000"
+          ],
+          "expected_output_sha256": "4b3bd169d6d348fe4bfae168b0da9b5beca6a51c8d69dcba50cf12f942a8cc8e",
+          "rationale": "Deterministic integer mixing proves the workload and output oracle path."
+        },
+        {
+          "id": "rotate",
+          "weight": 50,
+          "arguments": [
+            "rotate",
+            "200000"
+          ],
+          "expected_output_sha256": "e973fe88d28f9cca24b36f11f95847e6a9379adf1f0fda5a0d10fb3689beba9e",
+          "rationale": "A distinct deterministic kernel detects scenario-selection mistakes."
+        }
+      ],
+      "oracle": {
+        "workload_path": "cases/synthetic-control/workload.sh",
+        "workload_sha256": "172d2bbae4bfe06827fadd5bc40b46186c001da9f6a39631337b152e4ab565d5",
+        "method": "exit-status-and-output-sha256"
+      },
+      "resource_bounds": {
+        "timeout_seconds": 10,
+        "output_limit_bytes": 1048576,
+        "maximum_source_bytes": 26214400,
+        "curation_baseline_median_ms": 230
+      },
+      "expected_evidence_paths": [
+        "results/reference/2026-07-28/synthetic-control/run-1/run.json",
+        "results/reference/2026-07-28/synthetic-control/run-2/run.json",
+        "results/reference/2026-07-28/synthetic-control/run-3/run.json"
+      ]
+    }
+  ]
+}

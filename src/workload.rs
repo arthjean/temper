@@ -881,36 +881,38 @@ mod tests {
     }
 
     #[test]
-    fn timeout_terminates_and_reaps_a_forked_descendant() {
+    fn one_hundred_timeout_lifecycles_reap_every_forked_descendant() {
         let root = tempfile::tempdir().expect("temporary workspace");
-        let marker = root.path().join("child-pid");
-        let values = [
-            OsStr::new("/bin/sh"),
-            OsStr::new("-c"),
-            OsStr::new("sleep 30 & child=$!; printf '%s' \"$child\" > \"$1\""),
-            OsStr::new("temper-test"),
-            marker.as_os_str(),
-        ];
-        let spec = test_spec(&values, root.path(), Duration::from_millis(50));
-        assert_eq!(
-            spec.invoke(Path::new("/bin/true"))
-                .expect_err("timeout must fail")
-                .kind,
-            WorkloadFailureKind::Timeout
-        );
+        for lifecycle in 0..100 {
+            let marker = root.path().join(format!("child-pid-{lifecycle}"));
+            let values = [
+                OsStr::new("/bin/sh"),
+                OsStr::new("-c"),
+                OsStr::new("sleep 30 & child=$!; printf '%s' \"$child\" > \"$1\"; wait"),
+                OsStr::new("temper-test"),
+                marker.as_os_str(),
+            ];
+            let spec = test_spec(&values, root.path(), Duration::from_millis(50));
+            assert_eq!(
+                spec.invoke(Path::new("/bin/true"))
+                    .expect_err("timeout must fail")
+                    .kind,
+                WorkloadFailureKind::Timeout
+            );
 
-        let child_pid = fs::read_to_string(marker)
-            .expect("descendant marker")
-            .trim()
-            .to_owned();
-        let process_path = format!("/proc/{child_pid}");
-        let deadline = Instant::now() + Duration::from_secs(1);
-        while Path::new(&process_path).exists() && Instant::now() < deadline {
-            thread::sleep(Duration::from_millis(10));
+            let child_pid = fs::read_to_string(marker)
+                .expect("descendant marker")
+                .trim()
+                .to_owned();
+            let process_path = format!("/proc/{child_pid}");
+            let deadline = Instant::now() + Duration::from_secs(1);
+            while Path::new(&process_path).exists() && Instant::now() < deadline {
+                thread::sleep(Duration::from_millis(10));
+            }
+            assert!(
+                !Path::new(&process_path).exists(),
+                "lifecycle {lifecycle}: forked descendant {child_pid} survived process-group cleanup"
+            );
         }
-        assert!(
-            !Path::new(&process_path).exists(),
-            "forked descendant {child_pid} survived process-group cleanup"
-        );
     }
 }

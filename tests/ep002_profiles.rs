@@ -214,7 +214,8 @@ fn optimize_with_workload(
 ) -> Output {
     let tracked_before = tracked_input_sha256(&fixture.root);
     let workload = fixture.root.join("profile-workload");
-    fs::write(&workload, format!("#!/bin/sh\nset -eu\n{body}")).expect("write profile workload");
+    fs::write(&workload, format!("#!/bin/sh\nset -eu\nsleep 0.01\n{body}"))
+        .expect("write profile workload");
     make_executable(&workload);
     let mut command = Command::new(env!("CARGO_BIN_EXE_cargo-temper"));
     command

@@ -352,7 +352,10 @@ mod tests {
                     .is_ok_and(|result| result.outcome == MeasurementOutcome::Accepted)
             })
             .count();
-        assert!(false_promotions <= 1);
+        assert_eq!(
+            false_promotions, 0,
+            "the pre-tag A/A control requires zero promotions"
+        );
 
         let accepted_regressions = (0..20)
             .filter(|dataset| {
@@ -373,6 +376,20 @@ mod tests {
             })
             .count();
         assert!(accepted_improvements >= 18);
+    }
+
+    #[test]
+    fn deterministic_sample_fixture_accepts_a_confirmed_improvement() {
+        let baseline = [1_000_000; CONFIRMATION_PAIR_COUNT];
+        let candidate = [950_000; CONFIRMATION_PAIR_COUNT];
+
+        let result = confirmation(&baseline, &candidate, 2.0, BOOTSTRAP_SEED)
+            .expect("deterministic confirmation");
+
+        assert_eq!(result.outcome, MeasurementOutcome::Accepted);
+        assert!(result.confidence_interval_95.upper <= result.threshold_ratio);
+        assert_eq!(result.baseline_durations_ns, baseline);
+        assert_eq!(result.candidate_durations_ns, candidate);
     }
 
     #[test]

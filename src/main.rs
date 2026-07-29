@@ -3,10 +3,12 @@
 mod anchored;
 mod cargo;
 mod cli;
+mod config_graph;
 mod error;
 mod hash;
 mod interposition;
 mod measurement;
+mod parity;
 mod preflight;
 mod promotion;
 mod run;
@@ -55,8 +57,9 @@ fn main() {
 
 fn optimize(arguments: cli::OptimizeArgs) -> Result<()> {
     eprintln!(
-        "Temper CLI {} and report schema 2 are experimental; 0.x provides no backward-compatibility promise.",
-        env!("CARGO_PKG_VERSION")
+        "Temper CLI {} and report schema {} are experimental; 0.x provides no backward-compatibility promise.",
+        env!("CARGO_PKG_VERSION"),
+        run::SCHEMA_VERSION
     );
     workload::install_interrupt_handler()?;
     let preflight = preflight::run(
@@ -161,6 +164,9 @@ fn optimize(arguments: cli::OptimizeArgs) -> Result<()> {
         }
     }
 
+    // Observed inputs of the PGO build that passed training parity. The
+    // confirmation rebuild is compared against them before promotion.
+    let mut accepted_pgo_inputs = None;
     let pgo_base = strategy::lowest_median_strategy(&valid_measurements)
         .ok_or_else(|| TemperError::new("No valid pre-PGO strategy remained after screening."))?;
     run.complete_screening(pgo_base)?;
@@ -192,6 +198,8 @@ fn optimize(arguments: cli::OptimizeArgs) -> Result<()> {
                 return Err(error);
             }
             let optimized_plan = success.optimized_plan;
+            let reference_inputs = success.reference_inputs;
+            let instrumentation_inputs = success.instrumentation_inputs;
             run.record_pgo_training(success.record)?;
             let build_result = cargo::build(run.target(), &optimized_plan);
             if let Some(error) = interrupted_run(&mut run, json, "pgo_build") {
@@ -199,28 +207,43 @@ fn optimize(arguments: cli::OptimizeArgs) -> Result<()> {
             }
             match build_result {
                 Ok(build) => {
-                    let executable = build.executable_path.clone();
-                    run.record_pgo_build(build)?;
-                    match workload.screen(&executable) {
-                        Ok(measurement) => {
-                            let stable = measurement.outcome == MeasurementOutcome::Stable;
-                            let median = measurement.median_duration_ns;
-                            run.record_strategy_screening(Strategy::Pgo, measurement)?;
-                            if stable {
-                                valid_measurements.push((Strategy::Pgo, median));
+                    // Observed parity is decided after every PGO stage has
+                    // executed and before the optimized candidate can receive a
+                    // single screening sample. A mismatch rejects only PGO.
+                    let optimization_inputs = parity::stage_inputs(&build);
+                    let compiler_parity = parity::decide_training(
+                        reference_inputs,
+                        instrumentation_inputs,
+                        optimization_inputs.clone(),
+                    );
+                    if compiler_parity.matched {
+                        accepted_pgo_inputs = optimization_inputs;
+                        run.record_pgo_parity(compiler_parity)?;
+                        let executable = build.executable_path.clone();
+                        run.record_pgo_build(build)?;
+                        match workload.screen(&executable) {
+                            Ok(measurement) => {
+                                let stable = measurement.outcome == MeasurementOutcome::Stable;
+                                let median = measurement.median_duration_ns;
+                                run.record_strategy_screening(Strategy::Pgo, measurement)?;
+                                if stable {
+                                    valid_measurements.push((Strategy::Pgo, median));
+                                }
+                            }
+                            Err(failure) if failure.kind == WorkloadFailureKind::Interrupted => {
+                                run.fail_workload("pgo_build", &failure)?;
+                                return Err(emit_run_failure(
+                                    &run,
+                                    json,
+                                    TemperError::new(failure.message),
+                                ));
+                            }
+                            Err(failure) => {
+                                run.reject_strategy_workload(Strategy::Pgo, &failure)?;
                             }
                         }
-                        Err(failure) if failure.kind == WorkloadFailureKind::Interrupted => {
-                            run.fail_workload("pgo_build", &failure)?;
-                            return Err(emit_run_failure(
-                                &run,
-                                json,
-                                TemperError::new(failure.message),
-                            ));
-                        }
-                        Err(failure) => {
-                            run.reject_strategy_workload(Strategy::Pgo, &failure)?;
-                        }
+                    } else {
+                        run.reject_pgo_parity(build, compiler_parity)?;
                     }
                 }
                 Err(failure) => run.reject_pgo_build(failure)?,
@@ -269,6 +292,20 @@ fn optimize(arguments: cli::OptimizeArgs) -> Result<()> {
             return Ok(());
         }
     };
+    // A PGO confirmation must rebuild the accepted compiler input contract.
+    // Parity is revalidated here, before any promotion can follow.
+    if confirmation_candidate.invocation.strategy == Strategy::Pgo {
+        let confirmation_parity = parity::decide_confirmation(
+            accepted_pgo_inputs.clone(),
+            parity::stage_inputs(&confirmation_candidate),
+        );
+        if !confirmation_parity.matched {
+            run.reject_confirmation_parity(confirmation_candidate, confirmation_parity)?;
+            run.emit_report(json)?;
+            return Ok(());
+        }
+        run.record_confirmation_parity(confirmation_parity)?;
+    }
     let confirmation_candidate_path = confirmation_candidate.executable_path.clone();
     let confirmation_candidate_sha256 = confirmation_candidate.sha256.clone();
     run.record_confirmation_candidate(confirmation_candidate)?;
@@ -483,7 +520,7 @@ fn emit_pre_run_failure(json: bool, error: TemperError) -> TemperError {
         return error;
     }
     let report = serde_json::json!({
-        "schema_version": 2,
+        "schema_version": run::SCHEMA_VERSION,
         "experimental": true,
         "status": "failed",
         "final_decision": "failed",

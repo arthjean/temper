@@ -332,9 +332,11 @@ fn trains_merges_rebuilds_and_screens_pgo() {
         ])
     );
     assert!(
-        manifest["pgo_training"]["phase_parity"]["instrumentation"]["config_sources"][0]["sha256"]
-            .as_str()
-            .is_some_and(|checksum| checksum.len() == 64)
+        manifest["pgo_training"]["phase_parity"]["instrumentation"]["config_graph"]["sources"]
+            .as_array()
+            .is_some_and(|sources| sources
+                .iter()
+                .all(|source| source["sha256"].as_str().map(str::len) == Some(64)))
     );
 
     let pgo = manifest["strategies"]
@@ -426,7 +428,7 @@ fn changed_config_hash_rejects_only_pgo_before_optimization() {
     assert!(
         manifest["pgo_training"]["phase_parity"]["unexpected_differences"]
             .as_array()
-            .is_some_and(|fields| fields.iter().any(|field| field == "config_sources"))
+            .is_some_and(|fields| fields.iter().any(|field| field == "config_graph"))
     );
     assert_eq!(
         manifest["strategies"]

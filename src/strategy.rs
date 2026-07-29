@@ -9,11 +9,13 @@ use std::thread;
 use serde::Serialize;
 
 use crate::cargo::{self, BuildFailure, BuildRecord, TargetSelection};
+use crate::config_graph::{self, ConfigGraph};
 use crate::hash::sha256_file;
 use crate::interposition::{
     self, Injection, InterpositionPlan, InterpositionRecord, MISSING_FUNCTION_FLAG,
     PROFILE_GENERATE_FLAG, PROFILE_USE_FLAG, ShimStage, ShimTools,
 };
+use crate::parity::{self, StageInputs};
 use crate::preflight::{SUPPORTED_HOST, cargo_program, rustc_program};
 use crate::workload::{WorkloadFailure, WorkloadFailureKind, WorkloadSpec};
 
@@ -131,12 +133,6 @@ impl BuildPlan {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
-struct ConfigSourceRecord {
-    path: PathBuf,
-    sha256: String,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 struct ToolIdentity {
     cargo_version: String,
     rustc_version: String,
@@ -150,9 +146,11 @@ pub(crate) struct PgoPrerequisites {
     llvm_profdata_path: PathBuf,
     target_libdir: PathBuf,
     real_rustc: PathBuf,
+    real_rustc_version: String,
     shim_executable: PathBuf,
+    shim_sha256: String,
     shim_protocol: &'static str,
-    inspected_config_sources: Vec<ConfigSourceRecord>,
+    config_graph: ConfigGraph,
     tool_identity: ToolIdentity,
 }
 
@@ -160,7 +158,9 @@ impl PgoPrerequisites {
     fn tools(&self) -> ShimTools {
         ShimTools {
             shim_executable: self.shim_executable.clone(),
+            shim_sha256: self.shim_sha256.clone(),
             real_rustc: self.real_rustc.clone(),
+            real_rustc_version: self.real_rustc_version.clone(),
         }
     }
 }
@@ -173,7 +173,7 @@ struct PgoPhaseInputs {
     stage: ShimStage,
     cargo_arguments: Vec<String>,
     base_profile_overrides: Vec<String>,
-    config_sources: Vec<ConfigSourceRecord>,
+    config_graph: ConfigGraph,
     cargo_identity: String,
     rustc_identity: String,
     llvm_profdata_identity: ToolIdentity,
@@ -253,19 +253,24 @@ pub(crate) struct PgoTrainingRecord {
     raw_profile_files: Vec<ProfileFileRecord>,
     merge: Option<ProfileMergeRecord>,
     phase_parity: PgoParityRecord,
-    failure_stage: Option<PgoFailureStage>,
-    rejection_reason: Option<String>,
-    message: Option<String>,
-    remediation: Option<&'static str>,
+    pub(crate) failure_stage: Option<PgoFailureStage>,
+    pub(crate) rejection_reason: Option<String>,
+    pub(crate) rejection_source: Option<PathBuf>,
+    pub(crate) message: Option<String>,
+    pub(crate) remediation: Option<&'static str>,
 }
 
 pub(crate) struct PgoTrainingSuccess {
     pub(crate) record: PgoTrainingRecord,
     pub(crate) optimized_plan: BuildPlan,
+    /// Observed inputs of the pass-through reference and instrumentation
+    /// stages. Parity is only decided once the optimized build has executed.
+    pub(crate) reference_inputs: Option<StageInputs>,
+    pub(crate) instrumentation_inputs: Option<StageInputs>,
 }
 
 pub(crate) enum PgoTrainingOutcome {
-    Trained(PgoTrainingSuccess),
+    Trained(Box<PgoTrainingSuccess>),
     Rejected(PgoTrainingRecord),
     Interrupted(PgoTrainingRecord, WorkloadFailure),
 }
@@ -281,6 +286,7 @@ pub(crate) fn train_pgo(
     let prerequisites = match prove_pgo_prerequisites(&selection.workspace_root) {
         Ok(prerequisites) => prerequisites,
         Err(failure) => {
+            state.rejection_source = failure.source;
             return PgoTrainingOutcome::Rejected(state.reject(
                 PgoFailureStage::Prerequisites,
                 failure.reason,
@@ -468,6 +474,7 @@ pub(crate) fn train_pgo(
     let optimization_prerequisites = match prove_pgo_prerequisites(&selection.workspace_root) {
         Ok(prerequisites) => prerequisites,
         Err(failure) => {
+            state.rejection_source = failure.source;
             return PgoTrainingOutcome::Rejected(state.reject(
                 PgoFailureStage::Prerequisites,
                 failure.reason,
@@ -507,10 +514,20 @@ pub(crate) fn train_pgo(
             None,
         ));
     }
-    PgoTrainingOutcome::Trained(PgoTrainingSuccess {
+    let reference_inputs = state
+        .reference_build
+        .as_ref()
+        .and_then(parity::stage_inputs);
+    let instrumentation_inputs = state
+        .instrumentation_build
+        .as_ref()
+        .and_then(parity::stage_inputs);
+    PgoTrainingOutcome::Trained(Box::new(PgoTrainingSuccess {
         record: state.trained(),
         optimized_plan,
-    })
+        reference_inputs,
+        instrumentation_inputs,
+    }))
 }
 
 /// Accumulates every durable PGO training fact so each rejection persists the
@@ -526,6 +543,8 @@ struct TrainingState {
     raw_profile_files: Vec<ProfileFileRecord>,
     merge: Option<ProfileMergeRecord>,
     phase_parity: PgoParityRecord,
+    /// Config source a prerequisite rejection names, when one exists.
+    rejection_source: Option<PathBuf>,
 }
 
 impl TrainingState {
@@ -541,6 +560,7 @@ impl TrainingState {
             raw_profile_files: Vec::new(),
             merge: None,
             phase_parity: PgoParityRecord::pending(),
+            rejection_source: None,
         }
     }
 
@@ -566,6 +586,7 @@ impl TrainingState {
             phase_parity: self.phase_parity,
             failure_stage: Some(stage),
             rejection_reason: Some(reason.into()),
+            rejection_source: self.rejection_source,
             message: Some(message.into()),
             remediation,
         }
@@ -587,6 +608,7 @@ impl TrainingState {
             phase_parity: self.phase_parity,
             failure_stage: None,
             rejection_reason: None,
+            rejection_source: None,
             message: None,
             remediation: None,
         }
@@ -693,9 +715,9 @@ fn compare_phase_inputs(
         differences,
     );
     compare_field(
-        "config_sources",
-        &instrumentation.config_sources,
-        &optimization.config_sources,
+        "config_graph",
+        &instrumentation.config_graph,
+        &optimization.config_graph,
         differences,
     );
     compare_field(
@@ -751,7 +773,7 @@ fn phase_inputs(
             .map_or(ShimStage::Reference, |record| record.stage),
         cargo_arguments: invocation.cargo_arguments,
         base_profile_overrides: invocation.cargo_config_overrides,
-        config_sources: prerequisites.inspected_config_sources.clone(),
+        config_graph: prerequisites.config_graph.clone(),
         cargo_identity: prerequisites.tool_identity.cargo_version.clone(),
         rustc_identity: prerequisites.tool_identity.rustc_version.clone(),
         llvm_profdata_identity: prerequisites.tool_identity.clone(),
@@ -792,6 +814,7 @@ struct PgoPrerequisiteFailure {
     reason: &'static str,
     message: String,
     remediation: Option<&'static str>,
+    source: Option<PathBuf>,
 }
 
 /// Proves the PGO boundary before any compiler interposition starts.
@@ -818,16 +841,36 @@ fn prove_pgo_prerequisites(
                     "PGO was rejected because {variable} is set and Temper cannot prove that an outer compiler cache keys its PGO phase controls."
                 ),
                 remediation: None,
+                source: None,
             });
         }
     }
 
-    let inspected_config_sources = inspect_config_sources(workspace_root)?;
+    let cargo_version = tool_version(cargo_program(), &["-Vv"], "Cargo").map_err(|message| {
+        PgoPrerequisiteFailure {
+            reason: "cargo_identity_failed",
+            message,
+            remediation: None,
+            source: None,
+        }
+    })?;
+    // The configuration source graph is proven before any interposition: an
+    // included compiler override or an unsupported include shape must reject
+    // PGO before the reference build exists.
+    let config_graph = config_graph::scan(workspace_root, &cargo_version).map_err(|failure| {
+        PgoPrerequisiteFailure {
+            reason: failure.reason,
+            message: failure.message,
+            remediation: config_remediation(failure.reason),
+            source: failure.source,
+        }
+    })?;
     let target_libdir =
         rustc_target_libdir(workspace_root).map_err(|message| PgoPrerequisiteFailure {
             reason: "rustc_target_libdir_failed",
             message,
             remediation: None,
+            source: None,
         })?;
     let llvm_profdata_path = target_libdir
         .parent()
@@ -836,6 +879,7 @@ fn prove_pgo_prerequisites(
             reason: "llvm_profdata_unavailable",
             message: "rustc target-libdir has no toolchain target parent directory.".to_owned(),
             remediation: Some(LLVM_TOOLS_HINT),
+            source: None,
         })?;
     let metadata = fs::metadata(&llvm_profdata_path).map_err(|_| PgoPrerequisiteFailure {
         reason: "llvm_profdata_unavailable",
@@ -844,6 +888,7 @@ fn prove_pgo_prerequisites(
             llvm_profdata_path.display()
         ),
         remediation: Some(LLVM_TOOLS_HINT),
+        source: None,
     })?;
     if !metadata.is_file() || metadata.permissions().mode() & 0o111 == 0 {
         return Err(PgoPrerequisiteFailure {
@@ -853,6 +898,7 @@ fn prove_pgo_prerequisites(
                 llvm_profdata_path.display()
             ),
             remediation: Some(LLVM_TOOLS_HINT),
+            source: None,
         });
     }
     let llvm_profdata_path =
@@ -860,19 +906,14 @@ fn prove_pgo_prerequisites(
             reason: "llvm_profdata_unavailable",
             message: format!("Could not canonicalize toolchain llvm-profdata: {error}"),
             remediation: Some(LLVM_TOOLS_HINT),
+            source: None,
         })?;
-    let cargo_version = tool_version(cargo_program(), &["-Vv"], "Cargo").map_err(|message| {
-        PgoPrerequisiteFailure {
-            reason: "cargo_identity_failed",
-            message,
-            remediation: None,
-        }
-    })?;
     let rustc_version = tool_version(rustc_program(), &["-Vv"], "rustc").map_err(|message| {
         PgoPrerequisiteFailure {
             reason: "rustc_identity_failed",
             message,
             remediation: None,
+            source: None,
         }
     })?;
     let llvm_profdata_version = tool_version(
@@ -884,12 +925,14 @@ fn prove_pgo_prerequisites(
         reason: "llvm_profdata_identity_failed",
         message,
         remediation: Some(LLVM_TOOLS_HINT),
+        source: None,
     })?;
     let llvm_profdata_sha256 =
         sha256_file(&llvm_profdata_path).map_err(|error| PgoPrerequisiteFailure {
             reason: "llvm_profdata_identity_failed",
             message: error.to_string(),
             remediation: Some(LLVM_TOOLS_HINT),
+            source: None,
         })?;
     // The real compiler is resolved and identified before any process-local
     // `RUSTC` override, so the shim can never resolve itself.
@@ -898,15 +941,18 @@ fn prove_pgo_prerequisites(
             reason: "compiler_interposition_unavailable",
             message,
             remediation: None,
+            source: None,
         })?;
 
     Ok(PgoPrerequisites {
         llvm_profdata_path: llvm_profdata_path.clone(),
         target_libdir,
         real_rustc: tools.real_rustc,
+        real_rustc_version: tools.real_rustc_version,
         shim_executable: tools.shim_executable,
+        shim_sha256: tools.shim_sha256,
         shim_protocol: interposition::PROTOCOL,
-        inspected_config_sources,
+        config_graph,
         tool_identity: ToolIdentity {
             cargo_version,
             rustc_version,
@@ -915,6 +961,31 @@ fn prove_pgo_prerequisites(
             llvm_profdata_version,
         },
     })
+}
+
+/// One actionable remediation per configuration-source reason.
+fn config_remediation(reason: &str) -> Option<&'static str> {
+    match reason {
+        config_graph::COMPILER_OVERRIDE_REASON => Some(
+            "Remove build.rustc, build.rustc-wrapper and build.rustc-workspace-wrapper from the named Cargo config source, or accept the static candidates.",
+        ),
+        config_graph::INCLUDE_MISSING_REASON => {
+            Some("Restore the required included file or mark the include optional.")
+        }
+        config_graph::INCLUDE_CYCLE_REASON => {
+            Some("Break the include cycle so every Cargo config source loads once.")
+        }
+        config_graph::INCLUDE_MALFORMED_REASON => Some(
+            "Declare include as a list of `.toml` paths or `{ path = \"...\", optional = true }` tables.",
+        ),
+        config_graph::INCLUDE_UNSUPPORTED_REASON => {
+            Some("Upgrade to Cargo 1.94 or newer, which stabilized configuration include.")
+        }
+        config_graph::MUTATED_REASON => {
+            Some("Keep Cargo configuration files unchanged for the duration of one run.")
+        }
+        _ => None,
+    }
 }
 
 fn tool_version(program: OsString, arguments: &[&str], name: &str) -> Result<String, String> {
@@ -949,105 +1020,6 @@ fn rustc_target_libdir(workspace_root: &Path) -> Result<PathBuf, String> {
         .map_err(|_| "rustc target-libdir was not valid UTF-8.".to_owned())?;
     fs::canonicalize(path.trim())
         .map_err(|error| format!("rustc target-libdir could not be canonicalized: {error}"))
-}
-
-/// Records the directly discovered Cargo config sources and rejects a compiler
-/// override declared in any of them. Temper never merges config values; Cargo
-/// keeps ownership of effective rustflags. Recursive `include` provenance
-/// arrives with the schema-3 source graph.
-fn inspect_config_sources(
-    workspace_root: &Path,
-) -> Result<Vec<ConfigSourceRecord>, PgoPrerequisiteFailure> {
-    let paths = cargo_config_paths(workspace_root).map_err(|message| PgoPrerequisiteFailure {
-        reason: "cargo_config_inspection_failed",
-        message,
-        remediation: None,
-    })?;
-    let mut inspected_sources = Vec::new();
-    for path in &paths {
-        let contents = fs::read_to_string(path).map_err(|error| PgoPrerequisiteFailure {
-            reason: "cargo_config_read_failed",
-            message: format!("Cargo config {} could not be read: {error}", path.display()),
-            remediation: None,
-        })?;
-        let sha256 = sha256_file(path).map_err(|error| PgoPrerequisiteFailure {
-            reason: "cargo_config_hash_failed",
-            message: error.to_string(),
-            remediation: None,
-        })?;
-        inspected_sources.push(ConfigSourceRecord {
-            path: path.clone(),
-            sha256,
-        });
-        let config: toml::Value =
-            toml::from_str(&contents).map_err(|error| PgoPrerequisiteFailure {
-                reason: "cargo_config_parse_failed",
-                message: format!(
-                    "Cargo config {} could not be parsed: {error}",
-                    path.display()
-                ),
-                remediation: None,
-            })?;
-        let Some(build) = config.get("build") else {
-            continue;
-        };
-        for key in ["rustc", "rustc-wrapper", "rustc-workspace-wrapper"] {
-            if build.get(key).is_some() {
-                return Err(PgoPrerequisiteFailure {
-                    reason: "unproven_compiler_override",
-                    message: format!(
-                        "PGO was rejected because effective build.{key} may come from {}.",
-                        path.display()
-                    ),
-                    remediation: None,
-                });
-            }
-        }
-    }
-    Ok(inspected_sources)
-}
-
-fn cargo_config_paths(workspace_root: &Path) -> Result<Vec<PathBuf>, String> {
-    let mut paths = Vec::new();
-    if let Some(cargo_home) = cargo_home(workspace_root)
-        && let Some(path) = active_config_path(&cargo_home)
-    {
-        paths.push(path);
-    }
-    let mut ancestors: Vec<&Path> = workspace_root.ancestors().collect();
-    ancestors.reverse();
-    for ancestor in ancestors {
-        if let Some(path) = active_config_path(&ancestor.join(".cargo"))
-            && !paths.contains(&path)
-        {
-            paths.push(path);
-        }
-    }
-    Ok(paths)
-}
-
-fn cargo_home(workspace_root: &Path) -> Option<PathBuf> {
-    if let Some(configured) = std::env::var_os("CARGO_HOME") {
-        let configured = PathBuf::from(configured);
-        return Some(if configured.is_absolute() {
-            configured
-        } else {
-            workspace_root.join(configured)
-        });
-    }
-    std::env::var_os("HOME")
-        .map(PathBuf::from)
-        .map(|home| home.join(".cargo"))
-}
-
-fn active_config_path(directory: &Path) -> Option<PathBuf> {
-    let legacy = directory.join("config");
-    if legacy.is_file() {
-        Some(legacy)
-    } else {
-        let toml = directory.join("config.toml");
-        toml.is_file().then_some(toml)
-    }
 }
 
 fn collect_profile_files(root: &Path) -> Result<Vec<ProfileFileRecord>, String> {
@@ -1379,15 +1351,17 @@ pub(crate) fn selected_candidate(measurements: &[(Strategy, u64)]) -> Option<Str
 #[cfg(test)]
 mod tests {
     use super::{
-        BuildPlan, BuildStage, ConfigSourceRecord, PgoParityRecord, PgoPhaseInputs, Strategy,
-        ToolIdentity, inspect_config_sources, lowest_median_strategy, selected_candidate,
+        BuildPlan, BuildStage, PgoParityRecord, PgoPhaseInputs, Strategy, ToolIdentity,
+        lowest_median_strategy, selected_candidate,
     };
+    use crate::config_graph::{self, ConfigGraph};
     use crate::interposition::{
         Injection, InterpositionPlan, MISSING_FUNCTION_FLAG, PROFILE_GENERATE_FLAG,
-        PROFILE_USE_FLAG, ShimStage,
+        PROFILE_USE_FLAG, ShimStage, ShimTools,
     };
-    use std::fs;
     use std::path::{Path, PathBuf};
+
+    const CARGO_VERSION: &str = "cargo 1.97.1 (c980f4866 2026-06-30)";
 
     #[test]
     fn fixed_strategies_have_canonical_overrides_and_directories() {
@@ -1451,38 +1425,25 @@ mod tests {
     }
 
     #[test]
-    fn config_inspection_records_sources_without_reconstructing_rustflags() {
+    fn config_provenance_records_sources_without_reconstructing_rustflags() {
         let fixture = tempfile::tempdir().expect("fixture");
         let cargo = fixture.path().join(".cargo");
-        fs::create_dir(&cargo).expect("cargo directory");
+        std::fs::create_dir(&cargo).expect("cargo directory");
         // Every rustflags shape v0.0.2 rejected now stays with Cargo.
-        fs::write(
+        std::fs::write(
             cargo.join("config.toml"),
             "[build]\nrustflags = [\"--cfg\", \"build_flag\"]\n\n[target.x86_64-unknown-linux-gnu]\nrustflags = '--cfg \"quoted label\"'\n\n[target.'cfg(unix)']\nrustflags = [\"--cfg\", \"cfg_flag\"]\n",
         )
         .expect("rustflags config");
-        let sources = inspect_config_sources(fixture.path()).expect("rustflags stay with Cargo");
-        assert_eq!(sources.len(), 1);
-        assert_eq!(sources[0].path, cargo.join("config.toml"));
-        assert_eq!(sources[0].sha256.len(), 64);
-    }
-
-    #[test]
-    fn config_inspection_rejects_every_declared_compiler_override() {
-        let fixture = tempfile::tempdir().expect("fixture");
-        let cargo = fixture.path().join(".cargo");
-        fs::create_dir(&cargo).expect("cargo directory");
-        for key in ["rustc", "rustc-wrapper", "rustc-workspace-wrapper"] {
-            fs::write(
-                cargo.join("config.toml"),
-                format!("[build]\n{key} = \"/other/compiler\"\n"),
-            )
-            .expect("compiler override config");
-            let error =
-                inspect_config_sources(fixture.path()).expect_err("compiler override fails closed");
-            assert_eq!(error.reason, "unproven_compiler_override");
-            assert!(error.message.contains(&format!("build.{key}")));
-        }
+        let graph =
+            config_graph::scan(fixture.path(), CARGO_VERSION).expect("rustflags stay with Cargo");
+        let source = graph
+            .sources
+            .iter()
+            .find(|source| source.path.ends_with(".cargo/config.toml"))
+            .expect("fixture config source");
+        assert_eq!(source.sha256.len(), 64);
+        assert!(source.includes.is_empty());
     }
 
     #[test]
@@ -1524,7 +1485,7 @@ mod tests {
         changed
             .base_profile_overrides
             .push("profile.release.debug=1".to_owned());
-        changed.config_sources[0].sha256 = "changed-config-hash".to_owned();
+        changed.config_graph.sources[0].sha256 = "changed-config-hash".to_owned();
         changed.cargo_identity = "changed-cargo".to_owned();
         changed.rustc_identity = "changed-rustc".to_owned();
         changed.llvm_profdata_identity.llvm_profdata_sha256 = "changed-profdata".to_owned();
@@ -1541,7 +1502,7 @@ mod tests {
                 "target_triple",
                 "cargo_arguments",
                 "base_profile_overrides",
-                "config_sources",
+                "config_graph",
                 "cargo_identity",
                 "rustc_identity",
                 "llvm_profdata_identity",
@@ -1585,12 +1546,36 @@ mod tests {
     fn interposition_plan(stage: ShimStage, injection: Injection) -> InterpositionPlan {
         InterpositionPlan {
             stage,
-            shim_executable: PathBuf::from("/toolchain/cargo-temper"),
-            real_rustc: PathBuf::from("/toolchain/rustc"),
+            tools: ShimTools {
+                shim_executable: PathBuf::from("/toolchain/cargo-temper"),
+                shim_sha256: "shim hash".to_owned(),
+                real_rustc: PathBuf::from("/toolchain/rustc"),
+                real_rustc_version: "rustc identity".to_owned(),
+            },
             run_root: PathBuf::from("/run"),
             target_directory: PathBuf::from("/run/target").join(stage.label()),
             capture_directory: PathBuf::from("/run/captures").join(stage.label()),
             injection,
+        }
+    }
+
+    /// A minimal configuration graph: parity must compare it as one value.
+    fn config_graph() -> ConfigGraph {
+        ConfigGraph {
+            cargo_minor: 97,
+            include_supported: true,
+            declares_include: false,
+            sources: vec![config_graph::ConfigSource {
+                path: "/workspace/.cargo/config.toml".into(),
+                sha256: "config hash".to_owned(),
+                discovery: config_graph::Discovery::Ancestor,
+                includes: Vec::new(),
+            }],
+            environment_inputs: vec![config_graph::EnvironmentInput {
+                name: "RUSTFLAGS",
+                presence: config_graph::Presence::Absent,
+                sha256: None,
+            }],
         }
     }
 
@@ -1618,15 +1603,12 @@ mod tests {
                 plan.target_directory.to_string_lossy().into_owned(),
             ],
             base_profile_overrides: vec!["profile.release.lto=\"thin\"".to_owned()],
-            config_sources: vec![ConfigSourceRecord {
-                path: "/workspace/.cargo/config.toml".into(),
-                sha256: "config hash".to_owned(),
-            }],
+            config_graph: config_graph(),
             cargo_identity: tool_identity.cargo_version.clone(),
             rustc_identity: tool_identity.rustc_version.clone(),
             llvm_profdata_identity: tool_identity,
-            real_rustc: plan.real_rustc.clone(),
-            shim_executable: plan.shim_executable.clone(),
+            real_rustc: plan.tools.real_rustc.clone(),
+            shim_executable: plan.tools.shim_executable.clone(),
             injected_flags: match stage {
                 ShimStage::Generate => vec![PROFILE_GENERATE_FLAG],
                 _ => vec![PROFILE_USE_FLAG, MISSING_FUNCTION_FLAG],

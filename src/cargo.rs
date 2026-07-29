@@ -709,7 +709,7 @@ fn bounded_field(value: &str) -> String {
     value[..boundary].to_owned()
 }
 
-fn floor_char_boundary(value: &str, maximum: usize) -> usize {
+pub(crate) fn floor_char_boundary(value: &str, maximum: usize) -> usize {
     let mut boundary = maximum.min(value.len());
     while !value.is_char_boundary(boundary) {
         boundary = boundary.saturating_sub(1);

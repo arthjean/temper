@@ -210,11 +210,11 @@ fn new_schema_two_runs_leave_historical_schema_one_bytes_unchanged() {
         .expect("run entries")
         .into_iter()
         .find(|entry| entry.file_name() != "historical")
-        .expect("new schema-2 run");
+        .expect("new schema-3 run");
     let manifest: serde_json::Value =
-        serde_json::from_slice(&fs::read(new_run.path().join("run.json")).expect("schema-2 run"))
-            .expect("parse schema-2 run");
-    assert_eq!(manifest["schema_version"], 2);
+        serde_json::from_slice(&fs::read(new_run.path().join("run.json")).expect("schema-3 run"))
+            .expect("parse schema-3 run");
+    assert_eq!(manifest["schema_version"], 3);
 }
 
 fn rustc_capture_wrapper(root: &Path) -> PathBuf {

@@ -6,18 +6,25 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use serde::Serialize;
 
 use crate::anchored::AnchoredDirectory;
-use crate::cargo::{BuildFailure, BuildRecord, TargetSelection};
+use crate::cargo::{BuildFailure, BuildRecord, TargetSelection, floor_char_boundary};
 use crate::cli::OptimizeArgs;
+use crate::config_graph;
 use crate::error::{Result, TemperError};
 use crate::interposition::{self, Injection, InterpositionPlan, ShimStage};
 use crate::measurement::{ConfirmationResult, MeasurementOutcome, ScreeningResult};
+use crate::parity::{self, CompilerParityRecord};
 use crate::preflight::{Preflight, SourceReproducibility};
 use crate::promotion::PromotionRecord;
 use crate::strategy::{BuildPlan, PgoTrainingRecord, Strategy};
 use crate::workload::{WorkloadFailure, WorkloadFailureKind};
 
-const SCHEMA_VERSION: u8 = 2;
+pub(crate) const SCHEMA_VERSION: u8 = 3;
 const HUMAN_REPORT_LINE_LIMIT: usize = 25;
+/// Bounded number of persisted compiler decisions and reported decision lines.
+const COMPILER_DECISION_LIMIT: usize = 8;
+const COMPILER_DECISION_LINE_LIMIT: usize = 3;
+/// Bounded persisted compiler diagnostic and difference budget per build.
+const COMPILER_DIAGNOSTIC_LIMIT: usize = 64 * 1024;
 const PROMOTION_FAILURE_RESERVE: &str = ".promotion-failure-reserve";
 const PROMOTION_FAILURE_HEADROOM_BYTES: usize = 64 * 1024;
 const EMERGENCY_PROMOTION_FAILURE: &str = ".promotion-failure.json";
@@ -86,6 +93,131 @@ struct FailureRecord {
     build_failure: Option<BuildFailure>,
 }
 
+/// Whether one compiler decision rejects only PGO or fails the whole run.
+///
+/// Baseline and static builds are never interposed, so an interposition or
+/// evidence failure can only reach them through an unproven artifact, which
+/// stays fatal.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+enum DecisionScope {
+    PgoOnly,
+    Fatal,
+}
+
+/// One actionable fail-closed compiler decision, published in JSON and in the
+/// human report.
+#[derive(Clone, Debug, Serialize)]
+struct CompilerDecisionRecord {
+    reason: String,
+    scope: DecisionScope,
+    stage: Option<String>,
+    crate_name: Option<String>,
+    source: Option<PathBuf>,
+    difference_classes: Vec<String>,
+    message: String,
+    message_truncated: bool,
+    remediation: &'static str,
+}
+
+impl CompilerDecisionRecord {
+    fn new(reason: &str, scope: DecisionScope, message: &str, remediation: &'static str) -> Self {
+        let boundary = floor_char_boundary(message, COMPILER_DIAGNOSTIC_LIMIT);
+        Self {
+            reason: reason.to_owned(),
+            scope,
+            stage: None,
+            crate_name: None,
+            source: None,
+            difference_classes: Vec::new(),
+            message: message[..boundary].to_owned(),
+            message_truncated: boundary < message.len(),
+            remediation,
+        }
+    }
+
+    fn line(&self) -> String {
+        let stage = self
+            .stage
+            .as_deref()
+            .map(|stage| format!(", stage={stage}"))
+            .unwrap_or_default();
+        let subject = self
+            .crate_name
+            .as_deref()
+            .map(|name| format!(", crate={name}"))
+            .or_else(|| {
+                self.source
+                    .as_deref()
+                    .map(|source| format!(", source={}", source.display()))
+            })
+            .unwrap_or_default();
+        let differences = if self.difference_classes.is_empty() {
+            String::new()
+        } else {
+            format!(", differences={}", self.difference_classes.join("+"))
+        };
+        let truncation = if self.message_truncated {
+            ", truncated=true"
+        } else {
+            ""
+        };
+        format!(
+            "compiler: reason={}, scope={}{stage}{subject}{differences}{truncation}, remediation={}",
+            self.reason,
+            match self.scope {
+                DecisionScope::PgoOnly => "pgo_only",
+                DecisionScope::Fatal => "fatal",
+            },
+            self.remediation
+        )
+    }
+}
+
+/// One actionable remediation per stable compiler reason. A reason without an
+/// entry here is not a compiler decision and stays an ordinary build failure.
+fn compiler_remediation(reason: &str) -> Option<&'static str> {
+    match reason {
+        interposition::PROTOCOL_FAILURE_REASON => Some(
+            "The private compiler shim aborted; re-run the optimization and report the bounded shim diagnostic if it persists.",
+        ),
+        interposition::INPUT_CONFLICT_REASON => Some(
+            "Remove the existing -Cprofile-generate, -Cprofile-use or -Cinstrument-coverage compiler control from the project rustflags.",
+        ),
+        interposition::INPUT_AMBIGUITY_REASON => Some(
+            "Give every target compilation one --target and one --crate-name, and keep its argument list inside the supported bound.",
+        ),
+        interposition::CAPTURE_MISSING_REASON => Some(
+            "Let the run own its target directories; nothing else may build into or clean the interposed stage roots.",
+        ),
+        interposition::CAPTURE_CORRUPT_REASON => Some(
+            "Nothing may write into the run capture directories while Cargo builds; re-run on an untouched run directory.",
+        ),
+        interposition::CAPTURE_LIMIT_REASON => Some(
+            "The workspace exceeded the bounded per-stage compiler evidence budget; optimize a smaller binary target.",
+        ),
+        interposition::INJECTION_UNEXPECTED_REASON => Some(
+            "A compilation received unexpected phase controls; re-run without an external RUSTC override.",
+        ),
+        parity::MISMATCH_REASON => Some(
+            "Keep the Cargo configuration, environment and toolchain unchanged for the whole run, then re-run the optimization.",
+        ),
+        "ambient_compiler_override" => Some(
+            "Unset RUSTC_WRAPPER, RUSTC_WORKSPACE_WRAPPER and the CARGO_BUILD_RUSTC variables before a PGO run.",
+        ),
+        "compiler_interposition_unavailable" => Some(
+            "Repair the active Rust toolchain so the real rustc can be identified before interposition.",
+        ),
+        config_graph::COMPILER_OVERRIDE_REASON => Some(
+            "Remove build.rustc, build.rustc-wrapper and build.rustc-workspace-wrapper from the named Cargo config source.",
+        ),
+        other if config_graph::CONFIG_SOURCE_REASONS.contains(&other) => {
+            Some("Repair the named Cargo configuration source, then re-run the optimization.")
+        }
+        _ => None,
+    }
+}
+
 #[derive(Debug, Serialize)]
 struct StrategyWorkloadFailure {
     outcome: WorkloadFailureKind,
@@ -133,6 +265,7 @@ struct ConfirmationRecord {
     candidate_build_failure: Option<BuildFailure>,
     measurement: Option<ConfirmationResult>,
     workload_failure: Option<StrategyWorkloadFailure>,
+    compiler_parity: Option<CompilerParityRecord>,
     rejection_reason: Option<String>,
 }
 
@@ -147,6 +280,7 @@ impl ConfirmationRecord {
             candidate_build_failure: None,
             measurement: None,
             workload_failure: None,
+            compiler_parity: None,
             rejection_reason: None,
         }
     }
@@ -171,6 +305,8 @@ struct RunManifest {
     strategies: Vec<StrategyRecord>,
     pgo_base_strategy: Option<Strategy>,
     pgo_training: Option<PgoTrainingRecord>,
+    compiler_parity: Option<CompilerParityRecord>,
+    compiler_decisions: Vec<CompilerDecisionRecord>,
     selected_candidate: Option<Strategy>,
     confirmation: Option<ConfirmationRecord>,
     promotion: Option<PromotionRecord>,
@@ -196,6 +332,8 @@ struct EmergencyRunManifest<'a> {
     strategies: &'a [StrategyRecord],
     pgo_base_strategy: Option<Strategy>,
     pgo_training: &'a Option<PgoTrainingRecord>,
+    compiler_parity: &'a Option<CompilerParityRecord>,
+    compiler_decisions: &'a [CompilerDecisionRecord],
     selected_candidate: Option<Strategy>,
     confirmation: &'a Option<ConfirmationRecord>,
     promotion: Option<&'a PromotionRecord>,
@@ -227,6 +365,8 @@ impl<'a> EmergencyRunManifest<'a> {
             strategies: &manifest.strategies,
             pgo_base_strategy: manifest.pgo_base_strategy,
             pgo_training: &manifest.pgo_training,
+            compiler_parity: &manifest.compiler_parity,
+            compiler_decisions: &manifest.compiler_decisions,
             selected_candidate: manifest.selected_candidate,
             confirmation: &manifest.confirmation,
             promotion: None,
@@ -343,6 +483,8 @@ impl Run {
                 strategies: Vec::new(),
                 pgo_base_strategy: None,
                 pgo_training: None,
+                compiler_parity: None,
+                compiler_decisions: Vec::new(),
                 selected_candidate: None,
                 confirmation: None,
                 promotion: None,
@@ -380,6 +522,9 @@ impl Run {
     }
 
     pub(crate) fn fail_baseline(&mut self, failure: BuildFailure) -> Result<()> {
+        // A baseline artifact is the comparison anchor of the whole run, so an
+        // interposition or evidence defect there is fatal rather than PGO-only.
+        self.push_build_decision(&failure, DecisionScope::Fatal);
         let message = failure.message.clone();
         let bounded_diagnostics = failure.bounded_diagnostics.clone();
         let diagnostics_truncated = failure.diagnostics_truncated;
@@ -457,8 +602,40 @@ impl Run {
     }
 
     pub(crate) fn record_pgo_training(&mut self, record: PgoTrainingRecord) -> Result<()> {
+        self.push_training_decision(&record);
         self.manifest.pgo_training = Some(record);
         self.transition(CompletedPhase::PgoTraining, RunStatus::PgoBuild)
+    }
+
+    /// Persists the observed compiler parity of an executed PGO attempt.
+    ///
+    /// Parity is decided only after the reference, instrumentation and
+    /// optimized builds exist, and always before the optimized candidate can
+    /// receive a screening sample.
+    pub(crate) fn record_pgo_parity(&mut self, parity: CompilerParityRecord) -> Result<()> {
+        if !parity.matched {
+            self.push_parity_decision(&parity, ShimStage::Use);
+        }
+        self.manifest.compiler_parity = Some(parity);
+        self.persist()
+    }
+
+    /// Rejects an optimized PGO build whose observed compiler inputs drifted.
+    /// The build record is retained as evidence; it never reaches screening.
+    pub(crate) fn reject_pgo_parity(
+        &mut self,
+        build: BuildRecord,
+        parity: CompilerParityRecord,
+    ) -> Result<()> {
+        self.manifest.strategies.push(StrategyRecord {
+            identity: Strategy::Pgo,
+            build: Some(build),
+            build_failure: None,
+            screening: None,
+            workload_failure: None,
+            rejection_reason: Some(parity::MISMATCH_REASON.to_owned()),
+        });
+        self.record_pgo_parity(parity)
     }
 
     pub(crate) fn fail_pgo_training(
@@ -490,6 +667,7 @@ impl Run {
         } else {
             "pgo_build_failed"
         };
+        self.push_build_decision(&failure, DecisionScope::PgoOnly);
         self.manifest.strategies.push(StrategyRecord {
             identity: Strategy::Pgo,
             build: None,
@@ -573,11 +751,7 @@ impl Run {
         let profile = interposition.profile_path.clone().ok_or_else(|| {
             TemperError::new("The accepted PGO build recorded no merged profile path.")
         })?;
-        let tools = interposition::validated_tools(
-            &interposition.shim_executable,
-            &interposition.real_rustc,
-        )
-        .map_err(TemperError::new)?;
+        let tools = interposition::validated_tools(interposition).map_err(TemperError::new)?;
         interposition::plan_stage(
             &tools,
             &self.directory,
@@ -623,7 +797,33 @@ impl Run {
         self.persist()
     }
 
+    /// Rejects a confirmation rebuild whose observed compiler inputs no longer
+    /// match the accepted optimized build. Promotion cannot follow.
+    pub(crate) fn reject_confirmation_parity(
+        &mut self,
+        build: BuildRecord,
+        parity: CompilerParityRecord,
+    ) -> Result<()> {
+        self.push_parity_decision(&parity, ShimStage::Confirmation);
+        let confirmation = self.confirmation_mut()?;
+        confirmation.candidate_build = Some(build);
+        confirmation.compiler_parity = Some(parity);
+        confirmation.outcome = ConfirmationOutcome::Rejected;
+        confirmation.rejection_reason = Some(parity::MISMATCH_REASON.to_owned());
+        self.finish_no_improvement()
+    }
+
+    /// Records a matched confirmation parity before promotion may proceed.
+    pub(crate) fn record_confirmation_parity(
+        &mut self,
+        parity: CompilerParityRecord,
+    ) -> Result<()> {
+        self.confirmation_mut()?.compiler_parity = Some(parity);
+        self.persist()
+    }
+
     pub(crate) fn reject_confirmation_build(&mut self, failure: BuildFailure) -> Result<()> {
+        self.push_build_decision(&failure, DecisionScope::PgoOnly);
         let confirmation = self.confirmation_mut()?;
         confirmation.candidate_build_failure = Some(failure);
         confirmation.outcome = ConfirmationOutcome::Rejected;
@@ -884,7 +1084,7 @@ impl Run {
 
     fn human_report_lines(&self) -> Vec<String> {
         let mut lines = vec![format!(
-            "Temper {} schema 2 (experimental)",
+            "Temper {} schema {SCHEMA_VERSION} (experimental)",
             env!("CARGO_PKG_VERSION")
         )];
         if let Some(baseline) = &self.manifest.baseline {
@@ -932,6 +1132,26 @@ impl Run {
                 strategy.identity.canonical_identity()
             ));
         }
+        if let Some(parity) = &self.manifest.compiler_parity {
+            lines.push(format!(
+                "compiler parity: matched={}, stages={}, differences={}",
+                parity.matched,
+                parity.stages.len(),
+                if parity.difference_classes().is_empty() {
+                    "none".to_owned()
+                } else {
+                    parity.difference_classes().join("+")
+                }
+            ));
+        }
+        for decision in self
+            .manifest
+            .compiler_decisions
+            .iter()
+            .take(COMPILER_DECISION_LINE_LIMIT)
+        {
+            lines.push(decision.line());
+        }
         if let Some(confirmation) = &self.manifest.confirmation {
             if let Some(measurement) = &confirmation.measurement {
                 lines.push(format!(
@@ -958,6 +1178,63 @@ impl Run {
             ));
         }
         lines
+    }
+
+    /// Records one bounded compiler decision. The stable reason survives every
+    /// budget: only the decision list itself is truncated.
+    fn push_compiler_decision(&mut self, decision: CompilerDecisionRecord) {
+        if self.manifest.compiler_decisions.len() < COMPILER_DECISION_LIMIT {
+            self.manifest.compiler_decisions.push(decision);
+        }
+    }
+
+    fn push_build_decision(&mut self, failure: &BuildFailure, scope: DecisionScope) {
+        let Some(remediation) = compiler_remediation(failure.reason) else {
+            return;
+        };
+        let mut decision =
+            CompilerDecisionRecord::new(failure.reason, scope, &failure.message, remediation);
+        decision.stage = failure
+            .invocation
+            .interposition
+            .as_ref()
+            .map(|record| record.stage.label().to_owned());
+        self.push_compiler_decision(decision);
+    }
+
+    fn push_training_decision(&mut self, record: &PgoTrainingRecord) {
+        let Some(reason) = record.rejection_reason.as_deref() else {
+            return;
+        };
+        let Some(fallback) = compiler_remediation(reason) else {
+            return;
+        };
+        let remediation = record.remediation.unwrap_or(fallback);
+        let mut decision = CompilerDecisionRecord::new(
+            reason,
+            DecisionScope::PgoOnly,
+            record.message.as_deref().unwrap_or_default(),
+            remediation,
+        );
+        decision.source = record.rejection_source.clone();
+        self.push_compiler_decision(decision);
+    }
+
+    fn push_parity_decision(&mut self, parity: &CompilerParityRecord, stage: ShimStage) {
+        let Some(remediation) = compiler_remediation(parity::MISMATCH_REASON) else {
+            return;
+        };
+        let mut decision = CompilerDecisionRecord::new(
+            parity::MISMATCH_REASON,
+            DecisionScope::PgoOnly,
+            "Observed compiler inputs differed outside the schema-3 normalization allowlist.",
+            remediation,
+        );
+        decision.stage = Some(stage.label().to_owned());
+        decision.crate_name = parity.affected_crate();
+        decision.difference_classes = parity.difference_classes();
+        decision.message_truncated |= parity.differences_truncated;
+        self.push_compiler_decision(decision);
     }
 
     fn strategy_mut(&mut self, strategy: Strategy) -> Result<&mut StrategyRecord> {

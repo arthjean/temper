@@ -931,8 +931,8 @@ fn collect_one_run(
 
     let run: Value = serde_json::from_slice(&output.stdout)
         .map_err(|error| format!("parse Temper JSON output: {error}"))?;
-    if run["schema_version"] != 2 {
-        return Err("Temper did not emit schema-v2 evidence".to_owned());
+    if run["schema_version"] != 3 {
+        return Err("Temper did not emit schema-v3 evidence".to_owned());
     }
     let run_id = run["run_id"]
         .as_str()

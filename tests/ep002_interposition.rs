@@ -22,6 +22,10 @@ const HOST_TARGET: &str = "x86_64-unknown-linux-gnu";
 const PROTOCOL_FAILURE_EXIT: i32 = 97;
 const REJECTION_EXIT: i32 = 98;
 
+/// One private-protocol defect: a label, whether it can leave a bounded
+/// marker, and the environment overrides that produce it.
+type ProtocolCase = (&'static str, bool, Vec<(&'static str, OsString)>);
+
 // US-004: the shim is private, dispatched before Clap, and transparent.
 
 #[test]
@@ -97,13 +101,17 @@ fn argument_bytes_survive_process_replacement_without_conversion() {
 #[test]
 fn protocol_failures_fail_closed_without_any_fallback_compiler() {
     let shim = ShimHarness::new("protocol");
-    let cases: Vec<(&str, Vec<(&str, OsString)>)> = vec![
+    // `marked` records whether the failure can leave a bounded marker: only a
+    // canonical capture directory inside the current run may be written to.
+    let cases: Vec<ProtocolCase> = vec![
         (
             "missing value",
+            true,
             vec![("TEMPER_SHIM_STAGE", OsString::new())],
         ),
         (
             "unsupported version",
+            true,
             vec![(
                 "TEMPER_SHIM_PROTOCOL",
                 OsString::from("temper-rustc-shim-0"),
@@ -111,10 +119,12 @@ fn protocol_failures_fail_closed_without_any_fallback_compiler() {
         ),
         (
             "unknown stage",
+            true,
             vec![("TEMPER_SHIM_STAGE", OsString::from("baseline"))],
         ),
         (
             "unsupported target",
+            true,
             vec![(
                 "TEMPER_SHIM_TARGET",
                 OsString::from("aarch64-unknown-linux-gnu"),
@@ -122,6 +132,7 @@ fn protocol_failures_fail_closed_without_any_fallback_compiler() {
         ),
         (
             "out-of-root capture directory",
+            false,
             vec![(
                 "TEMPER_SHIM_CAPTURE_DIR",
                 shim.outside.as_os_str().to_owned(),
@@ -129,6 +140,7 @@ fn protocol_failures_fail_closed_without_any_fallback_compiler() {
         ),
         (
             "out-of-root profile path",
+            true,
             vec![(
                 "TEMPER_SHIM_INJECTION",
                 OsString::from(format!("generate={}", shim.outside.display())),
@@ -136,6 +148,7 @@ fn protocol_failures_fail_closed_without_any_fallback_compiler() {
         ),
         (
             "relative profile path",
+            true,
             vec![(
                 "TEMPER_SHIM_INJECTION",
                 OsString::from("generate=relative/profiles"),
@@ -143,10 +156,11 @@ fn protocol_failures_fail_closed_without_any_fallback_compiler() {
         ),
         (
             "relative real rustc",
+            true,
             vec![("TEMPER_SHIM_REAL_RUSTC", OsString::from("rustc"))],
         ),
     ];
-    for (label, overrides) in cases {
+    for (label, marked, overrides) in cases {
         let output = shim.invoke_overridden(&["--emit=link"], &overrides);
         assert_eq!(
             output.status.code(),
@@ -171,6 +185,26 @@ fn protocol_failures_fail_closed_without_any_fallback_compiler() {
             "{label} fell back to a PATH compiler after a protocol failure"
         );
         assert!(shim.records().is_empty(), "{label} persisted a record");
+
+        let markers = shim.protocol_failure_markers();
+        assert_eq!(
+            markers.len(),
+            usize::from(marked),
+            "{label} left the wrong number of protocol-failure markers"
+        );
+        for marker in &markers {
+            assert_eq!(marker["protocol"], PROTOCOL);
+            assert_eq!(marker["reason"], "compiler_protocol_failure");
+            assert!(marker["message"].as_str().is_some_and(|m| !m.is_empty()));
+        }
+        assert!(
+            fs::read_dir(&shim.outside)
+                .expect("read out-of-root directory")
+                .next()
+                .is_none(),
+            "{label} wrote outside the current run"
+        );
+        shim.reset();
     }
 }
 
@@ -786,19 +820,38 @@ impl ShimHarness {
     }
 
     fn reset(&self) {
-        for path in self.record_paths() {
-            fs::remove_file(path).expect("remove record");
+        for path in self.capture_paths() {
+            fs::remove_file(path).expect("remove capture entry");
         }
         let _ = fs::remove_file(&self.argv_path);
     }
 
-    fn record_paths(&self) -> Vec<PathBuf> {
+    fn capture_paths(&self) -> Vec<PathBuf> {
         let mut paths: Vec<PathBuf> = fs::read_dir(&self.capture_directory)
             .expect("read capture directory")
             .map(|entry| entry.expect("capture entry").path())
             .collect();
         paths.sort();
         paths
+    }
+
+    fn record_paths(&self) -> Vec<PathBuf> {
+        self.capture_paths()
+            .into_iter()
+            .filter(|path| !is_protocol_failure_marker(path))
+            .collect()
+    }
+
+    /// Bounded markers a protocol failure leaves behind, so the parent can tell
+    /// an aborted shim apart from an absent capture set.
+    fn protocol_failure_markers(&self) -> Vec<Value> {
+        self.capture_paths()
+            .iter()
+            .filter(|path| is_protocol_failure_marker(path))
+            .map(|path| {
+                serde_json::from_slice(&fs::read(path).expect("read marker")).expect("parse marker")
+            })
+            .collect()
     }
 
     fn records(&self) -> Vec<Value> {
@@ -903,6 +956,12 @@ fn interposed_stages(manifest: &Value) -> BTreeMap<String, Value> {
         collect(&strategy["build"]);
     }
     stages
+}
+
+fn is_protocol_failure_marker(path: &Path) -> bool {
+    path.file_name()
+        .and_then(|name| name.to_str())
+        .is_some_and(|name| name.starts_with("protocol-failure-"))
 }
 
 fn make_executable(path: &Path) {

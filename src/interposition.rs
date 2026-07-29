@@ -57,11 +57,22 @@ pub(crate) const REJECTION_EXIT: i32 = 98;
 
 pub(crate) const RECORD_LIMIT: usize = 10_000;
 pub(crate) const CAPTURE_BYTE_LIMIT: u64 = 32 * 1024 * 1024;
-const RECORD_BYTE_LIMIT: u64 = 16 * 1024;
+const RECORD_BYTE_LIMIT: u64 = 64 * 1024;
 const FIELD_LIMIT: usize = 512;
 const CRATE_TYPE_LIMIT: usize = 16;
 const NAME_ATTEMPT_LIMIT: u32 = 64;
 const DIAGNOSTIC_LIMIT: usize = 512;
+
+/// Bounded argument count of one comparable target compilation. A longer argv
+/// is unsupported rather than partially compared.
+pub(crate) const ARGUMENT_LIMIT: usize = 2_048;
+/// Hex length of one per-argument normalized digest. It keeps a record inside
+/// its byte budget while staying far beyond accidental collision.
+const ARGUMENT_DIGEST_LENGTH: usize = 16;
+/// Replacement of every stage-target-root substring in a normalized argument.
+const STAGE_ROOT_PLACEHOLDER: &[u8] = b"<STAGE_ROOT>";
+/// File-name prefix of a shim protocol-failure marker.
+const PROTOCOL_FAILURE_PREFIX: &str = "protocol-failure-";
 
 pub(crate) const MISSING_FUNCTION_WARNING: &str = "-Cllvm-args=-pgo-warn-missing-function";
 pub(crate) const PROFILE_GENERATE_FLAG: &str = "profile-generate";
@@ -76,16 +87,18 @@ pub(crate) const CAPTURE_MISSING_REASON: &str = "compiler_capture_missing";
 pub(crate) const CAPTURE_CORRUPT_REASON: &str = "compiler_capture_corrupt";
 pub(crate) const CAPTURE_LIMIT_REASON: &str = "compiler_capture_limit";
 pub(crate) const INJECTION_UNEXPECTED_REASON: &str = "compiler_injection_unexpected";
+pub(crate) const PROTOCOL_FAILURE_REASON: &str = "compiler_protocol_failure";
 
 /// Compiler-input reasons a build failure must surface unchanged, so an
 /// interposition or evidence defect is never reported as a plain build failure.
-pub(crate) const COMPILER_INPUT_REASONS: [&str; 6] = [
+pub(crate) const COMPILER_INPUT_REASONS: [&str; 7] = [
     INPUT_CONFLICT_REASON,
     INPUT_AMBIGUITY_REASON,
     CAPTURE_MISSING_REASON,
     CAPTURE_CORRUPT_REASON,
     CAPTURE_LIMIT_REASON,
     INJECTION_UNEXPECTED_REASON,
+    PROTOCOL_FAILURE_REASON,
 ];
 
 /// One interposed build stage. Every stage owns a fresh target and capture root.
@@ -206,15 +219,16 @@ impl Injection {
 #[derive(Clone, Debug)]
 pub(crate) struct ShimTools {
     pub(crate) shim_executable: PathBuf,
+    pub(crate) shim_sha256: String,
     pub(crate) real_rustc: PathBuf,
+    pub(crate) real_rustc_version: String,
 }
 
 /// Everything one interposed Cargo build needs to install the private protocol.
 #[derive(Clone, Debug)]
 pub(crate) struct InterpositionPlan {
     pub(crate) stage: ShimStage,
-    pub(crate) shim_executable: PathBuf,
-    pub(crate) real_rustc: PathBuf,
+    pub(crate) tools: ShimTools,
     pub(crate) run_root: PathBuf,
     pub(crate) target_directory: PathBuf,
     pub(crate) capture_directory: PathBuf,
@@ -227,8 +241,10 @@ impl InterpositionPlan {
             protocol: PROTOCOL,
             normalization: NORMALIZATION_VERSION,
             stage: self.stage,
-            shim_executable: self.shim_executable.clone(),
-            real_rustc: self.real_rustc.clone(),
+            shim_executable: self.tools.shim_executable.clone(),
+            shim_sha256: self.tools.shim_sha256.clone(),
+            real_rustc: self.tools.real_rustc.clone(),
+            real_rustc_version: self.tools.real_rustc_version.clone(),
             capture_directory: self.capture_directory.clone(),
             profile_path: self.injection.profile_path().map(Path::to_path_buf),
             injected_flags: self.injection.flag_identifiers(),
@@ -237,10 +253,10 @@ impl InterpositionPlan {
 
     /// Applies the process-local protocol to one Cargo child.
     pub(crate) fn apply(&self, command: &mut Command) {
-        command.env("RUSTC", &self.shim_executable);
+        command.env("RUSTC", &self.tools.shim_executable);
         command.env(PROTOCOL_VARIABLE, PROTOCOL);
         command.env(RUN_ROOT_VARIABLE, &self.run_root);
-        command.env(REAL_RUSTC_VARIABLE, &self.real_rustc);
+        command.env(REAL_RUSTC_VARIABLE, &self.tools.real_rustc);
         command.env(STAGE_VARIABLE, self.stage.label());
         command.env(TARGET_VARIABLE, SUPPORTED_HOST);
         command.env(TARGET_DIRECTORY_VARIABLE, &self.target_directory);
@@ -256,7 +272,9 @@ pub(crate) struct InterpositionRecord {
     pub(crate) normalization: u32,
     pub(crate) stage: ShimStage,
     pub(crate) shim_executable: PathBuf,
+    pub(crate) shim_sha256: String,
     pub(crate) real_rustc: PathBuf,
+    pub(crate) real_rustc_version: String,
     pub(crate) capture_directory: PathBuf,
     pub(crate) profile_path: Option<PathBuf>,
     pub(crate) injected_flags: Vec<&'static str>,
@@ -291,6 +309,11 @@ pub(crate) struct CaptureRecord {
     pub(crate) argument_count: usize,
     pub(crate) pre_digest: String,
     pub(crate) post_digest: String,
+    /// Ordered digest of the pre-injection argv after stage-root normalization.
+    pub(crate) normalized_digest: String,
+    /// Per-argument normalized digests. Only a target compilation carries them,
+    /// because only target compilations are compared across stages.
+    pub(crate) argument_digests: Vec<String>,
     pub(crate) injected_flags: Vec<String>,
     pub(crate) rejection: Option<String>,
 }
@@ -395,6 +418,7 @@ struct ShimContext {
     stage: ShimStage,
     target: String,
     real_rustc: PathBuf,
+    target_directory: PathBuf,
     capture_directory: PathBuf,
     injection: Injection,
 }
@@ -449,10 +473,24 @@ impl ShimContext {
             stage,
             target,
             real_rustc,
+            target_directory,
             capture_directory,
             injection,
         })
     }
+}
+
+/// Resolves the directory a protocol-failure marker may be written to.
+///
+/// It is only consulted on the failure path, and returns a directory only when
+/// the private run root and capture directory are both canonical and nested, so
+/// a malformed protocol can never create a file outside the current run.
+fn protocol_failure_directory() -> Option<PathBuf> {
+    let run_root = canonical_directory(RUN_ROOT_VARIABLE).ok()?;
+    let capture_directory = canonical_directory(CAPTURE_DIRECTORY_VARIABLE).ok()?;
+    capture_directory
+        .starts_with(&run_root)
+        .then_some(capture_directory)
 }
 
 fn reject_duplicate_values() -> Result<(), String> {
@@ -601,7 +639,8 @@ fn classify(arguments: &[OsString], target: &str) -> Classification {
         InvocationClass::Other
     };
     let ambiguous = targets.len() > 1
-        || (class == InvocationClass::TargetCompile && (crate_name.is_none() || crate_name_lost));
+        || (class == InvocationClass::TargetCompile
+            && (crate_name.is_none() || crate_name_lost || arguments.len() > ARGUMENT_LIMIT));
 
     crate_types.truncate(CRATE_TYPE_LIMIT);
     Classification {
@@ -651,6 +690,21 @@ fn build_record(
         } else {
             Vec::new()
         };
+    let stage_root = context.target_directory.as_os_str().as_bytes();
+    let normalized: Vec<Vec<u8>> = arguments
+        .iter()
+        .map(|argument| normalize_argument(argument, stage_root))
+        .collect();
+    // Only a target compilation is compared across stages, so only it pays the
+    // per-argument digest cost inside the bounded record.
+    let argument_digests = if classification.class == InvocationClass::TargetCompile {
+        normalized
+            .iter()
+            .map(|argument| short_digest(argument))
+            .collect()
+    } else {
+        Vec::new()
+    };
     CaptureRecord {
         protocol: PROTOCOL.to_owned(),
         normalization: NORMALIZATION_VERSION,
@@ -667,9 +721,43 @@ fn build_record(
         argument_count: arguments.len(),
         pre_digest: argument_digest(arguments),
         post_digest: argument_digest(final_arguments),
+        normalized_digest: framed_digest(
+            &normalized.iter().map(Vec::as_slice).collect::<Vec<&[u8]>>(),
+        ),
+        argument_digests,
         injected_flags,
         rejection: rejection.map(str::to_owned),
     }
+}
+
+/// Replaces every stage-target-root substring with the documented placeholder.
+///
+/// EP-001 observed exactly three argv positions that depend on the stage root:
+/// `--out-dir`, `-L dependency=` and `--extern <crate>=`. Normalizing the root
+/// itself covers all three without interpreting Cargo's argument grammar.
+fn normalize_argument(argument: &OsStr, stage_root: &[u8]) -> Vec<u8> {
+    let bytes = argument.as_bytes();
+    if stage_root.is_empty() || bytes.len() < stage_root.len() {
+        return bytes.to_vec();
+    }
+    let mut normalized = Vec::with_capacity(bytes.len());
+    let mut index = 0;
+    while index < bytes.len() {
+        if bytes[index..].starts_with(stage_root) {
+            normalized.extend_from_slice(STAGE_ROOT_PLACEHOLDER);
+            index += stage_root.len();
+        } else {
+            normalized.push(bytes[index]);
+            index += 1;
+        }
+    }
+    normalized
+}
+
+fn short_digest(value: &[u8]) -> String {
+    let mut digest = framed_digest(&[value]);
+    digest.truncate(ARGUMENT_DIGEST_LENGTH);
+    digest
 }
 
 fn write_record(directory: &Path, record: &CaptureRecord) -> Result<(), String> {
@@ -727,6 +815,13 @@ fn argument_digest(arguments: &[OsString]) -> String {
     framed_digest(&framed)
 }
 
+/// Length-framed digest over ordered text values, sharing the byte framing so
+/// derived aggregates cannot be forged by concatenation.
+pub(crate) fn framed_text_digest(values: &[String]) -> String {
+    let framed: Vec<&[u8]> = values.iter().map(|value| value.as_bytes()).collect();
+    framed_digest(&framed)
+}
+
 /// Length-framed digest over raw bytes. Framing keeps concatenation unambiguous.
 fn framed_digest(values: &[&[u8]]) -> String {
     let mut hasher = Sha256::new();
@@ -759,12 +854,66 @@ fn bounded(value: &str) -> String {
     value[..boundary].to_owned()
 }
 
+/// One bounded protocol-failure marker.
+///
+/// It is deliberately not a [`CaptureRecord`]: a protocol failure has no
+/// classified invocation, and the parent must be able to tell an aborted shim
+/// apart from an absent capture set without matching diagnostic text.
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+struct ProtocolFailureMarker {
+    protocol: String,
+    reason: String,
+    message: String,
+}
+
 fn protocol_failure(message: &str) -> ! {
-    eprintln!(
-        "temper shim protocol failure ({PROTOCOL}): {}",
-        bounded_diagnostic(message)
-    );
+    let message = bounded_diagnostic(message);
+    // The marker lets the parent tell an aborted shim apart from an absent
+    // capture set. It sharpens the reason; it never makes the failure closed.
+    if let Some(directory) = protocol_failure_directory() {
+        write_protocol_failure(&directory, message);
+    }
+    eprintln!("temper shim protocol failure ({PROTOCOL}): {message}");
     std::process::exit(PROTOCOL_FAILURE_EXIT)
+}
+
+/// Writes one create-new marker. Every failure here is deliberately ignored:
+/// the marker only sharpens the parent's reason, and the shim must still exit
+/// with its bounded diagnostic when the capture directory cannot accept it.
+fn write_protocol_failure(directory: &Path, message: &str) {
+    let marker = ProtocolFailureMarker {
+        protocol: PROTOCOL.to_owned(),
+        reason: PROTOCOL_FAILURE_REASON.to_owned(),
+        message: message.to_owned(),
+    };
+    let Ok(serialized) = serde_json::to_vec(&marker) else {
+        return;
+    };
+    let nanoseconds = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|elapsed| elapsed.as_nanos())
+        .unwrap_or_default();
+    for attempt in 0..NAME_ATTEMPT_LIMIT {
+        let identity = framed_digest(&[
+            &std::process::id().to_be_bytes(),
+            &nanoseconds.to_be_bytes(),
+            &attempt.to_be_bytes(),
+        ]);
+        let path = directory.join(format!("{PROTOCOL_FAILURE_PREFIX}{identity}.json"));
+        match fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&path)
+        {
+            Ok(mut file) => {
+                let _ignored = file.write_all(&serialized);
+                return;
+            }
+            Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
+            Err(_) => return,
+        }
+    }
 }
 
 fn bounded_diagnostic(message: &str) -> &str {
@@ -784,6 +933,34 @@ pub(crate) fn resolve_tools(expected_rustc_version: &str) -> Result<ShimTools, S
         return Err("The Temper executable is not a regular file.".to_owned());
     }
     let real_rustc = resolve_real_rustc()?;
+    identified_tools(shim_executable, real_rustc, expected_rustc_version)
+}
+
+/// Revalidates a previously recorded shim and real rustc pair before reusing it
+/// for the confirmation stage.
+pub(crate) fn validated_tools(recorded: &InterpositionRecord) -> Result<ShimTools, String> {
+    let shim = fs::canonicalize(&recorded.shim_executable)
+        .map_err(|error| format!("The recorded Temper executable is unavailable: {error}"))?;
+    let compiler = absolute_program(&recorded.real_rustc)
+        .map_err(|error| format!("The recorded real rustc is unavailable: {error}"))?;
+    if shim != recorded.shim_executable || compiler != recorded.real_rustc || !shim.is_file() {
+        return Err("A recorded compiler path changed since the accepted PGO build.".to_owned());
+    }
+    let tools = identified_tools(shim, compiler, &recorded.real_rustc_version)?;
+    if tools.shim_sha256 != recorded.shim_sha256 {
+        return Err("The Temper executable changed since the accepted PGO build.".to_owned());
+    }
+    Ok(tools)
+}
+
+/// Hashes the shim and proves the real rustc identity before it is installed.
+fn identified_tools(
+    shim_executable: PathBuf,
+    real_rustc: PathBuf,
+    expected_rustc_version: &str,
+) -> Result<ShimTools, String> {
+    let shim_sha256 = crate::hash::sha256_file(&shim_executable)
+        .map_err(|error| format!("The Temper executable could not be hashed: {error}"))?;
     let version = Command::new(&real_rustc)
         .arg("-Vv")
         .output()
@@ -791,35 +968,20 @@ pub(crate) fn resolve_tools(expected_rustc_version: &str) -> Result<ShimTools, S
     if !version.status.success() {
         return Err("The resolved real rustc identity probe failed.".to_owned());
     }
-    let version = String::from_utf8(version.stdout)
-        .map_err(|_| "The resolved real rustc identity was not valid UTF-8.".to_owned())?;
-    if version.trim() != expected_rustc_version.trim() {
+    let real_rustc_version = String::from_utf8(version.stdout)
+        .map_err(|_| "The resolved real rustc identity was not valid UTF-8.".to_owned())?
+        .trim()
+        .to_owned();
+    if real_rustc_version != expected_rustc_version.trim() {
         return Err(
             "The resolved real rustc identity does not match the preflight compiler.".to_owned(),
         );
     }
     Ok(ShimTools {
         shim_executable,
+        shim_sha256,
         real_rustc,
-    })
-}
-
-/// Revalidates a previously recorded shim and real rustc pair before reusing it
-/// for the confirmation stage.
-pub(crate) fn validated_tools(
-    shim_executable: &Path,
-    real_rustc: &Path,
-) -> Result<ShimTools, String> {
-    let shim = fs::canonicalize(shim_executable)
-        .map_err(|error| format!("The recorded Temper executable is unavailable: {error}"))?;
-    let compiler = absolute_program(real_rustc)
-        .map_err(|error| format!("The recorded real rustc is unavailable: {error}"))?;
-    if shim != shim_executable || compiler != real_rustc || !shim.is_file() {
-        return Err("A recorded compiler path changed since the accepted PGO build.".to_owned());
-    }
-    Ok(ShimTools {
-        shim_executable: shim,
-        real_rustc: compiler,
+        real_rustc_version,
     })
 }
 
@@ -911,8 +1073,7 @@ pub(crate) fn plan_stage(
     }
     Ok(InterpositionPlan {
         stage,
-        shim_executable: tools.shim_executable.clone(),
-        real_rustc: tools.real_rustc.clone(),
+        tools: tools.clone(),
         run_root,
         target_directory: directories.target,
         capture_directory: directories.capture,
@@ -1041,6 +1202,13 @@ pub(crate) fn collect(plan: &InterpositionPlan) -> Result<CaptureAggregate, Capt
             ));
         }
         capture_bytes = capture_bytes.saturating_add(metadata.len());
+        if entry
+            .file_name()
+            .as_bytes()
+            .starts_with(PROTOCOL_FAILURE_PREFIX.as_bytes())
+        {
+            return Err(read_protocol_failure(&path));
+        }
         records.push(read_record(&path, &root)?);
         if records.len() > RECORD_LIMIT {
             return Err(CaptureFailure::new(
@@ -1152,6 +1320,26 @@ pub(crate) fn collect(plan: &InterpositionPlan) -> Result<CaptureAggregate, Capt
     Ok(aggregate)
 }
 
+fn read_protocol_failure(path: &Path) -> CaptureFailure {
+    let marker = fs::read(path)
+        .ok()
+        .and_then(|contents| serde_json::from_slice::<ProtocolFailureMarker>(&contents).ok())
+        .filter(|marker| marker.protocol == PROTOCOL && marker.reason == PROTOCOL_FAILURE_REASON);
+    match marker {
+        Some(marker) => CaptureFailure::new(
+            PROTOCOL_FAILURE_REASON,
+            format!(
+                "The private compiler shim aborted before executing rustc: {}",
+                marker.message
+            ),
+        ),
+        None => CaptureFailure::new(
+            CAPTURE_CORRUPT_REASON,
+            "A stage protocol-failure marker could not be read.",
+        ),
+    }
+}
+
 fn read_record(path: &Path, root: &Path) -> Result<CaptureRecord, CaptureFailure> {
     let contents = fs::read(path).map_err(|error| {
         CaptureFailure::new(
@@ -1187,10 +1375,10 @@ mod tests {
         CAPTURE_CORRUPT_REASON, CAPTURE_LIMIT_REASON, CAPTURE_MISSING_REASON, CRATE_TYPE_LIMIT,
         CaptureRecord, Classification, INJECTION_UNEXPECTED_REASON, INPUT_AMBIGUITY_REASON,
         INPUT_CONFLICT_REASON, Injection, InterpositionPlan, InvocationClass,
-        NORMALIZATION_VERSION, PROTOCOL, RECORD_LIMIT, ShimStage, argument_digest,
-        claim_stage_directories, classify, collect,
+        NORMALIZATION_VERSION, PROTOCOL, PROTOCOL_FAILURE_REASON, RECORD_LIMIT, ShimStage,
+        ShimTools, argument_digest, claim_stage_directories, classify, collect, normalize_argument,
     };
-    use std::ffi::OsString;
+    use std::ffi::{OsStr, OsString};
     use std::os::unix::ffi::OsStringExt;
     use std::path::{Path, PathBuf};
 
@@ -1332,6 +1520,45 @@ mod tests {
     }
 
     #[test]
+    fn stage_root_normalization_covers_every_observed_position() {
+        let stage_root = b"/run/target/pgo_generate".as_slice();
+        for (argument, expected) in [
+            (
+                "/run/target/pgo_generate/release/deps",
+                "<STAGE_ROOT>/release/deps",
+            ),
+            (
+                "dependency=/run/target/pgo_generate/release/deps",
+                "dependency=<STAGE_ROOT>/release/deps",
+            ),
+            (
+                "unitlib=/run/target/pgo_generate/release/deps/libunitlib.rlib",
+                "unitlib=<STAGE_ROOT>/release/deps/libunitlib.rlib",
+            ),
+            ("--emit=dep-info,link", "--emit=dep-info,link"),
+        ] {
+            assert_eq!(
+                normalize_argument(OsStr::new(argument), stage_root),
+                expected.as_bytes(),
+                "{argument}"
+            );
+        }
+        // A stage-root-free argument keeps its exact bytes, including invalid UTF-8.
+        let invalid = OsString::from_vec(vec![0xff, 0xfe]);
+        assert_eq!(normalize_argument(&invalid, stage_root), vec![0xff, 0xfe]);
+    }
+
+    #[test]
+    fn an_unbounded_target_argv_is_unsupported_rather_than_compared() {
+        let mut values = vec!["--crate-name", "app", "--target", TARGET, "--emit=link"];
+        values.extend(std::iter::repeat_n("--cfg=pad", super::ARGUMENT_LIMIT));
+        assert_eq!(
+            classification(&values).rejection(),
+            Some(INPUT_AMBIGUITY_REASON)
+        );
+    }
+
+    #[test]
     fn injection_round_trips_through_the_private_protocol() {
         let generate = Injection::Generate(PathBuf::from("/run/raw"));
         let parsed = Injection::parse(&generate.encode()).expect("generate round trip");
@@ -1376,6 +1603,8 @@ mod tests {
             argument_count: 5,
             pre_digest: "pre".to_owned(),
             post_digest: "post".to_owned(),
+            normalized_digest: "normalized".to_owned(),
+            argument_digests: vec!["a".to_owned(), "b".to_owned()],
             injected_flags: injected.iter().map(|flag| (*flag).to_owned()).collect(),
             rejection: None,
         }
@@ -1397,8 +1626,12 @@ mod tests {
                 .expect("stage directories");
         InterpositionPlan {
             stage: ShimStage::Generate,
-            shim_executable: PathBuf::from("/toolchain/cargo-temper"),
-            real_rustc: PathBuf::from("/toolchain/rustc"),
+            tools: ShimTools {
+                shim_executable: PathBuf::from("/toolchain/cargo-temper"),
+                shim_sha256: "shim".to_owned(),
+                real_rustc: PathBuf::from("/toolchain/rustc"),
+                real_rustc_version: "rustc identity".to_owned(),
+            },
             run_root: root.to_path_buf(),
             target_directory: directories.target,
             capture_directory: directories.capture,
@@ -1531,8 +1764,29 @@ mod tests {
                 "over-sized record",
                 CAPTURE_LIMIT_REASON,
                 Box::new(|directory: &Path| {
-                    std::fs::write(directory.join("oversized.json"), vec![b' '; 17 * 1024])
+                    std::fs::write(directory.join("oversized.json"), vec![b' '; 65 * 1024])
                         .expect("write oversized record");
+                }),
+            ),
+            (
+                "protocol failure marker",
+                PROTOCOL_FAILURE_REASON,
+                Box::new(|directory: &Path| {
+                    write_capture(
+                        directory,
+                        "target-record",
+                        &capture_record(InvocationClass::TargetCompile, &["profile-generate"]),
+                    );
+                    std::fs::write(
+                        directory.join("protocol-failure-abc.json"),
+                        serde_json::to_vec(&super::ProtocolFailureMarker {
+                            protocol: PROTOCOL.to_owned(),
+                            reason: PROTOCOL_FAILURE_REASON.to_owned(),
+                            message: "missing private protocol value".to_owned(),
+                        })
+                        .expect("serialize marker"),
+                    )
+                    .expect("write marker");
                 }),
             ),
         ];

@@ -1506,6 +1506,24 @@ mod tests {
 
         let anonymous = classification(&["--target", TARGET, "--emit=link"]);
         assert_eq!(anonymous.rejection(), Some(INPUT_AMBIGUITY_REASON));
+
+        // Observed on corpus-v1 `hexyl`: the `rustix` build script probes the
+        // compiler for the requested target, reading its source from stdin and
+        // naming no crate. It carries the exact target and a compilation
+        // `--emit`, so the predicate cannot separate it from a real unit and
+        // fails closed instead of guessing. Widening the predicate needs its
+        // own evidence; this pins the boundary v0.0.3 actually ships.
+        let build_script_probe = classification(&[
+            "--crate-type=rlib",
+            "--emit=metadata",
+            "--target",
+            TARGET,
+            "--out-dir",
+            "/tmp/target/release/build/rustix-0000000000000000/out",
+            "-",
+        ]);
+        assert_eq!(build_script_probe.class, InvocationClass::TargetCompile);
+        assert_eq!(build_script_probe.rejection(), Some(INPUT_AMBIGUITY_REASON));
     }
 
     #[test]

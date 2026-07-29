@@ -444,7 +444,7 @@ fn failed_runs_still_emit_schema_v3_and_preflight_json_is_single_object() {
         .current_dir(&missing_lock.root)
         .args(["temper", "optimize", "--json", "--manifest-path"])
         .arg(missing_lock.root.join("Cargo.toml"))
-        .args(["--", "/bin/true"])
+        .args(["--", "/bin/sleep", "0.02"])
         .output()
         .expect("run JSON preflight failure");
     assert_eq!(output.status.code(), Some(1));

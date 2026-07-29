@@ -160,8 +160,18 @@ impl Fixture {
         }
     }
 
+    /// Runs one optimization with the default measurable workload.
+    ///
+    /// The workload sleeps rather than exiting immediately: measurement-v1
+    /// rejects a screening cohort whose relative median absolute deviation
+    /// exceeds 10%, and a zero-duration workload makes that ratio pure process
+    /// noise on a loaded host. The floor bounds the ratio without changing any
+    /// decision, because every artifact runs the same workload.
     pub(crate) fn optimize(&self, extra_arguments: &[&str]) -> Output {
-        self.optimize_workload(extra_arguments, &[OsStr::new("/bin/true")])
+        self.optimize_workload(
+            extra_arguments,
+            &[OsStr::new("/bin/sleep"), OsStr::new("0.02")],
+        )
     }
 
     pub(crate) fn optimize_workload(

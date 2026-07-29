@@ -139,7 +139,7 @@ fn compiler_input_environment_is_recorded_as_digests_without_values() {
         .env("CARGO_BUILD_RUSTFLAGS", "")
         .args(["temper", "optimize", "--allow-dirty", "--manifest-path"])
         .arg(fixture.root.join("Cargo.toml"))
-        .args(["--", "/bin/true"])
+        .args(["--", "/bin/sleep", "0.02"])
         .output()
         .expect("run environment digest case");
     assert!(output.status.success(), "{}", stderr(&output));

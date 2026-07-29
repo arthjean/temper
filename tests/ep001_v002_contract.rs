@@ -159,7 +159,7 @@ fn suspicious_json_and_ambiguous_artifacts_fail_before_measurement() {
             .env("CARGO", &wrapper)
             .args(["temper", "optimize", "--allow-dirty", "--manifest-path"])
             .arg(fixture.root.join("Cargo.toml"))
-            .args(["--", "/bin/true"])
+            .args(["--", "/bin/sleep", "0.02"])
             .output()
             .expect("run Cargo stream case");
         assert_eq!(output.status.code(), Some(1), "{}", stderr(&output));
@@ -182,7 +182,7 @@ fn plain_text_and_fresh_matching_artifacts_remain_accepted() {
         .env("CARGO", &wrapper)
         .args(["temper", "optimize", "--allow-dirty", "--manifest-path"])
         .arg(fixture.root.join("Cargo.toml"))
-        .args(["--", "/bin/true"])
+        .args(["--", "/bin/sleep", "0.02"])
         .output()
         .expect("run fresh artifact case");
     assert!(output.status.success(), "{}", stderr(&output));

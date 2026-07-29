@@ -495,7 +495,7 @@ fn an_ambient_wrapper_rejects_pgo_before_the_reference_build() {
         .env("RUSTC_WRAPPER", &wrapper)
         .args(["temper", "optimize", "--allow-dirty", "--manifest-path"])
         .arg(fixture.root.join("Cargo.toml"))
-        .args(["--", "/bin/true"])
+        .args(["--", "/bin/sleep", "0.02"])
         .output()
         .expect("run ambient wrapper case");
     assert!(output.status.success(), "{}", stderr(&output));

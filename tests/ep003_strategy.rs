@@ -160,7 +160,7 @@ fn a_static_build_failure_does_not_stop_remaining_strategies() {
         .env("CARGO", &wrapper)
         .args(["temper", "optimize", "--allow-dirty", "--manifest-path"])
         .arg(fixture.root.join("Cargo.toml"))
-        .args(["--", "/bin/true"])
+        .args(["--", "/bin/sleep", "0.02"])
         .output()
         .expect("run isolated failure");
     assert!(output.status.success(), "{}", stderr(&output));
@@ -223,7 +223,7 @@ fn pgo_never_falls_back_to_path_for_llvm_profdata() {
         .env("PATH", combined_path)
         .args(["temper", "optimize", "--allow-dirty", "--manifest-path"])
         .arg(fixture.root.join("Cargo.toml"))
-        .args(["--", "/bin/true"])
+        .args(["--", "/bin/sleep", "0.02"])
         .output()
         .expect("run toolchain boundary");
     assert!(output.status.success(), "{}", stderr(&output));

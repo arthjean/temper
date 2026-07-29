@@ -215,7 +215,7 @@ fn sigint_during_baseline_build_persists_an_interrupted_manifest() {
         .current_dir(&fixture.root)
         .args(["temper", "optimize", "--manifest-path"])
         .arg(fixture.root.join("Cargo.toml"))
-        .args(["--", "/bin/true"])
+        .args(["--", "/bin/sleep", "0.02"])
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
     let mut child = child.spawn().expect("start interrupted baseline fixture");

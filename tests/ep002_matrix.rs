@@ -112,10 +112,13 @@ fn run_supported_case(
 ) -> Output {
     let tracked_before = tracked_input_sha256(&fixture.root);
     let workload = fixture.root.join("matrix-workload");
+    // The winning arm keeps a nonzero floor and the gaps stay far larger than
+    // per-invocation process noise, so base selection cannot flip on a loaded
+    // host.
     let sleeps = match base_strategy {
-        BaseStrategy::Baseline => ("0", "0.03", "0.06"),
-        BaseStrategy::Thin => ("0.06", "0", "0.03"),
-        BaseStrategy::Fat => ("0.06", "0.03", "0"),
+        BaseStrategy::Baseline => ("0.02", "0.10", "0.18"),
+        BaseStrategy::Thin => ("0.18", "0.02", "0.10"),
+        BaseStrategy::Fat => ("0.18", "0.10", "0.02"),
     };
     fs::write(
         &workload,

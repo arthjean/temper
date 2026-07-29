@@ -1,4 +1,4 @@
 [workspace]
-members = ["app", "temper-macro"]
+members = ["app", "support", "temper-macro"]
 resolver = "3"
 

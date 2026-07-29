@@ -132,10 +132,10 @@ fn rejects_cross_targets_and_ignores_nested_workspace_run_output() {
     let cross_target = Fixture::single("cross-target", true, true);
     let rejected = cross_target.optimize(&["--target", "aarch64-unknown-linux-gnu"]);
     assert_eq!(rejected.status.code(), Some(1));
-    assert!(
-        stderr(&rejected)
-            .contains("Temper v0.0.2 supports only x86_64-unknown-linux-gnu host binaries")
-    );
+    assert!(stderr(&rejected).contains(&format!(
+        "Temper v{} supports only x86_64-unknown-linux-gnu host binaries",
+        env!("CARGO_PKG_VERSION")
+    )));
     assert!(!cross_target.root.join(".temper").exists());
 
     let nested = Fixture::nested_single("nested-fixture");
@@ -150,9 +150,10 @@ fn prerequisite_and_baseline_failures_stop_before_later_phases() {
     let missing_lock = Fixture::single("missing-lock", true, false);
     let missing_lock_output = missing_lock.optimize(&[]);
     assert_eq!(missing_lock_output.status.code(), Some(1));
-    assert!(
-        stderr(&missing_lock_output).contains("Temper v0.0.2 requires an existing Cargo.lock.")
-    );
+    assert!(stderr(&missing_lock_output).contains(&format!(
+        "Temper v{} requires an existing Cargo.lock.",
+        env!("CARGO_PKG_VERSION")
+    )));
     assert!(!missing_lock.root.join(".temper").exists());
 
     let missing_cargo = Fixture::single("missing-cargo", true, true);

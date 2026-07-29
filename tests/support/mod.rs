@@ -1,4 +1,10 @@
-#![allow(dead_code, clippy::unwrap_used, clippy::expect_used)]
+#![allow(
+    dead_code,
+    clippy::unwrap_used,
+    clippy::expect_used,
+    clippy::panic,
+    reason = "shared integration test assertions"
+)]
 
 use std::ffi::OsStr;
 use std::fs;
@@ -208,6 +214,94 @@ impl Fixture {
 
 pub(crate) fn command() -> Command {
     Command::new(env!("CARGO_BIN_EXE_cargo-temper"))
+}
+
+/// Asserts one interposed stage recorded the expected private protocol and a
+/// complete capture aggregate that injected the phase controls on target
+/// compilations only.
+pub(crate) fn assert_interposed_stage(build: &Value, stage: &str, injected: &[&str]) {
+    let injected = serde_json::to_value(injected).expect("injected flag list");
+    assert_eq!(build["outcome"], "built", "{stage} must have been built");
+    let interposition = &build["interposition"];
+    assert_eq!(interposition["protocol"], "temper-rustc-shim-1");
+    assert_eq!(interposition["normalization"], 1);
+    assert_eq!(interposition["stage"], stage);
+    assert_eq!(interposition["injected_flags"], injected);
+    let evidence = &build["compiler_evidence"];
+    assert_eq!(evidence["stage"], stage);
+    assert_eq!(evidence["injected_flags"], injected);
+    let target_compilations = evidence["target_compilations"]
+        .as_u64()
+        .expect("target compilation count");
+    assert!(
+        target_compilations > 0,
+        "{stage} observed no target compilation"
+    );
+    let expected_injections = if injected == serde_json::json!([]) {
+        0
+    } else {
+        target_compilations
+    };
+    assert_eq!(
+        evidence["injected_invocations"].as_u64(),
+        Some(expected_injections),
+        "{stage} injected the wrong number of invocations"
+    );
+    assert!(
+        evidence["capture_digest"]
+            .as_str()
+            .is_some_and(|digest| digest.len() == 64)
+    );
+    assert!(
+        evidence["record_count"]
+            .as_u64()
+            .is_some_and(|count| count >= target_compilations)
+    );
+    // Persisted evidence stays inside the documented per-stage budget.
+    assert!(
+        evidence["record_count"]
+            .as_u64()
+            .is_some_and(|count| count <= 10_000)
+    );
+    assert!(
+        evidence["capture_bytes"]
+            .as_u64()
+            .is_some_and(|bytes| bytes <= 32 * 1024 * 1024)
+    );
+}
+
+/// Every capture record one interposed stage persisted, ordered by record
+/// identity exactly as the parent aggregates them.
+pub(crate) fn capture_records(run_directory: &Path, stage: &str) -> Vec<Value> {
+    let directory = run_directory.join("captures").join(stage);
+    let mut paths: Vec<PathBuf> = fs::read_dir(&directory)
+        .unwrap_or_else(|error| panic!("read {} captures: {error}", directory.display()))
+        .map(|entry| entry.expect("capture entry").path())
+        .collect();
+    paths.sort();
+    paths
+        .iter()
+        .map(|path| {
+            serde_json::from_slice(&fs::read(path).expect("read capture record"))
+                .expect("parse capture record")
+        })
+        .collect()
+}
+
+/// The digest a shim record carries for one whole compiler argument.
+///
+/// It reproduces the shim's length framing independently, so an ordered
+/// argument assertion never trusts the digest the shim wrote about itself.
+pub(crate) fn argument_digest(argument: &str) -> String {
+    use sha2::{Digest, Sha256};
+    let bytes = argument.as_bytes();
+    let mut hasher = Sha256::new();
+    hasher.update(1_u64.to_be_bytes());
+    hasher.update((bytes.len() as u64).to_be_bytes());
+    hasher.update(bytes);
+    let mut digest = format!("{:x}", hasher.finalize());
+    digest.truncate(16);
+    digest
 }
 
 pub(crate) fn stdout(output: &Output) -> String {

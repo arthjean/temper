@@ -5,8 +5,13 @@ version = 4
 name = "pgo-workspace-app"
 version = "0.1.0"
 dependencies = [
+ "pgo-workspace-support",
  "temper-macro",
 ]
+
+[[package]]
+name = "pgo-workspace-support"
+version = "0.1.0"
 
 [[package]]
 name = "temper-macro"

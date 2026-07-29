@@ -6,5 +6,6 @@ publish = false
 build = "build.rs"
 
 [dependencies]
+pgo-workspace-support = { path = "../support" }
 temper-macro = { path = "../temper-macro" }
 

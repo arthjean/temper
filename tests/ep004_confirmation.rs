@@ -79,10 +79,13 @@ fn aa_confirmation_is_a_successful_no_improvement_json_run() {
 #[test]
 fn confirmed_candidate_is_promoted_with_matching_identity_and_latest_pointer() {
     let fixture = Fixture::single("confirmed-promotion", true, true);
+    // The absolute durations are large enough that per-invocation process
+    // noise on a loaded test host stays well inside the measurement-v1
+    // dispersion gate; the 5:1 contrast is what forces the decision.
     let workload = OsStr::new(
         "case \"$TEMPER_BINARY\" in \
-         */confirmation/baseline/*|*/target/baseline/*) sleep 0.05 ;; \
-         *) sleep 0.01 ;; \
+         */confirmation/baseline/*|*/target/baseline/*) sleep 0.15 ;; \
+         *) sleep 0.03 ;; \
          esac",
     );
     let output =
@@ -203,10 +206,13 @@ fn latest_precommit_failure_rolls_back_the_promoted_artifact_and_manifest_state(
     fs::write(temper_directory.join("latest.json"), previous_latest)
         .expect("seed previous latest pointer");
 
+    // The absolute durations are large enough that per-invocation process
+    // noise on a loaded test host stays well inside the measurement-v1
+    // dispersion gate; the 5:1 contrast is what forces the decision.
     let workload = OsStr::new(
         "case \"$TEMPER_BINARY\" in \
-         */confirmation/baseline/*|*/target/baseline/*) sleep 0.05 ;; \
-         *) sleep 0.01 ;; \
+         */confirmation/baseline/*|*/target/baseline/*) sleep 0.15 ;; \
+         *) sleep 0.03 ;; \
          esac",
     );
     let child = command()
@@ -254,10 +260,13 @@ fn promotion_reserve_creation_failure_activates_the_preallocated_failed_manifest
     let previous_latest = b"{\"sentinel\":\"previous latest\"}\n";
     fs::write(temper_directory.join("latest.json"), previous_latest)
         .expect("seed previous latest pointer");
+    // The absolute durations are large enough that per-invocation process
+    // noise on a loaded test host stays well inside the measurement-v1
+    // dispersion gate; the 5:1 contrast is what forces the decision.
     let workload = OsStr::new(
         "case \"$TEMPER_BINARY\" in \
-         */confirmation/baseline/*|*/target/baseline/*) sleep 0.05 ;; \
-         *) sleep 0.01 ;; \
+         */confirmation/baseline/*|*/target/baseline/*) sleep 0.15 ;; \
+         *) sleep 0.03 ;; \
          esac",
     );
     let child = command()
@@ -339,10 +348,13 @@ fn sigint_during_promotion_is_end_to_end_atomic() {
     fs::write(temper_directory.join("latest.json"), previous_latest)
         .expect("seed previous latest pointer");
 
+    // The absolute durations are large enough that per-invocation process
+    // noise on a loaded test host stays well inside the measurement-v1
+    // dispersion gate; the 5:1 contrast is what forces the decision.
     let workload = OsStr::new(
         "case \"$TEMPER_BINARY\" in \
-         */confirmation/baseline/*|*/target/baseline/*) sleep 0.05 ;; \
-         *) sleep 0.01 ;; \
+         */confirmation/baseline/*|*/target/baseline/*) sleep 0.15 ;; \
+         *) sleep 0.03 ;; \
          esac",
     );
     let mut child = command()

@@ -25,10 +25,10 @@
     {
       "id": "EP-003",
       "title": "Publish schema-3 observed compiler parity",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "stories_total": 3,
-      "stories_done": 0
+      "stories_done": 3
     },
     {
       "id": "EP-004",
@@ -141,43 +141,43 @@
       "id": "US-008",
       "title": "Version the config graph and compiler evidence as schema 3",
       "epic": "EP-003",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "size": "L",
       "blocked_by": [
         "US-006"
       ],
-      "started_at": null,
-      "completed_at": null,
+      "started_at": "2026-07-29",
+      "completed_at": "2026-07-29",
       "reviewed_at": null
     },
     {
       "id": "US-009",
       "title": "Compute strict compiler parity after PGO execution",
       "epic": "EP-003",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "size": "L",
       "blocked_by": [
         "US-007",
         "US-008"
       ],
-      "started_at": null,
-      "completed_at": null,
+      "started_at": "2026-07-29",
+      "completed_at": "2026-07-29",
       "reviewed_at": null
     },
     {
       "id": "US-010",
       "title": "Report actionable fail-closed compiler decisions",
       "epic": "EP-003",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "size": "M",
       "blocked_by": [
         "US-009"
       ],
-      "started_at": null,
-      "completed_at": null,
+      "started_at": "2026-07-29",
+      "completed_at": "2026-07-29",
       "reviewed_at": null
     },
     {

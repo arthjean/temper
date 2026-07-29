@@ -89,6 +89,15 @@ pub(crate) const CAPTURE_LIMIT_REASON: &str = "compiler_capture_limit";
 pub(crate) const INJECTION_UNEXPECTED_REASON: &str = "compiler_injection_unexpected";
 pub(crate) const PROTOCOL_FAILURE_REASON: &str = "compiler_protocol_failure";
 
+/// Reasons the shim itself refused to execute rustc. They are the cause of the
+/// nonzero Cargo exit they produce, so they must survive it instead of being
+/// reported as the ordinary build failure they caused.
+pub(crate) const SHIM_ABORT_REASONS: [&str; 3] = [
+    INPUT_CONFLICT_REASON,
+    INPUT_AMBIGUITY_REASON,
+    PROTOCOL_FAILURE_REASON,
+];
+
 /// Compiler-input reasons a build failure must surface unchanged, so an
 /// interposition or evidence defect is never reported as a plain build failure.
 pub(crate) const COMPILER_INPUT_REASONS: [&str; 7] = [

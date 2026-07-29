@@ -373,16 +373,36 @@ pub(crate) fn build(
         ));
     }
     if !status.success() {
+        // A shim that refused an unsupported compiler input aborts the compile
+        // and therefore makes Cargo exit nonzero. Its stable reason is the
+        // cause, so it survives the build failure it produced. Every other
+        // capture defect leaves the ordinary Cargo reason in place.
+        let shim_abort = match &capture {
+            CaptureOutcome::Failed(failure)
+                if interposition::SHIM_ABORT_REASONS.contains(&failure.reason) =>
+            {
+                Some((failure.reason, failure.message.clone()))
+            }
+            _ => None,
+        };
+        let (reason, message, evidence) = match shim_abort {
+            Some((reason, message)) => (reason, message, None),
+            None => (
+                "cargo_build_failed",
+                format!(
+                    "Cargo build failed for {}; see bounded diagnostics.",
+                    plan.strategy.canonical_identity()
+                ),
+                capture.evidence(),
+            ),
+        };
         return Err(BuildFailure::with_diagnostics(
             &invocation,
             started,
-            "cargo_build_failed",
-            format!(
-                "Cargo build failed for {}; see bounded diagnostics.",
-                plan.strategy.canonical_identity()
-            ),
+            reason,
+            message,
             diagnostics,
-            capture.evidence(),
+            evidence,
         ));
     }
     let compiler_evidence = match capture {

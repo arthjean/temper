@@ -233,6 +233,13 @@ run, it writes no marker and the parent reports `compiler_capture_missing`
 instead of `compiler_protocol_failure`. The marker sharpens the reason; it is
 never the mechanism that makes a failure closed.
 
+A shim that refuses an invocation aborts the compile, so Cargo exits nonzero.
+`compiler_protocol_failure`, `pgo_compiler_input_conflict` and
+`pgo_compiler_input_ambiguous` are the cause of that exit and therefore replace
+the generic `cargo_build_failed` reason. Every other capture defect leaves the
+Cargo reason in place, because a genuine compilation failure can also produce an
+incomplete capture set.
+
 ## Durability
 
 Durability ordering is unchanged from schema 2. The emergency manifest is

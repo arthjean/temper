@@ -297,7 +297,14 @@ fn collect_corpus_v1_reference_evidence() -> Result<(), String> {
                 &results_root,
                 &Path::new(&case.id).join(format!("run-{run_number}")),
             )?;
-            match collect_one_run(&corpus_root, case, run_number, &run_directory, &identity) {
+            match collect_one_run(
+                &corpus_root,
+                case,
+                REFERENCE_DATE,
+                run_number,
+                &run_directory,
+                &identity,
+            ) {
                 Ok(summary) => completed_runs.push(summary),
                 Err(error) => {
                     write_json(
@@ -342,6 +349,90 @@ fn collect_corpus_v1_reference_evidence() -> Result<(), String> {
                 .filter(|case| case.classification == "synthetic")
                 .count(),
             "aggregate_cross_application_score": Value::Null,
+        }),
+    );
+    Ok(())
+}
+
+/// v0.0.3 US-013: one real corpus-v1 case executed against the release
+/// implementation and retained outside the immutable corpus reference tree.
+///
+/// The corpus contract, its sources, inputs, workloads and existing reference
+/// records are untouched. Each corpus workload remains a bounded local proxy;
+/// nothing here introduces an aggregate score or a representativeness claim.
+#[test]
+#[ignore = "runs one full Temper search; writes retained v0.0.3 evidence when TEMPER_EVIDENCE_DIR is set"]
+fn collect_v003_corpus_case_evidence() -> Result<(), String> {
+    let output_directory = PathBuf::from(
+        std::env::var_os("TEMPER_EVIDENCE_DIR")
+            .expect("TEMPER_EVIDENCE_DIR must name the new dated evidence directory"),
+    );
+    assert!(
+        fs::symlink_metadata(&output_directory).is_err(),
+        "refusing to overwrite retained evidence"
+    );
+    let collection_date = std::env::var("TEMPER_EVIDENCE_DATE")
+        .map_err(|_| "TEMPER_EVIDENCE_DATE must name the evidence date".to_owned())?;
+    let case_id = std::env::var("TEMPER_CORPUS_CASE").unwrap_or_else(|_| "hexyl".to_owned());
+
+    let repository = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let corpus_root = repository.join(CORPUS_PATH);
+    let manifest = validate_manifest_value(repository, repository_manifest())?;
+    let manifest_sha256 = sha256_file(&corpus_root.join("manifest.json"))
+        .map_err(|error| format!("hash corpus manifest: {error}"))?;
+    let case = manifest
+        .cases
+        .iter()
+        .find(|case| case.id == case_id)
+        .ok_or_else(|| format!("corpus-v1 has no case {case_id}"))?;
+    if case.classification != "real" {
+        return Err(format!("{case_id} is not a real corpus-v1 case"));
+    }
+    fs::create_dir_all(&output_directory)
+        .map_err(|error| format!("create evidence directory: {error}"))?;
+
+    let identity = ReferenceIdentity::capture(repository);
+    let metadata = match collect_one_run(
+        &corpus_root,
+        case,
+        &collection_date,
+        1,
+        &output_directory,
+        &identity,
+    ) {
+        Ok(metadata) => metadata,
+        Err(error) => {
+            write_json(
+                &output_directory.join("failure.json"),
+                &json!({"case_id": case.id, "error": error}),
+            );
+            return Err(error);
+        }
+    };
+    if metadata["schema_version"] != 3 {
+        return Err("the corpus case did not produce schema-3 evidence".to_owned());
+    }
+    assert_eq!(
+        sha256_file(&corpus_root.join("manifest.json"))
+            .map_err(|error| format!("re-hash corpus manifest: {error}"))?,
+        manifest_sha256,
+        "corpus manifest changed during collection"
+    );
+    write_json(
+        &output_directory.join("summary.json"),
+        &json!({
+            "evidence_date": collection_date,
+            "classification": "correctness_only",
+            "performance_claim": Value::Null,
+            "workload_class": "bounded_local_proxy",
+            "representativeness_claim": Value::Null,
+            "aggregate_cross_application_score": Value::Null,
+            "corpus_id": manifest.corpus_id,
+            "changelog_version": manifest.changelog_version,
+            "manifest_sha256": manifest_sha256,
+            "case_id": case.id,
+            "temper": identity,
+            "run": metadata,
         }),
     );
     Ok(())
@@ -852,6 +943,7 @@ impl ReferenceIdentity {
 fn collect_one_run(
     corpus_root: &Path,
     case: &CorpusCase,
+    collection_date: &str,
     run_number: u64,
     output_directory: &Path,
     identity: &ReferenceIdentity,
@@ -983,7 +1075,7 @@ fn collect_one_run(
     let audit = recheck_run_checksums(&run)?;
     write_json(&output_directory.join("audit.json"), &audit);
     let metadata = json!({
-        "reference_date": REFERENCE_DATE,
+        "reference_date": collection_date,
         "case_id": case.id,
         "run_number": run_number,
         "corpus_version": "1.0.0",

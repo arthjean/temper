@@ -12,7 +12,7 @@ pub(crate) const DEFAULT_TIMEOUT_SECONDS: u64 = 300;
     bin_name = "cargo temper",
     version,
     about = "Experimental measured optimization for Rust binaries",
-    long_about = "Temper CLI and report schema version 2 are experimental. Interfaces may break during 0.x without a backward-compatibility promise."
+    long_about = "Temper CLI and report schema version 3 are experimental. Interfaces may break during 0.x without a backward-compatibility promise."
 )]
 struct Cli {
     #[command(subcommand)]
@@ -23,7 +23,7 @@ struct Cli {
 enum Command {
     /// Validate a project and build an isolated release baseline.
     ///
-    /// Temper CLI and report schema version 2 are experimental. Interfaces may
+    /// Temper CLI and report schema version 3 are experimental. Interfaces may
     /// break during 0.x without a backward-compatibility promise.
     #[command(override_usage = "cargo temper optimize [OPTIONS] -- <WORKLOAD>...")]
     Optimize(OptimizeArgs),

@@ -417,7 +417,7 @@ dependencies = [
 
 [[package]]
 name = "temper"
-version = "0.0.2"
+version = "0.0.3"
 dependencies = [
  "cargo_metadata",
  "clap",

@@ -8,15 +8,15 @@ compilation strategies, and produce a faster binary only when the improvement
 can be reproduced.
 
 > [!IMPORTANT]
-> Temper v0.0.1 is implemented as an experimental Linux Cargo subcommand. It is
+> Temper v0.0.3 is implemented as an experimental Linux Cargo subcommand. It is
 > installable from source but is not published, licensed for public release, or
 > covered by a stable interface promise.
 
 ## Current implementation
 
-The implemented v0.0.1 loop builds the existing release baseline, screens
-ThinLTO and Fat LTO with one codegen unit, trains one LLVM PGO candidate, and
-promotes a binary only after independent confirmation:
+The implemented loop builds the existing release baseline, screens ThinLTO and
+Fat LTO with one codegen unit, trains one LLVM PGO candidate, and promotes a
+binary only after independent confirmation:
 
 ```shell
 cargo temper optimize \
@@ -25,8 +25,18 @@ cargo temper optimize \
   -- ./scripts/temper-workload --dataset representative
 ```
 
-See the [v0.0.1 user contract](docs/v0.0.1.md), the
-[measurement protocol](docs/measurement-v1.md), and the
+v0.0.3 hands every compiler input back to Cargo. A private compiler shim appends
+the PGO phase controls after Cargo has resolved the project's rustflags, so
+flags reaching rustc through a Cargo `include` file, a cfg-keyed target table or
+the environment are preserved instead of being reconstructed. Parity is then
+decided on the compiler arguments Temper actually observed, and any compiler
+wrapper rejects PGO alone while the static candidates stay eligible.
+
+See the [v0.0.3 release contract](docs/v0.0.3.md), the
+[v0.0.1 user contract](docs/v0.0.1.md), the
+[report schema](docs/schema-v3.md), the
+[measurement protocol](docs/measurement-v1.md), the
+[compatibility matrix](docs/pgo-compatibility-matrix-v1.md), and the
 [verification ledger](docs/verification-v0.0.1.md). The ledger distinguishes
 automated tests, synthetic dogfooding, and performance claims.
 

@@ -1,6 +1,6 @@
 [package]
 name = "temper"
-version = "0.0.2"
+version = "0.0.3"
 edition = "2024"
 description = "Experimental measured optimization for Rust binaries"
 publish = false

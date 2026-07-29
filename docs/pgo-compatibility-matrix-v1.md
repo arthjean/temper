@@ -109,6 +109,23 @@ sample, and leaves built static strategies eligible. The EP-002 matrix helpers
 compare tracked source, manifest and lockfile checksums before and after each
 new supported and profile-boundary execution.
 
+## Known predicate limitation
+
+The matrices above use fixtures Temper controls. Running one real corpus-v1 case
+(`hexyl`) on 2026-07-29 exposed a shape none of them contained: the `rustix`
+build script probes the compiler for the requested target with
+`rustc --crate-type=rlib --emit=metadata --target <triple> --out-dir <build out> -`
+and no `--crate-name`. That is an exact-target compilation `--emit`, so the
+predicate cannot separate it from a real unit and rejects the whole PGO attempt
+with `pgo_compiler_input_ambiguous`. Static candidates stayed eligible and the
+run completed normally, but PGO is unavailable for any dependency tree
+containing such a probe, which includes much of the common CLI ecosystem.
+
+The behaviour is what the PRD specifies: fail closed, never broaden the
+predicate without evidence. The shape is pinned by
+`rejects_ambiguous_target_and_identity_shapes` in `src/interposition.rs` so any
+future widening is a deliberate, evidenced change rather than a silent one.
+
 ## Overhead fixture
 
 The paired cold-build benchmark builds `tests/fixtures/pgo-workspace` (a build

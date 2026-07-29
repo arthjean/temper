@@ -1,0 +1,9 @@
+Temper 0.0.3 schema 3 (experimental)
+baseline: built=101 ms, screening=156921835 ns, dispersion=0.01%
+thin-lto: built=1490 ms, screening=156908934 ns, dispersion=0.02%
+fat-lto-cgu1: built=1579 ms, screening=156896604 ns, dispersion=0.01%
+pgo: built=1686 ms, screening=35550118 ns, dispersion=0.05%
+compiler parity: matched=true, stages=3, differences=none
+confirmation: ratio=0.226755, ci95=[0.226634, 0.226824], dispersion=[0.02%, 0.04%]
+decision: confirmed
+artifact: /tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/best/artifact (8cf18a2bbe7a12a7bca710f49f80479c17fe530b163fcac6d0ec9cc654ccb6cb)

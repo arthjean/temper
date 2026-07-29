@@ -1,0 +1,2 @@
+Temper CLI 0.0.3 and report schema 3 are experimental; 0.x provides no backward-compatibility promise.
+Bounded search complete: baseline median 222687024 ns; selected candidate fat-lto-cgu1.

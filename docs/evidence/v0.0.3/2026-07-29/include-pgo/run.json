@@ -1,0 +1,1231 @@
+{
+  "schema_version": 3,
+  "experimental": true,
+  "compatibility": "No backward-compatibility promise during 0.x.",
+  "cli_version": "0.0.3",
+  "run_id": "1785314226-174831361-2721393",
+  "status": "confirmed",
+  "completed_phases": [
+    "preflight",
+    "baseline_build",
+    "static_builds",
+    "screening",
+    "pgo_training",
+    "pgo_build",
+    "candidate_selection",
+    "confirmation",
+    "promotion"
+  ],
+  "final_decision": "confirmed",
+  "source_reproducibility": "dirty",
+  "request": {
+    "minimum_improvement_percent": 2.0,
+    "timeout_seconds": 300,
+    "workload": {
+      "executable": "/tmp/.tmpv8rUv0/run-candidate",
+      "arguments": []
+    }
+  },
+  "preflight": {
+    "host_triple": "x86_64-unknown-linux-gnu",
+    "kernel": "Linux 7.1.5-200.fc44.x86_64",
+    "cpu_model": "AMD Ryzen 7 7800X3D 8-Core Processor",
+    "logical_core_count": 16,
+    "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+    "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+    "manifest_path": "/tmp/.tmpv8rUv0/Cargo.toml",
+    "lockfile_path": "/tmp/.tmpv8rUv0/Cargo.lock",
+    "lockfile_sha256": "4488f4b280fa156538aea7add202683118c944f36e890049be82c4ca4930f345"
+  },
+  "target": {
+    "package_id": "path+file:///tmp/.tmpv8rUv0#v003-include-evidence@0.1.0",
+    "package_name": "v003-include-evidence",
+    "binary_name": "v003-include-evidence",
+    "workspace_root": "/tmp/.tmpv8rUv0"
+  },
+  "baseline": {
+    "strategy": "baseline",
+    "stage": "baseline",
+    "target_directory": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/baseline",
+    "cargo_arguments": [
+      "build",
+      "--release",
+      "--locked",
+      "--target",
+      "x86_64-unknown-linux-gnu",
+      "--message-format=json",
+      "--package",
+      "v003-include-evidence",
+      "--bin",
+      "v003-include-evidence",
+      "--target-dir",
+      "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/baseline"
+    ],
+    "cargo_config_overrides": [],
+    "interposition": null,
+    "outcome": "built",
+    "executable_path": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/baseline/x86_64-unknown-linux-gnu/release/v003-include-evidence",
+    "sha256": "bd18c057289991f5da674b0a5543313faff5d38f330a0ea71ae4e618052ac5e2",
+    "size_bytes": 445704,
+    "build_duration_ms": 101,
+    "bounded_diagnostics": "build-finished: success=true\n   Compiling v003-include-evidence v0.1.0 (/tmp/.tmpv8rUv0)\n\n    Finished `release` profile [optimized] target(s) in 0.08s\n",
+    "compiler_diagnostics": [],
+    "diagnostics_truncated": false,
+    "compiler_evidence": null
+  },
+  "baseline_measurement": {
+    "sample_durations_ns": [
+      156922565,
+      156900334,
+      156936554,
+      156921835,
+      156946924,
+      156882744,
+      156907565
+    ],
+    "median_duration_ns": 156921835,
+    "relative_mad": 0.00009379829135951667,
+    "outcome": "stable"
+  },
+  "strategies": [
+    {
+      "identity": "thin-lto",
+      "build": {
+        "strategy": "thin-lto",
+        "stage": "static_candidate",
+        "target_directory": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/thin-lto",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "v003-include-evidence",
+          "--bin",
+          "v003-include-evidence",
+          "--target-dir",
+          "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/thin-lto",
+          "--config",
+          "profile.release.lto=\"thin\""
+        ],
+        "cargo_config_overrides": [
+          "profile.release.lto=\"thin\""
+        ],
+        "interposition": null,
+        "outcome": "built",
+        "executable_path": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/thin-lto/x86_64-unknown-linux-gnu/release/v003-include-evidence",
+        "sha256": "e6d346580f352c402379889dc042ba50104aeb8e701c6a8021d478850e13d6a7",
+        "size_bytes": 433672,
+        "build_duration_ms": 1490,
+        "bounded_diagnostics": "build-finished: success=true\n   Compiling v003-include-evidence v0.1.0 (/tmp/.tmpv8rUv0)\n\n    Finished `release` profile [optimized] target(s) in 1.47s\n",
+        "compiler_diagnostics": [],
+        "diagnostics_truncated": false,
+        "compiler_evidence": null
+      },
+      "build_failure": null,
+      "screening": {
+        "sample_durations_ns": [
+          156943784,
+          156821965,
+          156922414,
+          156908934,
+          156878655,
+          156880874,
+          156918174
+        ],
+        "median_duration_ns": 156908934,
+        "relative_mad": 0.00017882984279276283,
+        "outcome": "stable"
+      },
+      "workload_failure": null,
+      "rejection_reason": null
+    },
+    {
+      "identity": "fat-lto-cgu1",
+      "build": {
+        "strategy": "fat-lto-cgu1",
+        "stage": "static_candidate",
+        "target_directory": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/fat-lto-cgu1",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "v003-include-evidence",
+          "--bin",
+          "v003-include-evidence",
+          "--target-dir",
+          "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/fat-lto-cgu1",
+          "--config",
+          "profile.release.lto=\"fat\"",
+          "--config",
+          "profile.release.codegen-units=1"
+        ],
+        "cargo_config_overrides": [
+          "profile.release.lto=\"fat\"",
+          "profile.release.codegen-units=1"
+        ],
+        "interposition": null,
+        "outcome": "built",
+        "executable_path": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/fat-lto-cgu1/x86_64-unknown-linux-gnu/release/v003-include-evidence",
+        "sha256": "05e0b9d49a58ab062e7daeb38975a645d9778bf6144b74e075cae63839c1ef33",
+        "size_bytes": 376992,
+        "build_duration_ms": 1579,
+        "bounded_diagnostics": "build-finished: success=true\n   Compiling v003-include-evidence v0.1.0 (/tmp/.tmpv8rUv0)\n\n    Finished `release` profile [optimized] target(s) in 1.56s\n",
+        "compiler_diagnostics": [],
+        "diagnostics_truncated": false,
+        "compiler_evidence": null
+      },
+      "build_failure": null,
+      "screening": {
+        "sample_durations_ns": [
+          156906504,
+          156861644,
+          156883385,
+          156899504,
+          156896604,
+          156924595,
+          156851034
+        ],
+        "median_duration_ns": 156896604,
+        "relative_mad": 0.0000842529389609988,
+        "outcome": "stable"
+      },
+      "workload_failure": null,
+      "rejection_reason": null
+    },
+    {
+      "identity": "pgo",
+      "build": {
+        "strategy": "pgo",
+        "stage": "pgo_optimized",
+        "target_directory": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/pgo_use",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "v003-include-evidence",
+          "--bin",
+          "v003-include-evidence",
+          "--target-dir",
+          "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/pgo_use",
+          "--config",
+          "profile.release.lto=\"fat\"",
+          "--config",
+          "profile.release.codegen-units=1"
+        ],
+        "cargo_config_overrides": [
+          "profile.release.lto=\"fat\"",
+          "profile.release.codegen-units=1"
+        ],
+        "interposition": {
+          "protocol": "temper-rustc-shim-1",
+          "normalization": 1,
+          "stage": "pgo_use",
+          "shim_executable": "/home/arthur/dev/temper/target/debug/cargo-temper",
+          "shim_sha256": "bccbb28d59144ed677776b5cddb02734e2329a64287f92bd06f7220006c2bd7c",
+          "real_rustc": "/home/arthur/.cargo/bin/rustc",
+          "real_rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+          "capture_directory": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/captures/pgo_use",
+          "profile_path": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/pgo/merged.profdata",
+          "injected_flags": [
+            "profile-use",
+            "pgo-warn-missing-function"
+          ]
+        },
+        "outcome": "built",
+        "executable_path": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/pgo_use/x86_64-unknown-linux-gnu/release/v003-include-evidence",
+        "sha256": "8cf18a2bbe7a12a7bca710f49f80479c17fe530b163fcac6d0ec9cc654ccb6cb",
+        "size_bytes": 373920,
+        "build_duration_ms": 1686,
+        "bounded_diagnostics": "build-finished: success=true\n   Compiling v003-include-evidence v0.1.0 (/tmp/.tmpv8rUv0)\n\n    Finished `release` profile [optimized] target(s) in 1.67s\n",
+        "compiler_diagnostics": [],
+        "diagnostics_truncated": false,
+        "compiler_evidence": {
+          "protocol": "temper-rustc-shim-1",
+          "normalization": 1,
+          "stage": "pgo_use",
+          "record_count": 5,
+          "capture_bytes": 3954,
+          "target_compilations": 1,
+          "host_compilations": 0,
+          "probes": 2,
+          "other_invocations": 2,
+          "injected_invocations": 1,
+          "injected_flags": [
+            "profile-use",
+            "pgo-warn-missing-function"
+          ],
+          "capture_digest": "ced4e1f75300a5b0fbda9acb633af2966b2b45bf391259af13a5a9e34098d6c7"
+        }
+      },
+      "build_failure": null,
+      "screening": {
+        "sample_durations_ns": [
+          35570678,
+          35570708,
+          35481739,
+          35553059,
+          35550118,
+          35540168,
+          35530849
+        ],
+        "median_duration_ns": 35550118,
+        "relative_mad": 0.0005420235173340353,
+        "outcome": "stable"
+      },
+      "workload_failure": null,
+      "rejection_reason": null
+    }
+  ],
+  "pgo_base_strategy": "fat-lto-cgu1",
+  "pgo_training": {
+    "outcome": "trained",
+    "base_strategy": "fat-lto-cgu1",
+    "prerequisites": {
+      "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+      "target_libdir": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+      "real_rustc": "/home/arthur/.cargo/bin/rustc",
+      "real_rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+      "shim_executable": "/home/arthur/dev/temper/target/debug/cargo-temper",
+      "shim_sha256": "bccbb28d59144ed677776b5cddb02734e2329a64287f92bd06f7220006c2bd7c",
+      "shim_protocol": "temper-rustc-shim-1",
+      "config_graph": {
+        "cargo_minor": 97,
+        "include_supported": true,
+        "declares_include": true,
+        "sources": [
+          {
+            "path": "/tmp/.tmpv8rUv0/.cargo/included.toml",
+            "sha256": "256f1142a01eb9bd3c7ae1ef1345880ac6089e7ac93ebf190f16beff0943634b",
+            "discovery": "include",
+            "includes": []
+          },
+          {
+            "path": "/tmp/.tmpv8rUv0/.cargo/config.toml",
+            "sha256": "54a6b559a8d89a6c0168105ecfef30d3a20b78e62b3cbe1bdd71c4363d1793cb",
+            "discovery": "ancestor",
+            "includes": [
+              {
+                "declared": "included.toml",
+                "resolved": "/tmp/.tmpv8rUv0/.cargo/included.toml",
+                "optional": false,
+                "present": true
+              },
+              {
+                "declared": "absent.toml",
+                "resolved": "/tmp/.tmpv8rUv0/.cargo/absent.toml",
+                "optional": true,
+                "present": false
+              }
+            ]
+          }
+        ],
+        "environment_inputs": [
+          {
+            "name": "CARGO_ENCODED_RUSTFLAGS",
+            "presence": "absent",
+            "sha256": null
+          },
+          {
+            "name": "RUSTFLAGS",
+            "presence": "absent",
+            "sha256": null
+          },
+          {
+            "name": "CARGO_BUILD_RUSTFLAGS",
+            "presence": "absent",
+            "sha256": null
+          },
+          {
+            "name": "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS",
+            "presence": "absent",
+            "sha256": null
+          },
+          {
+            "name": "RUSTC",
+            "presence": "absent",
+            "sha256": null
+          },
+          {
+            "name": "RUSTC_WRAPPER",
+            "presence": "absent",
+            "sha256": null
+          },
+          {
+            "name": "RUSTC_WORKSPACE_WRAPPER",
+            "presence": "absent",
+            "sha256": null
+          },
+          {
+            "name": "CARGO_BUILD_RUSTC",
+            "presence": "absent",
+            "sha256": null
+          },
+          {
+            "name": "CARGO_BUILD_RUSTC_WRAPPER",
+            "presence": "absent",
+            "sha256": null
+          },
+          {
+            "name": "CARGO_BUILD_RUSTC_WORKSPACE_WRAPPER",
+            "presence": "absent",
+            "sha256": null
+          },
+          {
+            "name": "CARGO_BUILD_TARGET",
+            "presence": "absent",
+            "sha256": null
+          },
+          {
+            "name": "CARGO_HOME",
+            "presence": "set",
+            "sha256": "e27c277340668098029ae89478295d0faf2b0bad5e66c5ae206efd2309fec80c"
+          }
+        ]
+      },
+      "tool_identity": {
+        "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+        "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+        "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+        "llvm_profdata_sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+        "llvm_profdata_version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+      }
+    },
+    "reference_build": {
+      "strategy": "pgo",
+      "stage": "pgo_reference",
+      "target_directory": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/pgo_reference",
+      "cargo_arguments": [
+        "build",
+        "--release",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--message-format=json",
+        "--package",
+        "v003-include-evidence",
+        "--bin",
+        "v003-include-evidence",
+        "--target-dir",
+        "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/pgo_reference",
+        "--config",
+        "profile.release.lto=\"fat\"",
+        "--config",
+        "profile.release.codegen-units=1"
+      ],
+      "cargo_config_overrides": [
+        "profile.release.lto=\"fat\"",
+        "profile.release.codegen-units=1"
+      ],
+      "interposition": {
+        "protocol": "temper-rustc-shim-1",
+        "normalization": 1,
+        "stage": "pgo_reference",
+        "shim_executable": "/home/arthur/dev/temper/target/debug/cargo-temper",
+        "shim_sha256": "bccbb28d59144ed677776b5cddb02734e2329a64287f92bd06f7220006c2bd7c",
+        "real_rustc": "/home/arthur/.cargo/bin/rustc",
+        "real_rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+        "capture_directory": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/captures/pgo_reference",
+        "profile_path": null,
+        "injected_flags": []
+      },
+      "outcome": "built",
+      "executable_path": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/pgo_reference/x86_64-unknown-linux-gnu/release/v003-include-evidence",
+      "sha256": "05e0b9d49a58ab062e7daeb38975a645d9778bf6144b74e075cae63839c1ef33",
+      "size_bytes": 376992,
+      "build_duration_ms": 1587,
+      "bounded_diagnostics": "build-finished: success=true\n   Compiling v003-include-evidence v0.1.0 (/tmp/.tmpv8rUv0)\n\n    Finished `release` profile [optimized] target(s) in 1.57s\n",
+      "compiler_diagnostics": [],
+      "diagnostics_truncated": false,
+      "compiler_evidence": {
+        "protocol": "temper-rustc-shim-1",
+        "normalization": 1,
+        "stage": "pgo_reference",
+        "record_count": 5,
+        "capture_bytes": 3943,
+        "target_compilations": 1,
+        "host_compilations": 0,
+        "probes": 2,
+        "other_invocations": 2,
+        "injected_invocations": 0,
+        "injected_flags": [],
+        "capture_digest": "60f7c197c5b89a736c4a59d5eb8362588a3fd90c3135069cae6bd093428c82f2"
+      }
+    },
+    "reference_failure": null,
+    "instrumentation_build": {
+      "strategy": "pgo",
+      "stage": "pgo_instrumentation",
+      "target_directory": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/pgo_generate",
+      "cargo_arguments": [
+        "build",
+        "--release",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--message-format=json",
+        "--package",
+        "v003-include-evidence",
+        "--bin",
+        "v003-include-evidence",
+        "--target-dir",
+        "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/pgo_generate",
+        "--config",
+        "profile.release.lto=\"fat\"",
+        "--config",
+        "profile.release.codegen-units=1"
+      ],
+      "cargo_config_overrides": [
+        "profile.release.lto=\"fat\"",
+        "profile.release.codegen-units=1"
+      ],
+      "interposition": {
+        "protocol": "temper-rustc-shim-1",
+        "normalization": 1,
+        "stage": "pgo_generate",
+        "shim_executable": "/home/arthur/dev/temper/target/debug/cargo-temper",
+        "shim_sha256": "bccbb28d59144ed677776b5cddb02734e2329a64287f92bd06f7220006c2bd7c",
+        "real_rustc": "/home/arthur/.cargo/bin/rustc",
+        "real_rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+        "capture_directory": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/captures/pgo_generate",
+        "profile_path": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/pgo/raw",
+        "injected_flags": [
+          "profile-generate"
+        ]
+      },
+      "outcome": "built",
+      "executable_path": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/pgo_generate/x86_64-unknown-linux-gnu/release/v003-include-evidence",
+      "sha256": "06146b016e0b23730da7df2411dc412d1a8f932407be48affd02acc44ae42f66",
+      "size_bytes": 452648,
+      "build_duration_ms": 1640,
+      "bounded_diagnostics": "build-finished: success=true\n   Compiling v003-include-evidence v0.1.0 (/tmp/.tmpv8rUv0)\n\n    Finished `release` profile [optimized] target(s) in 1.62s\n",
+      "compiler_diagnostics": [],
+      "diagnostics_truncated": false,
+      "compiler_evidence": {
+        "protocol": "temper-rustc-shim-1",
+        "normalization": 1,
+        "stage": "pgo_generate",
+        "record_count": 5,
+        "capture_bytes": 3956,
+        "target_compilations": 1,
+        "host_compilations": 0,
+        "probes": 2,
+        "other_invocations": 2,
+        "injected_invocations": 1,
+        "injected_flags": [
+          "profile-generate"
+        ],
+        "capture_digest": "5ef660bb98f321a8b41596219063ef6a26eb96d00c3f21d2dcc292ca2cd879ba"
+      }
+    },
+    "instrumentation_failure": null,
+    "training_duration_ns": 157000474,
+    "raw_profile_files": [
+      {
+        "path": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/pgo/raw/temper-12844476302171488737_0-2723911.profraw",
+        "size_bytes": 872,
+        "sha256": "c25ce78f635a0e092c10b6e43f0bbf1fcbc3e03b95dedb43b288abbe26949399"
+      }
+    ],
+    "merge": {
+      "outcome": "merged",
+      "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+      "arguments": [
+        "merge",
+        "--failure-mode=any",
+        "-o",
+        "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/pgo/merged.profdata",
+        "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/pgo/raw/temper-12844476302171488737_0-2723911.profraw"
+      ],
+      "profraw_files": [
+        {
+          "path": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/pgo/raw/temper-12844476302171488737_0-2723911.profraw",
+          "size_bytes": 872,
+          "sha256": "c25ce78f635a0e092c10b6e43f0bbf1fcbc3e03b95dedb43b288abbe26949399"
+        }
+      ],
+      "profdata_path": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/pgo/merged.profdata",
+      "profdata_size_bytes": 1752,
+      "profdata_sha256": "975d969a449ceb6a4c0bd493de447c401c429a5389f8c62b1441674d80fc3129",
+      "bounded_diagnostics": "",
+      "diagnostics_truncated": false,
+      "message": null
+    },
+    "phase_parity": {
+      "permitted_differences": [
+        "interposition_stage",
+        "target_directory",
+        "capture_directory",
+        "profile_generate_vs_use",
+        "pgo_warn_missing_function_in_use"
+      ],
+      "reference": {
+        "package_id": "path+file:///tmp/.tmpv8rUv0#v003-include-evidence@0.1.0",
+        "binary_target": "v003-include-evidence",
+        "target_triple": "x86_64-unknown-linux-gnu",
+        "stage": "pgo_reference",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "v003-include-evidence",
+          "--bin",
+          "v003-include-evidence",
+          "--target-dir",
+          "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/pgo_reference",
+          "--config",
+          "profile.release.lto=\"fat\"",
+          "--config",
+          "profile.release.codegen-units=1"
+        ],
+        "base_profile_overrides": [
+          "profile.release.lto=\"fat\"",
+          "profile.release.codegen-units=1"
+        ],
+        "config_graph": {
+          "cargo_minor": 97,
+          "include_supported": true,
+          "declares_include": true,
+          "sources": [
+            {
+              "path": "/tmp/.tmpv8rUv0/.cargo/included.toml",
+              "sha256": "256f1142a01eb9bd3c7ae1ef1345880ac6089e7ac93ebf190f16beff0943634b",
+              "discovery": "include",
+              "includes": []
+            },
+            {
+              "path": "/tmp/.tmpv8rUv0/.cargo/config.toml",
+              "sha256": "54a6b559a8d89a6c0168105ecfef30d3a20b78e62b3cbe1bdd71c4363d1793cb",
+              "discovery": "ancestor",
+              "includes": [
+                {
+                  "declared": "included.toml",
+                  "resolved": "/tmp/.tmpv8rUv0/.cargo/included.toml",
+                  "optional": false,
+                  "present": true
+                },
+                {
+                  "declared": "absent.toml",
+                  "resolved": "/tmp/.tmpv8rUv0/.cargo/absent.toml",
+                  "optional": true,
+                  "present": false
+                }
+              ]
+            }
+          ],
+          "environment_inputs": [
+            {
+              "name": "CARGO_ENCODED_RUSTFLAGS",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "RUSTFLAGS",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "CARGO_BUILD_RUSTFLAGS",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "RUSTC",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "RUSTC_WRAPPER",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "RUSTC_WORKSPACE_WRAPPER",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "CARGO_BUILD_RUSTC",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "CARGO_BUILD_RUSTC_WRAPPER",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "CARGO_BUILD_RUSTC_WORKSPACE_WRAPPER",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "CARGO_BUILD_TARGET",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "CARGO_HOME",
+              "presence": "set",
+              "sha256": "e27c277340668098029ae89478295d0faf2b0bad5e66c5ae206efd2309fec80c"
+            }
+          ]
+        },
+        "cargo_identity": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+        "rustc_identity": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+        "llvm_profdata_identity": {
+          "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+          "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+          "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "llvm_profdata_sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+          "llvm_profdata_version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+        },
+        "real_rustc": "/home/arthur/.cargo/bin/rustc",
+        "shim_executable": "/home/arthur/dev/temper/target/debug/cargo-temper",
+        "injected_flags": [],
+        "target_directory": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/pgo_reference",
+        "capture_directory": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/captures/pgo_reference"
+      },
+      "instrumentation": {
+        "package_id": "path+file:///tmp/.tmpv8rUv0#v003-include-evidence@0.1.0",
+        "binary_target": "v003-include-evidence",
+        "target_triple": "x86_64-unknown-linux-gnu",
+        "stage": "pgo_generate",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "v003-include-evidence",
+          "--bin",
+          "v003-include-evidence",
+          "--target-dir",
+          "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/pgo_generate",
+          "--config",
+          "profile.release.lto=\"fat\"",
+          "--config",
+          "profile.release.codegen-units=1"
+        ],
+        "base_profile_overrides": [
+          "profile.release.lto=\"fat\"",
+          "profile.release.codegen-units=1"
+        ],
+        "config_graph": {
+          "cargo_minor": 97,
+          "include_supported": true,
+          "declares_include": true,
+          "sources": [
+            {
+              "path": "/tmp/.tmpv8rUv0/.cargo/included.toml",
+              "sha256": "256f1142a01eb9bd3c7ae1ef1345880ac6089e7ac93ebf190f16beff0943634b",
+              "discovery": "include",
+              "includes": []
+            },
+            {
+              "path": "/tmp/.tmpv8rUv0/.cargo/config.toml",
+              "sha256": "54a6b559a8d89a6c0168105ecfef30d3a20b78e62b3cbe1bdd71c4363d1793cb",
+              "discovery": "ancestor",
+              "includes": [
+                {
+                  "declared": "included.toml",
+                  "resolved": "/tmp/.tmpv8rUv0/.cargo/included.toml",
+                  "optional": false,
+                  "present": true
+                },
+                {
+                  "declared": "absent.toml",
+                  "resolved": "/tmp/.tmpv8rUv0/.cargo/absent.toml",
+                  "optional": true,
+                  "present": false
+                }
+              ]
+            }
+          ],
+          "environment_inputs": [
+            {
+              "name": "CARGO_ENCODED_RUSTFLAGS",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "RUSTFLAGS",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "CARGO_BUILD_RUSTFLAGS",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "RUSTC",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "RUSTC_WRAPPER",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "RUSTC_WORKSPACE_WRAPPER",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "CARGO_BUILD_RUSTC",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "CARGO_BUILD_RUSTC_WRAPPER",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "CARGO_BUILD_RUSTC_WORKSPACE_WRAPPER",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "CARGO_BUILD_TARGET",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "CARGO_HOME",
+              "presence": "set",
+              "sha256": "e27c277340668098029ae89478295d0faf2b0bad5e66c5ae206efd2309fec80c"
+            }
+          ]
+        },
+        "cargo_identity": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+        "rustc_identity": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+        "llvm_profdata_identity": {
+          "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+          "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+          "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "llvm_profdata_sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+          "llvm_profdata_version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+        },
+        "real_rustc": "/home/arthur/.cargo/bin/rustc",
+        "shim_executable": "/home/arthur/dev/temper/target/debug/cargo-temper",
+        "injected_flags": [
+          "profile-generate"
+        ],
+        "target_directory": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/pgo_generate",
+        "capture_directory": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/captures/pgo_generate"
+      },
+      "optimization": {
+        "package_id": "path+file:///tmp/.tmpv8rUv0#v003-include-evidence@0.1.0",
+        "binary_target": "v003-include-evidence",
+        "target_triple": "x86_64-unknown-linux-gnu",
+        "stage": "pgo_use",
+        "cargo_arguments": [
+          "build",
+          "--release",
+          "--locked",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--message-format=json",
+          "--package",
+          "v003-include-evidence",
+          "--bin",
+          "v003-include-evidence",
+          "--target-dir",
+          "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/pgo_use",
+          "--config",
+          "profile.release.lto=\"fat\"",
+          "--config",
+          "profile.release.codegen-units=1"
+        ],
+        "base_profile_overrides": [
+          "profile.release.lto=\"fat\"",
+          "profile.release.codegen-units=1"
+        ],
+        "config_graph": {
+          "cargo_minor": 97,
+          "include_supported": true,
+          "declares_include": true,
+          "sources": [
+            {
+              "path": "/tmp/.tmpv8rUv0/.cargo/included.toml",
+              "sha256": "256f1142a01eb9bd3c7ae1ef1345880ac6089e7ac93ebf190f16beff0943634b",
+              "discovery": "include",
+              "includes": []
+            },
+            {
+              "path": "/tmp/.tmpv8rUv0/.cargo/config.toml",
+              "sha256": "54a6b559a8d89a6c0168105ecfef30d3a20b78e62b3cbe1bdd71c4363d1793cb",
+              "discovery": "ancestor",
+              "includes": [
+                {
+                  "declared": "included.toml",
+                  "resolved": "/tmp/.tmpv8rUv0/.cargo/included.toml",
+                  "optional": false,
+                  "present": true
+                },
+                {
+                  "declared": "absent.toml",
+                  "resolved": "/tmp/.tmpv8rUv0/.cargo/absent.toml",
+                  "optional": true,
+                  "present": false
+                }
+              ]
+            }
+          ],
+          "environment_inputs": [
+            {
+              "name": "CARGO_ENCODED_RUSTFLAGS",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "RUSTFLAGS",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "CARGO_BUILD_RUSTFLAGS",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "RUSTC",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "RUSTC_WRAPPER",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "RUSTC_WORKSPACE_WRAPPER",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "CARGO_BUILD_RUSTC",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "CARGO_BUILD_RUSTC_WRAPPER",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "CARGO_BUILD_RUSTC_WORKSPACE_WRAPPER",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "CARGO_BUILD_TARGET",
+              "presence": "absent",
+              "sha256": null
+            },
+            {
+              "name": "CARGO_HOME",
+              "presence": "set",
+              "sha256": "e27c277340668098029ae89478295d0faf2b0bad5e66c5ae206efd2309fec80c"
+            }
+          ]
+        },
+        "cargo_identity": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+        "rustc_identity": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+        "llvm_profdata_identity": {
+          "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+          "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+          "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "llvm_profdata_sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+          "llvm_profdata_version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+        },
+        "real_rustc": "/home/arthur/.cargo/bin/rustc",
+        "shim_executable": "/home/arthur/dev/temper/target/debug/cargo-temper",
+        "injected_flags": [
+          "profile-use",
+          "pgo-warn-missing-function"
+        ],
+        "target_directory": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/pgo_use",
+        "capture_directory": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/captures/pgo_use"
+      },
+      "matched": true,
+      "unexpected_differences": []
+    },
+    "failure_stage": null,
+    "rejection_reason": null,
+    "rejection_source": null,
+    "message": null,
+    "remediation": null
+  },
+  "compiler_parity": {
+    "normalization": 1,
+    "scope": "pgo_training",
+    "allowlist": [
+      "stage_target_root_paths",
+      "profile_generate_vs_profile_use",
+      "pgo_warn_missing_function_in_use"
+    ],
+    "stages": [
+      {
+        "stage": "pgo_reference",
+        "record_count": 5,
+        "target_compilations": 1,
+        "capture_digest": "60f7c197c5b89a736c4a59d5eb8362588a3fd90c3135069cae6bd093428c82f2",
+        "normalized_aggregate_digest": "60a8ee33db06f7fbc677344690be8fcaff5181f3ede53a1dbfa4f02430dc235d"
+      },
+      {
+        "stage": "pgo_generate",
+        "record_count": 5,
+        "target_compilations": 1,
+        "capture_digest": "5ef660bb98f321a8b41596219063ef6a26eb96d00c3f21d2dcc292ca2cd879ba",
+        "normalized_aggregate_digest": "60a8ee33db06f7fbc677344690be8fcaff5181f3ede53a1dbfa4f02430dc235d"
+      },
+      {
+        "stage": "pgo_use",
+        "record_count": 5,
+        "target_compilations": 1,
+        "capture_digest": "ced4e1f75300a5b0fbda9acb633af2966b2b45bf391259af13a5a9e34098d6c7",
+        "normalized_aggregate_digest": "60a8ee33db06f7fbc677344690be8fcaff5181f3ede53a1dbfa4f02430dc235d"
+      }
+    ],
+    "matched": true,
+    "reason": null,
+    "differences": [],
+    "differences_truncated": false
+  },
+  "compiler_decisions": [],
+  "selected_candidate": "pgo",
+  "confirmation": {
+    "strategy": "pgo",
+    "outcome": "accepted",
+    "baseline_build": {
+      "strategy": "baseline",
+      "stage": "confirmation",
+      "target_directory": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/confirmation/baseline",
+      "cargo_arguments": [
+        "build",
+        "--release",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--message-format=json",
+        "--package",
+        "v003-include-evidence",
+        "--bin",
+        "v003-include-evidence",
+        "--target-dir",
+        "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/confirmation/baseline"
+      ],
+      "cargo_config_overrides": [],
+      "interposition": null,
+      "outcome": "built",
+      "executable_path": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/confirmation/baseline/x86_64-unknown-linux-gnu/release/v003-include-evidence",
+      "sha256": "bd18c057289991f5da674b0a5543313faff5d38f330a0ea71ae4e618052ac5e2",
+      "size_bytes": 445704,
+      "build_duration_ms": 95,
+      "bounded_diagnostics": "build-finished: success=true\n   Compiling v003-include-evidence v0.1.0 (/tmp/.tmpv8rUv0)\n\n    Finished `release` profile [optimized] target(s) in 0.08s\n",
+      "compiler_diagnostics": [],
+      "diagnostics_truncated": false,
+      "compiler_evidence": null
+    },
+    "baseline_build_failure": null,
+    "candidate_build": {
+      "strategy": "pgo",
+      "stage": "confirmation",
+      "target_directory": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/confirmation/pgo",
+      "cargo_arguments": [
+        "build",
+        "--release",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--message-format=json",
+        "--package",
+        "v003-include-evidence",
+        "--bin",
+        "v003-include-evidence",
+        "--target-dir",
+        "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/confirmation/pgo",
+        "--config",
+        "profile.release.lto=\"fat\"",
+        "--config",
+        "profile.release.codegen-units=1"
+      ],
+      "cargo_config_overrides": [
+        "profile.release.lto=\"fat\"",
+        "profile.release.codegen-units=1"
+      ],
+      "interposition": {
+        "protocol": "temper-rustc-shim-1",
+        "normalization": 1,
+        "stage": "pgo_confirmation",
+        "shim_executable": "/home/arthur/dev/temper/target/debug/cargo-temper",
+        "shim_sha256": "bccbb28d59144ed677776b5cddb02734e2329a64287f92bd06f7220006c2bd7c",
+        "real_rustc": "/home/arthur/.cargo/bin/rustc",
+        "real_rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+        "capture_directory": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/captures/confirmation/pgo",
+        "profile_path": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/pgo/merged.profdata",
+        "injected_flags": [
+          "profile-use",
+          "pgo-warn-missing-function"
+        ]
+      },
+      "outcome": "built",
+      "executable_path": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/confirmation/pgo/x86_64-unknown-linux-gnu/release/v003-include-evidence",
+      "sha256": "8cf18a2bbe7a12a7bca710f49f80479c17fe530b163fcac6d0ec9cc654ccb6cb",
+      "size_bytes": 373920,
+      "build_duration_ms": 1710,
+      "bounded_diagnostics": "build-finished: success=true\n   Compiling v003-include-evidence v0.1.0 (/tmp/.tmpv8rUv0)\n\n    Finished `release` profile [optimized] target(s) in 1.69s\n",
+      "compiler_diagnostics": [],
+      "diagnostics_truncated": false,
+      "compiler_evidence": {
+        "protocol": "temper-rustc-shim-1",
+        "normalization": 1,
+        "stage": "pgo_confirmation",
+        "record_count": 5,
+        "capture_bytes": 3999,
+        "target_compilations": 1,
+        "host_compilations": 0,
+        "probes": 2,
+        "other_invocations": 2,
+        "injected_invocations": 1,
+        "injected_flags": [
+          "profile-use",
+          "pgo-warn-missing-function"
+        ],
+        "capture_digest": "045d8e826b682cab47200a6e148785c25507c0d711749f2bda3b6dfd675b63e1"
+      }
+    },
+    "candidate_build_failure": null,
+    "measurement": {
+      "baseline_durations_ns": [
+        156978044,
+        156877284,
+        156927814,
+        156912094,
+        156951465,
+        156975155,
+        156955714,
+        156974745,
+        156915814,
+        156927814,
+        156867944,
+        156927924,
+        156989515,
+        156882055,
+        156913704,
+        156875344,
+        156932584,
+        156906494,
+        156902684,
+        156821414
+      ],
+      "candidate_durations_ns": [
+        35571129,
+        35581228,
+        35602589,
+        35586178,
+        35573328,
+        35555228,
+        35581658,
+        35522788,
+        35590488,
+        35616119,
+        35580959,
+        35547298,
+        35576988,
+        35568198,
+        35564088,
+        35538929,
+        35607029,
+        35596198,
+        35589609,
+        35625838
+      ],
+      "median_ratio": 0.22675494478661232,
+      "baseline_relative_mad": 0.00020248937474046788,
+      "candidate_relative_mad": 0.0003934673957317725,
+      "confidence_interval_95": {
+        "lower": 0.22663379260850547,
+        "upper": 0.2268235505929213
+      },
+      "threshold_ratio": 0.98,
+      "outcome": "accepted"
+    },
+    "workload_failure": null,
+    "compiler_parity": {
+      "normalization": 1,
+      "scope": "pgo_confirmation",
+      "allowlist": [
+        "stage_target_root_paths",
+        "profile_generate_vs_profile_use",
+        "pgo_warn_missing_function_in_use"
+      ],
+      "stages": [
+        {
+          "stage": "pgo_use",
+          "record_count": 5,
+          "target_compilations": 1,
+          "capture_digest": "ced4e1f75300a5b0fbda9acb633af2966b2b45bf391259af13a5a9e34098d6c7",
+          "normalized_aggregate_digest": "60a8ee33db06f7fbc677344690be8fcaff5181f3ede53a1dbfa4f02430dc235d"
+        },
+        {
+          "stage": "pgo_confirmation",
+          "record_count": 5,
+          "target_compilations": 1,
+          "capture_digest": "045d8e826b682cab47200a6e148785c25507c0d711749f2bda3b6dfd675b63e1",
+          "normalized_aggregate_digest": "60a8ee33db06f7fbc677344690be8fcaff5181f3ede53a1dbfa4f02430dc235d"
+        }
+      ],
+      "matched": true,
+      "reason": null,
+      "differences": [],
+      "differences_truncated": false
+    },
+    "rejection_reason": null
+  },
+  "promotion": {
+    "source_strategy": "pgo",
+    "source_path": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/target/confirmation/pgo/x86_64-unknown-linux-gnu/release/v003-include-evidence",
+    "source_sha256": "8cf18a2bbe7a12a7bca710f49f80479c17fe530b163fcac6d0ec9cc654ccb6cb",
+    "promoted_path": "/tmp/.tmpv8rUv0/.temper/runs/1785314226-174831361-2721393/best/artifact",
+    "promoted_sha256": "8cf18a2bbe7a12a7bca710f49f80479c17fe530b163fcac6d0ec9cc654ccb6cb",
+    "size_bytes": 373920,
+    "permissions_mode": 493
+  },
+  "failure": null
+}

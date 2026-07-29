@@ -1,0 +1,6 @@
+#!/bin/sh
+case "$TEMPER_BINARY" in
+  */pgo_use/*|*/confirmation/pgo/*) sleep 0.03 ;;
+  *) sleep 0.15 ;;
+esac
+exec "$TEMPER_BINARY"

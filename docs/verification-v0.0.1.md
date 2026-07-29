@@ -446,3 +446,134 @@ caching wrapper is a documented emulation of a build-directory-independent
 cache and not `sccache`; the Cargo feature-version boundary was executed on
 `cargo 1.93.1` only; and nothing in this section measures the runtime of any
 optimized binary.
+
+## 2026-07-29 v0.0.3 EP-004 compatibility matrices and release evidence
+
+This append-only section records the executed EP-004 evidence for
+[`../tasks/prd-temper-v0.0.3.md`](../tasks/prd-temper-v0.0.3.md). It is
+correctness and cost evidence. It contains no optimization-gain claim, no
+aggregate corpus score, and no production-representativeness claim.
+
+| Field | Value |
+|---|---|
+| Tested commit | `f3d3fc53a6d9dc41391790c24c178267aacd606b` |
+| Tested worktree | `src`, `tests`, `Cargo.toml`, `Cargo.lock`, `scripts` and `docs` committed and unmodified; the collectors reported `worktree_dirty` only because they were writing the untracked evidence directory named below |
+| Toolchain | rustc 1.97.1 (8bab26f4f 2026-07-14), LLVM 22.1.6; cargo 1.97.1 (c980f4866 2026-06-30) |
+| Host | Linux 7.1.5-200.fc44.x86_64, `x86_64-unknown-linux-gnu`, AMD Ryzen 7 7800X3D, 16 logical cores |
+| Raw evidence | [`evidence/v0.0.3/2026-07-29`](evidence/v0.0.3/2026-07-29) |
+| Regenerate with | `scripts/collect-v0.0.3-evidence.sh <YYYY-MM-DD>` |
+
+### Quality gates
+
+`cargo fmt --check`, `cargo check --all-targets --locked`,
+`cargo clippy --all-targets --all-features --locked --no-deps -- -D warnings`
+and `cargo test --all-targets --locked` all pass on the tested commit. The test
+suite reports 158 passing and 7 ignored cases; the ignored cases are the
+evidence collectors and the paired overhead benchmark, which the script above
+runs explicitly.
+
+The suite was executed repeatedly while EP-004 roughly doubled its concurrent
+build work, and three separate load-induced failures were observed and fixed
+rather than accepted:
+
+- `ep002_matrix` base-strategy selection and `ep004_confirmation` promotion used
+  workload contrasts whose faster arm had no duration floor, so per-invocation
+  process noise could flip the decision. Both now keep a nonzero floor with
+  wider absolute gaps and the same ratios;
+- `ep001_v002_contract` failed with
+  `Baseline screening was unstable (relative MAD 0.143449)`. The shared fixture
+  helper used `/bin/true`, so screening measured a zero-duration process and its
+  relative median absolute deviation was pure process noise. The default
+  workload is now `/bin/sleep 0.02`, together with every explicit call site that
+  asserts a measured run. Call sites that fail before measurement keep
+  `/bin/true`.
+
+Measurement-v1 is unchanged, and every artifact in a run still executes the same
+workload, so no decision boundary moved. The gate remains genuinely sensitive to
+host load by design: these runs shared the host with an unrelated Rust build,
+and that is what exposed each margin.
+
+### Compatibility matrices
+
+Both matrices in
+[`pgo-compatibility-matrix-v1.md`](pgo-compatibility-matrix-v1.md) pass on the
+toolchain above: 13 Cargo rustflags and `include` provenance cases and 6
+wrapper, isolation and evidence cases, plus the retained v0.0.2 PGO cases.
+
+### Include-based PGO run
+
+Workload class: **synthetic**. The fixture is a single-binary crate whose only
+source of a required target rustflag is a Cargo `include` file and whose source
+fails to compile without it. Its workload sleeps longer for every non-PGO
+artifact so the bounded search reaches confirmation; that path dependence
+manufactures the decision boundary and is coverage evidence only. **The
+confirmation ratio of that run is not an optimization gain and must never be
+cited as one.**
+
+The run (`1785314226-174831361-2721393`) is schema 3, `confirmed`, and records
+four interposed stages, each with exactly one observed target compilation, zero
+host compilations, two passed-through probes, and injected phase controls only
+on `pgo_generate`, `pgo_use` and `pgo_confirmation`. Observed training parity
+and confirmation parity both match, and the config graph records `included.toml`
+before `config.toml` with a missing optional edge. Raw `run.json`, both report
+streams and the hashed fixture sources are retained.
+
+### Paired pass-through overhead
+
+12 paired cold builds of `tests/fixtures/pgo-workspace` with a release
+`cargo-temper` as the interposed compiler, alternating arm order after one
+discarded warm-up pair: **median ratio 1.0348**, range 0.9992 to 1.0992, against
+the 5% budget. Direct and pass-through builds produced the selected executable
+with identical SHA-256 (`0e171fd9…`). Raw per-pair ratios are in
+`overhead.json`. The fixture is small, so per-`exec` cost is amortized over few
+compiler invocations and the figure does not transfer to a large workspace.
+
+### Real corpus-v1 case, and the predicate limitation it exposed
+
+Corpus-v1 case `hexyl` was executed unchanged against the release
+implementation, outside the immutable corpus reference tree. The corpus
+manifest, sources, inputs, workloads and existing 2026-07-28 reference records
+are byte-for-byte untouched. Its workload remains a **bounded local proxy**; no
+representativeness claim and no aggregate cross-application score is introduced.
+
+The run (`1785314254-53154417-2729874`) is schema 3 and completed with
+`no_improvement`, selecting `fat-lto-cgu1` and promoting nothing
+(median ratio 1.000355, 95% CI 1.000069 to 1.022402).
+
+PGO was rejected for that run with one bounded `pgo_compiler_input_ambiguous`
+decision, scoped `pgo_only`. The cause was isolated to a single invocation: the
+`rustix` build script probes the compiler for the requested target with
+
+```text
+rustc --crate-type=rlib --emit=metadata --target x86_64-unknown-linux-gnu \
+      --out-dir <target>/release/build/rustix-<hash>/out -
+```
+
+reading its source from stdin and naming no crate. It carries the exact
+supported target and a compilation `--emit`, so the v0.0.3 predicate cannot
+separate it from a real unit and fails closed rather than guessing, exactly as
+the PRD requires. The consequence is a real product limitation rather than an
+implementation defect: **any dependency tree containing such a build-script
+probe gets static optimization only**, and `rustix` is common in the CLI
+ecosystem. The shape is pinned by
+`rejects_ambiguous_target_and_identity_shapes` in `src/interposition.rs` so a
+future widening of the predicate must be deliberate and separately evidenced.
+
+The same trace showed that the `anyhow`, `thiserror` and `proc-macro2` build
+scripts run target probes that *do* carry `--crate-name`, so they are classified
+as target compilations and would receive phase controls. Their output is
+metadata written into a build-script output directory and discarded, so no
+artifact is affected, but the observation belongs with any future work on the
+predicate.
+
+### Evidence limits
+
+- the include fixture is synthetic and tiny; nothing in this section measures
+  the runtime of any optimized binary;
+- the overhead figure applies to the stated host, toolchain and small fixture
+  only;
+- one corpus case was executed once; that is a schema-3 completeness check, not
+  a benchmark, and no aggregate score exists;
+- the predicate limitation above was found by executing one real case. Other
+  real dependency trees may contain further unclassifiable shapes that no
+  fixture in this repository covers.

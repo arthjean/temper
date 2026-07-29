@@ -1,0 +1,64 @@
+{
+  "aggregate_cross_application_score": null,
+  "case_id": "hexyl",
+  "changelog_version": "1.0.0",
+  "classification": "correctness_only",
+  "corpus_id": "temper-corpus-v1",
+  "evidence_date": "2026-07-29",
+  "manifest_sha256": "e9cfac6901aec96ca3397229817bf8ea84ccb2248c4092b8250dc02ed1caa868",
+  "performance_claim": null,
+  "representativeness_claim": null,
+  "run": {
+    "baseline_screening_median_ns": 222687024,
+    "case_id": "hexyl",
+    "confidence_interval_95": {
+      "lower": 1.00006906981432,
+      "upper": 1.0224023572383625
+    },
+    "confirmation_median_ratio": 1.000354681462274,
+    "corpus_version": "1.0.0",
+    "decision": "insufficient_improvement",
+    "input_sha256": [
+      {
+        "path": "cases/hexyl/source/tests/examples/hello_world_elf64",
+        "sha256": "c6f999f766c94ded605701e5a3ad3aced09796af3410c7d88c6605d0d73edb91"
+      }
+    ],
+    "raw_run_identifier": "1785314254-53154417-2729874",
+    "reference_date": "2026-07-29",
+    "run_number": 1,
+    "schema_version": 3,
+    "selected_candidate": "fat-lto-cgu1",
+    "source_revision": "6ecc29b9c8c84d08a7e860f7f69c22b113b480ea",
+    "source_sha256": "ad5d404a679aa03696e6e38a99e37c369e8be7b95787f93ea90916d7e277bdcd",
+    "status": "no_improvement",
+    "temper": {
+      "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+      "cpu": "AMD Ryzen 7 7800X3D 8-Core Processor",
+      "kernel": "Linux 7.1.5-200.fc44.x86_64 x86_64 GNU/Linux",
+      "llvm": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build.",
+      "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+      "logical_cores": 16,
+      "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+      "temper_commit": "f3d3fc53a6d9dc41391790c24c178267aacd606b",
+      "temper_implementation_sha256": "765eaa9d826b17a386a7b99e418fad8e561f11921c482bba908a4c9d57f91a7c",
+      "temper_worktree_dirty": true
+    },
+    "workload_argv": [
+      "cases/hexyl/workload.sh"
+    ]
+  },
+  "temper": {
+    "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)\nrelease: 1.97.1\ncommit-hash: c980f4866141969fab6254a680546a277789d6f0\ncommit-date: 2026-06-30\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.2 (sys:0.20.4 vendored)\nlibcurl: 8.20.0-DEV (sys:0.4.88+curl-8.20.0 vendored ssl:OpenSSL/3.6.2)\nssl: OpenSSL 3.6.2 7 Apr 2026\nos: Fedora 44.0.0 [64-bit]",
+    "cpu": "AMD Ryzen 7 7800X3D 8-Core Processor",
+    "kernel": "Linux 7.1.5-200.fc44.x86_64 x86_64 GNU/Linux",
+    "llvm": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build.",
+    "llvm_profdata_path": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+    "logical_cores": 16,
+    "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+    "temper_commit": "f3d3fc53a6d9dc41391790c24c178267aacd606b",
+    "temper_implementation_sha256": "765eaa9d826b17a386a7b99e418fad8e561f11921c482bba908a4c9d57f91a7c",
+    "temper_worktree_dirty": true
+  },
+  "workload_class": "bounded_local_proxy"
+}

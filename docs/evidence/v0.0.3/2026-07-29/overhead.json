@@ -1,0 +1,22 @@
+{
+  "artifact_sha256": "0e171fd9100e65b753eacb7ee660f076b113205242c8fe77edb7b963240a755c",
+  "identical_sha256": true,
+  "median_ratio": 1.0348285444739516,
+  "pairs": 12,
+  "ratios": [
+    0.9992351209437685,
+    1.0068737511790709,
+    1.0150288087558847,
+    1.0168146875673454,
+    1.0182192154304384,
+    1.028652153438205,
+    1.0348285444739516,
+    1.041520835007987,
+    1.05277369884448,
+    1.0650981230281493,
+    1.069047674223494,
+    1.0992194241281779
+  ],
+  "real_rustc": "/home/arthur/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+  "shim_executable": "/home/arthur/dev/temper/target/tmp/overhead-shim/release/cargo-temper"
+}

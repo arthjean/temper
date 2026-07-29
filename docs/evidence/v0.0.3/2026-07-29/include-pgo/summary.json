@@ -1,0 +1,198 @@
+{
+  "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+  "classification": "correctness_only",
+  "compiler_parity": {
+    "allowlist": [
+      "stage_target_root_paths",
+      "profile_generate_vs_profile_use",
+      "pgo_warn_missing_function_in_use"
+    ],
+    "differences": [],
+    "differences_truncated": false,
+    "matched": true,
+    "normalization": 1,
+    "reason": null,
+    "scope": "pgo_training",
+    "stages": [
+      {
+        "capture_digest": "60f7c197c5b89a736c4a59d5eb8362588a3fd90c3135069cae6bd093428c82f2",
+        "normalized_aggregate_digest": "60a8ee33db06f7fbc677344690be8fcaff5181f3ede53a1dbfa4f02430dc235d",
+        "record_count": 5,
+        "stage": "pgo_reference",
+        "target_compilations": 1
+      },
+      {
+        "capture_digest": "5ef660bb98f321a8b41596219063ef6a26eb96d00c3f21d2dcc292ca2cd879ba",
+        "normalized_aggregate_digest": "60a8ee33db06f7fbc677344690be8fcaff5181f3ede53a1dbfa4f02430dc235d",
+        "record_count": 5,
+        "stage": "pgo_generate",
+        "target_compilations": 1
+      },
+      {
+        "capture_digest": "ced4e1f75300a5b0fbda9acb633af2966b2b45bf391259af13a5a9e34098d6c7",
+        "normalized_aggregate_digest": "60a8ee33db06f7fbc677344690be8fcaff5181f3ede53a1dbfa4f02430dc235d",
+        "record_count": 5,
+        "stage": "pgo_use",
+        "target_compilations": 1
+      }
+    ]
+  },
+  "config_graph": {
+    "cargo_minor": 97,
+    "declares_include": true,
+    "include_supported": true,
+    "sources": [
+      {
+        "discovery": "include",
+        "includes": [],
+        "path": "/tmp/.tmpv8rUv0/.cargo/included.toml",
+        "sha256": "256f1142a01eb9bd3c7ae1ef1345880ac6089e7ac93ebf190f16beff0943634b"
+      },
+      {
+        "discovery": "ancestor",
+        "includes": [
+          {
+            "declared": "included.toml",
+            "optional": false,
+            "present": true,
+            "resolved": "/tmp/.tmpv8rUv0/.cargo/included.toml"
+          },
+          {
+            "declared": "absent.toml",
+            "optional": true,
+            "present": false,
+            "resolved": "/tmp/.tmpv8rUv0/.cargo/absent.toml"
+          }
+        ],
+        "path": "/tmp/.tmpv8rUv0/.cargo/config.toml",
+        "sha256": "54a6b559a8d89a6c0168105ecfef30d3a20b78e62b3cbe1bdd71c4363d1793cb"
+      }
+    ]
+  },
+  "confirmation_parity": {
+    "allowlist": [
+      "stage_target_root_paths",
+      "profile_generate_vs_profile_use",
+      "pgo_warn_missing_function_in_use"
+    ],
+    "differences": [],
+    "differences_truncated": false,
+    "matched": true,
+    "normalization": 1,
+    "reason": null,
+    "scope": "pgo_confirmation",
+    "stages": [
+      {
+        "capture_digest": "ced4e1f75300a5b0fbda9acb633af2966b2b45bf391259af13a5a9e34098d6c7",
+        "normalized_aggregate_digest": "60a8ee33db06f7fbc677344690be8fcaff5181f3ede53a1dbfa4f02430dc235d",
+        "record_count": 5,
+        "stage": "pgo_use",
+        "target_compilations": 1
+      },
+      {
+        "capture_digest": "045d8e826b682cab47200a6e148785c25507c0d711749f2bda3b6dfd675b63e1",
+        "normalized_aggregate_digest": "60a8ee33db06f7fbc677344690be8fcaff5181f3ede53a1dbfa4f02430dc235d",
+        "record_count": 5,
+        "stage": "pgo_confirmation",
+        "target_compilations": 1
+      }
+    ]
+  },
+  "evidence_date": "2026-07-29",
+  "final_decision": "confirmed",
+  "fixture_files": [
+    {
+      "path": "Cargo.toml",
+      "sha256": "5bc0b7454cec2c6504553d2dc69de8202594960258b3cc7da9d7ae7aefe2678c"
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "4488f4b280fa156538aea7add202683118c944f36e890049be82c4ca4930f345"
+    },
+    {
+      "path": "src/main.rs",
+      "sha256": "061059f86aa5df1e2dcffdcfc966df34f521808798fa3e832893e394b9c04044"
+    },
+    {
+      "path": ".cargo/config.toml",
+      "sha256": "d53e0ec322f7d836144ae74b315c6e1deb09aae084a21c0f31eb2ce88c6b00dd"
+    },
+    {
+      "path": ".cargo/included.toml",
+      "sha256": "aef84b601cb9120d611b6ef01a08a169cdbda24abff3560f2edbec05ac207316"
+    },
+    {
+      "path": "run-candidate",
+      "sha256": "83e625c99fe935b49787dc409720b3bb478dd4a63b71c55c149079248b615b5f"
+    }
+  ],
+  "interposition": {
+    "normalization": 1,
+    "protocol": "temper-rustc-shim-1",
+    "real_rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+    "shim_sha256": "bccbb28d59144ed677776b5cddb02734e2329a64287f92bd06f7220006c2bd7c"
+  },
+  "kernel": "Linux 7.1.5-200.fc44.x86_64 x86_64",
+  "performance_claim": null,
+  "promoted_sha256": "8cf18a2bbe7a12a7bca710f49f80479c17fe530b163fcac6d0ec9cc654ccb6cb",
+  "representativeness_claim": null,
+  "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+  "schema_version": 3,
+  "selected_candidate": "pgo",
+  "sentinel_cfg": "temper_included_sentinel",
+  "stages": [
+    {
+      "artifact_sha256": "05e0b9d49a58ab062e7daeb38975a645d9778bf6144b74e075cae63839c1ef33",
+      "capture_digest": "60f7c197c5b89a736c4a59d5eb8362588a3fd90c3135069cae6bd093428c82f2",
+      "expected_injected_flags": [],
+      "host_compilations": 0,
+      "injected_invocations": 0,
+      "probes": 2,
+      "stage": "pgo_reference",
+      "target_compilations": 1
+    },
+    {
+      "artifact_sha256": "06146b016e0b23730da7df2411dc412d1a8f932407be48affd02acc44ae42f66",
+      "capture_digest": "5ef660bb98f321a8b41596219063ef6a26eb96d00c3f21d2dcc292ca2cd879ba",
+      "expected_injected_flags": [
+        "profile-generate"
+      ],
+      "host_compilations": 0,
+      "injected_invocations": 1,
+      "probes": 2,
+      "stage": "pgo_generate",
+      "target_compilations": 1
+    },
+    {
+      "artifact_sha256": "8cf18a2bbe7a12a7bca710f49f80479c17fe530b163fcac6d0ec9cc654ccb6cb",
+      "capture_digest": "ced4e1f75300a5b0fbda9acb633af2966b2b45bf391259af13a5a9e34098d6c7",
+      "expected_injected_flags": [
+        "profile-use",
+        "pgo-warn-missing-function"
+      ],
+      "host_compilations": 0,
+      "injected_invocations": 1,
+      "probes": 2,
+      "stage": "pgo_use",
+      "target_compilations": 1
+    },
+    {
+      "artifact_sha256": "8cf18a2bbe7a12a7bca710f49f80479c17fe530b163fcac6d0ec9cc654ccb6cb",
+      "capture_digest": "045d8e826b682cab47200a6e148785c25507c0d711749f2bda3b6dfd675b63e1",
+      "expected_injected_flags": [
+        "profile-use",
+        "pgo-warn-missing-function"
+      ],
+      "host_compilations": 0,
+      "injected_invocations": 1,
+      "probes": 2,
+      "stage": "pgo_confirmation",
+      "target_compilations": 1
+    }
+  ],
+  "status": "confirmed",
+  "tested_commit": "f3d3fc53a6d9dc41391790c24c178267aacd606b",
+  "workload": "synthetic sentinel-guarded fixture; the workload only executes the built binary",
+  "workload_class": "synthetic",
+  "worktree_dirty": true
+}
